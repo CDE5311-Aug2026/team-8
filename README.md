@@ -34,4 +34,3 @@ No desktop frame or responsive constraints were exposed. On wide screens the mob
 TypeScript passed. The production assets were built with Vite using a temporary Babel transform because this environment blocks Vite's esbuild subprocess. The shipped Vite configuration remains standard. The browser walkthrough covers the sample flow, details confirmation, story editing, review, packaging, saving and local publishing. Assets and fonts are bundled for offline use after installation/build.
 
 The prototype source is maintained in the Farmily repository. Publishing inside the app remains a local demonstration.
-
