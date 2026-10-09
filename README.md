@@ -13,7 +13,7 @@ npm run dev
 
 Open the localhost address printed by Vite. `npm run build` checks TypeScript and creates `dist/`; `npm run preview` serves the production build.
 
-The included `dist/` is ready to preview. On this computer, `Preview.ps1` uses the bundled Node runtime when available, so you can run the prototype without changing your installed Node version.
+Build `dist/` with `npm run build` before previewing. On this computer, `Preview.ps1` uses the bundled Node runtime when available, so you can run the prototype without changing your installed Node version.
 
 ## Flow and behaviour
 
@@ -34,3 +34,20 @@ No desktop frame or responsive constraints were exposed. On wide screens the mob
 TypeScript passed. The production assets were built with Vite using a temporary Babel transform because this environment blocks Vite's esbuild subprocess. The shipped Vite configuration remains standard. The browser walkthrough covers the sample flow, details confirmation, story editing, review, packaging, saving and local publishing. Assets and fonts are bundled for offline use after installation/build.
 
 The prototype source is maintained in the Farmily repository. Publishing inside the app remains a local demonstration.
+
+## GitHub Pages
+
+The workflow `.github/workflows/pages.yml` builds with Node.js 24, installs the locked dependencies with `npm ci`, checks TypeScript, and deploys `dist/` through the official GitHub Pages artifact workflow. Pushes to `main` and manual runs trigger deployment. Only the deployment job receives Pages write and identity-token permissions.
+
+A repository administrator must select **Settings → Pages → Source → GitHub Actions**. Private repositories require a GitHub plan that supports Pages. After enabling Pages, rerun the workflow from Actions.
+
+Expected URL: https://CDE5311-Aug2026.github.io/team-8/
+
+To test the Pages build locally:
+
+```sh
+npm run build -- --base /team-8/
+npm run preview -- --base /team-8/
+```
+
+Open the preview address with `/team-8/` appended. The regular development command still serves at `/`.
