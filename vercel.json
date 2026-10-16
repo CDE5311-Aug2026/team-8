@@ -1,0 +1,6 @@
+{
+  "functions": {
+    "api/analyze.ts": { "maxDuration": 60 },
+    "api/branding.ts": { "maxDuration": 120 }
+  }
+}

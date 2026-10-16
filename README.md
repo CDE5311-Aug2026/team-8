@@ -6,7 +6,7 @@ React + TypeScript + Vite reconstruction of the mobile screens visible in [Farmi
 
 ## Run
 
-Use Node.js 22.12+ (or 24 LTS). From this folder:
+Use Node.js 24 LTS. From this folder:
 
 ```sh
 npm install
@@ -17,22 +17,62 @@ Open the localhost address printed by Vite. `npm run build` checks TypeScript an
 
 Build `dist/` with `npm run build` before previewing. On this computer, `Preview.ps1` uses the bundled Node runtime when available, so you can run the prototype without changing your installed Node version.
 
-## Flow and behaviour
+## Farmer onboarding and product flow
 
-Use **Try with sample photo** to explore the complete flow without uploading an image. Add product → product details → story → review → packaging → packaging preview → save → listing → catalogue.
+The current prototype follows the revised [farmer onboarding frame](https://www.figma.com/design/kowdyJKqaPGqrG9qWD2Lb9/Farmily---UI?node-id=430-995). Profile creation leads to the farmer home, with independently tracked steps for profile, brand identity and the first saved product. Photos, story and philosophy are optional during profile creation; the farmer can add them later.
 
-Fields, uploads (JPG/PNG/WebP up to 2 MB), ingredient confirmation, original/enhanced story selection, favourites, packaging styles, label download, draft saving and local publishing work. Drafts are stored under `farmily-draft` in this browser's local storage when saved. No backend or external publishing is connected. AI scanning, text suggestions, photo enhancement and packaging generation are local demonstrations, not real AI services. Uploading an image does not detect its content automatically.
+The home keeps the cream/green palette, farm overview, brand brief, products and suggestion cards from the reference. Missing photos have an explicit empty state rather than a stock farm photo. The navigation is Home, Products, Orders and Profile. Brand creation is a standalone page, launched from onboarding or the branding actions, with no bottom navigation. The top-right close button saves work in progress and returns to the page that opened it. Orders currently shows an empty state; no order backend is connected. Text, controls and additional onboarding details extend the visible Figma frame where needed.
 
-## Design interpretation
+Brand identity is created once for the farm from its name, story, products, philosophy and optional farm/product/process photos. Three directions include a palette, typography, tagline, rationale and packaging approach. The farmer can change colours and tagline, review and save a direction, or save the branding step for later. Changes to the farm story, product range, philosophy or reference photos flag an existing identity for review.
 
-The supplied node opens a group of mobile flow screens, including alternate states. The prototype follows the 402 px mobile composition with an ivory background, green text/buttons, gold AI controls, rounded white cards, and the text visible in the design. Bree Serif and Lato are bundled approximations of the visible typography; exact layer styles were unavailable in the guest Figma viewer. Photos are cropped from the visible Figma canvas, not original-resolution exports.
+A saved, reviewed brand identity matching the current farm profile is required before product creation. Every add-product entry point routes to branding when the identity is missing or needs review; saving/publishing is also guarded. Product creation is now **photo/manual entry → product details → review and save**. It reuses the farm story and saved brand identity; packaging generation is no longer a step in each product flow. Listing previews reuse the same identity. Product analysis still uses the real server endpoint described below. Fields, review checks, saved product drafts, and local publishing remain functional. This prototype currently stores one product draft in the browser; it is not a multi-product database.
 
-The review/packaging screens literally show **Step title**, and the source skips step 4; these are preserved. The details mockup contains Dairy/Goat Milk next to tomato imagery. The prototype uses the Heirloom Tomatoes content from the review and listing screens for consistency.
+The sample farm, sample product and sample brand concepts are explicitly marked examples. They make no API calls. The profile, reviewed identity, first saved product and explicitly paused branding work persist in localStorage. They are not accounts or cloud storage. There is no real authentication, order management or marketplace publishing.
 
-No desktop frame or responsive constraints were exposed. On wide screens the mobile composition stays centred; small screens use the available width. There is no horizontal scrolling at 320 px.
+## Branding AI and image provenance
+
+The same local API server exposes POST /api/branding. It uses the Responses API for structured brand concepts and the image generation API for an optional decorative illustration when no reference photos were uploaded. The API key stays on the server. The shared AI_SCAN_TOKEN gate applies on Vercel. No request runs automatically on profile creation or upload; generation requires the farmer’s explicit action.
+
+- A supplied photo is labelled **Original photo provided by you**.
+- A generated image is labelled **AI-generated image based on your written farm profile. This is an illustration, not a photograph of your farm.** This disclosure persists with the identity and appears in the product packaging preview as well.
+- A typographic concept without a photo is described as a colour/type layout. It is not labelled as an AI-generated farm image.
+- Generation prompts prohibit invented documentary depictions, certifications and factual farming claims. Review remains necessary.
+- Optional photos are limited to three JPG/PNG/WebP files at 512 KB each. Story and philosophy can be absent, though richer input helps the resulting brief. The server sends the farm name, story, product range, philosophy and chosen photo references to OpenAI; farmer name and location are excluded from the upstream payload.
+
+Set OPENAI_IMAGE_MODEL if needed (default gpt-image-1). Image generation can require separate model access and has its own cost. Without a configured key, the UI explains that live generation is unavailable and offers clearly marked sample concepts. No successful live recognition or image generation is claimed by the local tests.
 
 ## Verification
 
-TypeScript passed. The production assets were built with Vite using a temporary Babel transform because this environment blocks Vite's esbuild subprocess. The shipped Vite configuration remains standard. The browser walkthrough covers the sample flow, details confirmation, story editing, review, packaging, saving and local publishing. Assets and fonts are bundled for offline use after installation/build.
+Run npm run build for UI/server type checks and the standard Vite production build. Run npm test for the extraction, onboarding progression, provenance and API integration checks. Provider calls are mocked in tests; no paid calls are made. Browser checks cover profile creation without photos, progress at 1/3 → 2/3 → 3/3, pausing/reloading a branding draft, editing/saving a sample identity, reusing it in product review, and saved progress after reload.
 
-The prototype source is maintained in the Farmily repository. Publishing inside the app remains a local demonstration.
+## Product photo analysis — local setup
+
+This implementation is local and has not been deployed. It replaces the timed scan simulation with a bounded image analysis workflow: upload → server analysis → editable review → explicitly apply to product details. Sample data remains separate and clearly labelled.
+
+1. Use Node.js 24 LTS and run `npm ci`.
+2. Copy `.env.example` to `.env.local` and set `OPENAI_API_KEY` privately in that file. Never paste a key into the app or commit it. The default model is `gpt-4.1-mini`; `OPENAI_MODEL` can select another image-capable model supporting Responses structured outputs.
+3. In one terminal run `npm run dev:api` (loopback port 8787).
+4. In a second terminal run `npm run dev`. Open the Vite address. Vite forwards `/api` to the local server.
+5. Upload a JPG, PNG or WebP under 2 MB and choose **Analyze photo**. The image is sent to OpenAI only at this point. Review/correct fields, check the review box, then use the details. Add price and any missing ingredients/allergen declarations manually.
+
+The production preview command serves static assets only. Use the development commands above to test scans locally.
+
+### Extraction rules
+
+- Readable labels: extract name, category, description, brand, ingredients, allergens, net quantity, nutrition (including units/serving context), storage, dates as printed, producer and origin. Each label-derived value carries a short supporting quote.
+- Unlabelled products: suggest only a basic name, category and visible description. Label-only facts remain empty. Ambiguity produces clarification questions; unrelated photos return no product facts.
+- A second validation step removes unsupported sensitive field guesses independently of the prompt. This does not guarantee factual accuracy; farmers must compare results with the photo. An unreadable or absent allergen declaration never becomes “no allergens”.
+- Applying a scan starts a fresh product draft so the sample tomato values cannot leak into another product. Review edits also reset the final ingredients/allergens confirmation.
+- Missing configuration, service errors, refusal, incomplete replies and cancellation offer retry/manual entry. No fake scan result is substituted.
+
+### Server and later Vercel setup
+
+`api/analyze.ts` is a Vercel Node function; `server/dev.ts` runs the same handler locally. Set `OPENAI_API_KEY`, optional `OPENAI_MODEL`, and `AI_SCAN_TOKEN` in server environment settings when deployment is authorized. The deployed endpoint refuses scans unless a scan token is configured. Demo users enter that separate token under **Have a scan access code?**; it is held in memory and is not the OpenAI key. No secrets use a `VITE_` prefix.
+
+The access code is a temporary gate for a class demo, not farmer accounts or a distributed rate limiter. Before broad public use, replace it with authenticated farmer sessions and per-user quotas. Configure provider project spending limits as appropriate. The function enforces request/image limits, validates image signatures, bounds output, times out upstream requests, and uses `store: false`. Application code does not log or persist uploaded photos on the server. OpenAI provider retention rules still apply. Product photos/drafts are saved in this browser only when the farmer saves a draft.
+
+### Checks
+
+`npm run build` checks both UI and server TypeScript, then builds the UI. `npm test` tests extraction rules and HTTP handler success/error cases with a mocked OpenAI transport; it makes no paid requests. This suite does not measure real OCR/recognition accuracy.
+
+API references: [image inputs](https://developers.openai.com/api/docs/guides/images-vision), [structured outputs](https://developers.openai.com/api/docs/guides/structured-outputs?api-mode=responses).
