@@ -1,3 +1,4 @@
+import DevBadge from './DevBadge';
 import { useEffect, useRef, useState } from 'react';
 import { Camera } from 'lucide-react';
 import { categories, fieldLabels, fieldNames, validateAnalysis, type Analysis, type FieldName } from '../shared/analysis';
@@ -49,7 +50,7 @@ export default function ProductScanner({ onUse, onSample }: { onUse: (info: Prod
     <div className="two-buttons"><button className="button secondary" disabled={busy || reading} onClick={() => camera.current?.click()}>Take a photo</button><button className="button secondary" disabled={busy || reading} onClick={() => input.current?.click()}>Upload a photo</button></div>
     <div className="ai-callout"><strong>✦ Farmily AI</strong><p>Have a label? We’ll read its details. No label? We’ll suggest basic product information. You’ll check everything before using it.</p></div>
     <p className="fine-print">When you choose Analyze photo, this image is sent to OpenAI for analysis. Missing information stays blank.</p>
-    <details className="scan-access"><summary>Have a scan access code?</summary><label className="field"><span>Scan access code</span><input type="password" autoComplete="off" value={token} onChange={e => setToken(e.target.value)} /></label></details>
+    <details className="scan-access"><summary><DevBadge/> Demo scan access code</summary><label className="field"><span>Scan access code</span><input type="password" autoComplete="off" value={token} onChange={e => setToken(e.target.value)} /></label></details>
     {error && <div className="scan-error" role="alert">{error}</div>}
     <div aria-live="polite">{reading && <p>Opening photo…</p>}{busy && <p>Reading your photo… This may take a moment.</p>}</div>
     {busy ? <button className="button secondary" onClick={() => active.current?.abort()}>Cancel analysis</button> : photo && <button className="button primary" disabled={reading} onClick={() => void analyze()}>{analysis ? 'Analyze again' : 'Analyze photo'}</button>}
@@ -63,6 +64,6 @@ export default function ProductScanner({ onUse, onSample }: { onUse: (info: Prod
       <label className="check-row"><input type="checkbox" checked={confirmed} onChange={e => setConfirmed(e.target.checked)} />I’ve reviewed these suggestions. Missing ingredients, allergens and dates still need checking.</label>
       <button className="button primary" disabled={!confirmed || !values.name.trim()} onClick={() => onUse(values, photo)}>Use reviewed details</button>
     </section>}
-    {!busy && <div className="actions"><button className="button secondary" disabled={reading} onClick={() => onUse(emptyInfo(), photo)}>Enter details manually</button>{!photo && <button className="text-button" onClick={onSample}>Explore with sample data</button>}</div>}
+    {!busy && <div className="actions"><button className="button secondary" disabled={reading} onClick={() => onUse(emptyInfo(), photo)}>Enter details manually</button>{!photo && <button className="text-button" onClick={onSample}><DevBadge/> Explore with sample data</button>}</div>}
   </section>;
 }

@@ -32,15 +32,15 @@ export default async function handler(req: IncomingMessage & { body?: unknown },
   if (!req.headers['content-type']?.startsWith('application/json')) return send(415, { error: 'Send the photo as JSON.' });
   const token = process.env.AI_SCAN_TOKEN;
   // An explicit passcode protects the paid demo endpoint until farmer authentication exists.
-  if (process.env.VERCEL && !token) return send(503, { error: 'Photo analysis has not been enabled by the app owner.' });
+  if (process.env.VERCEL && !token) return send(503, { error: '[DEV] Photo analysis has not been enabled by the app owner.' });
   if (token) {
     const supplied = Buffer.from(String(req.headers['x-scan-token'] || '')); const expected = Buffer.from(token);
-    if (supplied.length !== expected.length || !timingSafeEqual(supplied, expected)) return send(401, { error: 'Enter the photo scan access code provided by the app owner.' });
+    if (supplied.length !== expected.length || !timingSafeEqual(supplied, expected)) return send(401, { error: '[DEV] Enter the photo scan access code provided by the app owner.' });
   }
   let image: string;
   try { const body = await bodyOf(req) as { image?: unknown }; image = validateImage(body?.image); }
   catch (error) { return send(400, { error: error instanceof SyntaxError ? 'The photo request could not be read.' : (error as Error).message }); }
-  if (!process.env.OPENAI_API_KEY) return send(503, { error: 'Photo analysis is not configured yet. You can still enter the product details manually.' });
+  if (!process.env.OPENAI_API_KEY) return send(503, { error: '[DEV] Photo analysis is not configured yet. You can still enter the product details manually.' });
   try {
     const response = await fetch('https://api.openai.com/v1/responses', {
       method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${process.env.OPENAI_API_KEY}` },

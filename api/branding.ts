@@ -12,7 +12,7 @@ export default async function handler(req:IncomingMessage & {body?:unknown},res:
   if(!token)return send(401,{error:'Create an account or sign in to generate and save your brand.'});
   const url=process.env.SUPABASE_URL||process.env.VITE_SUPABASE_URL;
   const key=process.env.SUPABASE_PUBLISHABLE_KEY||process.env.VITE_SUPABASE_PUBLISHABLE_KEY;
-  if(!url||!key)return send(503,{error:'Account verification is not configured yet. You can still explore sample concepts.'});
+  if(!url||!key)return send(503,{error:'[DEV] Account verification is not configured yet. You can still explore sample concepts.'});
   try{const client=createClient(url,key,{auth:{persistSession:false,autoRefreshToken:false},global:{fetch:(...args)=>fetch(...args)}});const {data,error}=await client.auth.getUser(token);if(error||!data.user||data.user.is_anonymous)return send(401,{error:'Please sign in again before generating your brand.'});}catch{return send(503,{error:'Account verification is unavailable. Please try again.'});}
   let data;
   try{
@@ -22,7 +22,7 @@ export default async function handler(req:IncomingMessage & {body?:unknown},res:
     if(!['concepts','image'].includes(String(body.action)))throw new Error('Choose branding ideas or an illustration.');
     data={profile,action:body.action,concept:body.action==='image'?validConcept(body.concept):null};
   }catch(error){return send(400,{error:error instanceof SyntaxError?'The profile request could not be read.':(error as Error).message});}
-  if(!process.env.OPENAI_API_KEY)return send(503,{error:'AI branding is not configured yet. You can explore the sample concepts or return later; your profile is saved.'});
+  if(!process.env.OPENAI_API_KEY)return send(503,{error:'[DEV] AI branding is not configured yet. You can explore the sample concepts or return later; your profile is saved.'});
   const profileText=JSON.stringify({farmName:data.profile.farmName,story:data.profile.story,products:data.profile.products,philosophy:data.profile.philosophy});
   const headers={'Content-Type':'application/json',Authorization:`Bearer ${process.env.OPENAI_API_KEY}`};
   try{
