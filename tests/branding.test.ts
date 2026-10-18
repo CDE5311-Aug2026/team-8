@@ -26,14 +26,14 @@ test('photos are optional and image provenance cannot be confused with farm phot
  assert.throws(()=>validConcept({...sampleConcepts[0],colors:['red','white','blue']}));
 });
 test('branding endpoint uses profile and optional photos, gates credentials, and marks generated images',async t=>{
- const previous={OPENAI_API_KEY:process.env.OPENAI_API_KEY,AI_SCAN_TOKEN:process.env.AI_SCAN_TOKEN,VERCEL:process.env.VERCEL};
- delete process.env.OPENAI_API_KEY;delete process.env.AI_SCAN_TOKEN;delete process.env.VERCEL;
+ const previous={OPENAI_API_KEY:process.env.OPENAI_API_KEY,AI_SCAN_TOKEN:process.env.AI_SCAN_TOKEN,VERCEL:process.env.VERCEL,SUPABASE_URL:process.env.SUPABASE_URL,SUPABASE_PUBLISHABLE_KEY:process.env.SUPABASE_PUBLISHABLE_KEY};
+ delete process.env.OPENAI_API_KEY;delete process.env.AI_SCAN_TOKEN;delete process.env.VERCEL;process.env.SUPABASE_URL='https://farmily-test.supabase.co';process.env.SUPABASE_PUBLISHABLE_KEY='public-test-key';
  const original=globalThis.fetch;let payload:any;let destination='';
  let provider=()=>Response.json({status:'completed',output:[{content:[{type:'output_text',text:JSON.stringify({concepts:sampleConcepts})}]}]});
- globalThis.fetch=async(input,init)=>{if(String(input).startsWith('https://api.openai.com/')){destination=String(input);payload=JSON.parse(String(init?.body));return provider();}return original(input,init);};
+ globalThis.fetch=async(input,init)=>{if(String(input).startsWith('https://farmily-test.supabase.co/'))return Response.json({id:'verified-test-user',email:'test@example.com',is_anonymous:false});if(String(input).startsWith('https://api.openai.com/')){destination=String(input);payload=JSON.parse(String(init?.body));return provider();}return original(input,init);};
  const server=createServer((req,res)=>void handler(req,res));await new Promise<void>(resolve=>server.listen(0,'127.0.0.1',resolve));
  const address=server.address();if(!address||typeof address==='string')throw new Error('Missing address');const url=`http://127.0.0.1:${address.port}`;
- const post=(body:unknown,headers={})=>fetch(url,{method:'POST',headers:{'Content-Type':'application/json',...headers},body:JSON.stringify(body)});
+ const post=(body:unknown,headers={})=>fetch(url,{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer test-session',...headers},body:JSON.stringify(body)});
  try{
   await t.test('missing API key and malformed profiles return useful errors',async()=>{assert.equal((await post({action:'concepts',profile:sampleProfile})).status,503);assert.equal((await post({action:'concepts',profile:{}})).status,400);});
   process.env.OPENAI_API_KEY='test-only-key';
@@ -51,8 +51,8 @@ test('branding endpoint uses profile and optional photos, gates credentials, and
   });
   await t.test('malformed provider output and production access fail safely',async()=>{
    provider=()=>Response.json({status:'incomplete'});assert.equal((await post({action:'concepts',profile:sampleProfile})).status,502);
-   process.env.VERCEL='1';assert.equal((await post({action:'concepts',profile:sampleProfile})).status,503);
-   process.env.AI_SCAN_TOKEN='demo-code';assert.equal((await post({action:'concepts',profile:sampleProfile})).status,401);
+   assert.equal((await post({action:'concepts',profile:sampleProfile},{Authorization:''})).status,401);
+   process.env.SUPABASE_URL='';process.env.SUPABASE_PUBLISHABLE_KEY='';assert.equal((await post({action:'concepts',profile:sampleProfile})).status,503);
   });
  }finally{globalThis.fetch=original;await new Promise<void>(resolve=>server.close(()=>resolve()));for(const[key,value]of Object.entries(previous)){if(value===undefined)delete process.env[key];else process.env[key]=value;}}
 });

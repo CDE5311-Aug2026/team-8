@@ -27,11 +27,11 @@ Brand identity is created once for the farm from its name, story, products, phil
 
 A saved, reviewed brand identity matching the current farm profile is required before product creation. Every add-product entry point routes to branding when the identity is missing or needs review; saving/publishing is also guarded. Product creation is now **photo/manual entry → product details → review and save**. It reuses the farm story and saved brand identity; packaging generation is no longer a step in each product flow. Listing previews reuse the same identity. Product analysis still uses the real server endpoint described below. Fields, review checks, saved product drafts, and local publishing remain functional. This prototype currently stores one product draft in the browser; it is not a multi-product database.
 
-The sample farm, sample product and sample brand concepts are explicitly marked examples. They make no API calls. The profile, reviewed identity, first saved product and explicitly paused branding work persist in localStorage. They are not accounts or cloud storage. There is no real authentication, order management or marketplace publishing.
+The sample farm, sample product and sample brand concepts are explicitly marked examples. They make no API calls. The profile, reviewed identity, first saved product and explicitly paused branding work persist in localStorage. They are not accounts or cloud storage. Authentication is optional and requires the Supabase setup below. Order management and marketplace publishing remain unconnected.
 
 ## Branding AI and image provenance
 
-The same local API server exposes POST /api/branding. It uses the Responses API for structured brand concepts and the image generation API for an optional decorative illustration when no reference photos were uploaded. The API key stays on the server. The shared AI_SCAN_TOKEN gate applies on Vercel. No request runs automatically on profile creation or upload; generation requires the farmer’s explicit action.
+The same local API server exposes POST /api/branding. It uses the Responses API for structured brand concepts and the image generation API for an optional decorative illustration when no reference photos were uploaded. The API key stays on the server. Brand generation requires a verified Supabase session; the scan access code applies only to product analysis. No request runs automatically on profile creation or upload; generation requires the farmer’s explicit action.
 
 - A supplied photo is labelled **Original photo provided by you**.
 - A generated image is labelled **AI-generated image based on your written farm profile. This is an illustration, not a photograph of your farm.** This disclosure persists with the identity and appears in the product packaging preview as well.
@@ -76,3 +76,21 @@ The access code is a temporary gate for a class demo, not farmer accounts or a d
 `npm run build` checks both UI and server TypeScript, then builds the UI. `npm test` tests extraction rules and HTTP handler success/error cases with a mocked OpenAI transport; it makes no paid requests. This suite does not measure real OCR/recognition accuracy.
 
 API references: [image inputs](https://developers.openai.com/api/docs/guides/images-vision), [structured outputs](https://developers.openai.com/api/docs/guides/structured-outputs?api-mode=responses).
+
+## Roles, accounts and guests
+
+The welcome screen offers **Explore Farmily**, **Start selling**, and **Sign in**. Start selling opens farm profile onboarding. Saving a new guest profile opens an optional account invitation with **Create an account** and **Not now**; Not now enters Home at **1/3**. **Explore with a sample farm** remains available for demos. Home and Profile share an account card, dismissible on Home. Profile also offers a confirmed deletion of the farm workspace, returning to Welcome without deleting the account. Buying stops at a WIP notice; no customer shopping interface is implemented. A returning guest or signed-in user with a valid profile skips repeated profile questions. Local profile existence never means authenticated.
+
+Guest mode is explicit and labelled in the farmer header, Home and Profile. Guests can explore sample branding and save product drafts. Generating their own branding requires farm details and a verified account. Publishing requires a verified account. Publishing is still a local prototype action, not a live marketplace API. Orders remains an empty preview; accepting real orders is not implemented.
+
+Email/password authentication uses the official Supabase client. Configure VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY in .env.local and Vercel Preview settings. Only a public publishable (or anon) project key belongs here; never use a service-role/secret key. Restart Vite or rebuild after changing these values. No Supabase project was provisioned or linked by this change.
+
+In Supabase, enable email/password authentication and email confirmation, set the Site URL, and allow the localhost and Vercel preview return URLs. Run supabase/workspaces.sql once to create the workspace table with per-user Row Level Security. Verify real sign-up, confirmation email delivery, sign-in, refresh, sign-out and saving in the configured project before release.
+
+When configuration is missing, the account forms explain that sign-up/sign-in are not connected and keep guest entry available. They do not fake accounts or sign-in success. Email confirmation without a session prompts the user to check their email. Passwords are not saved by application code or included in the profile. The SDK handles session persistence/refresh, and sessions are verified with getUser before an identity is accepted.
+
+Guest profile/branding/product data stays in the original browser workspace. Signed-in users have separate per-account browser keys and a cloud workspace keyed by auth.uid(). Account changes remount the farmer UI so another user’s draft cannot remain on screen. Guest data is copied into an empty account workspace only with the explicit import checkbox; existing cloud data is not overwritten by that import. A cloud saving failure displays a local-only warning. Row Level Security restricts reads/writes to the owner.
+
+No real-account or cloud-saving success has been verified without project credentials. Automated permission/storage tests and guest browser checks run without creating remote users or sending emails.
+
+Existing accounts use their own saved workspace. Returning farmers with a valid profile enter Home directly. Legacy deferred-setup preferences are respected on reload; explicitly choosing Start selling opens onboarding when the profile is incomplete. The first product stays locked until brand identity is ready. The customer route remains a WIP notice.

@@ -1,23 +1,27 @@
+import {workspaceStorage} from './accountStorage';
 import {useState} from 'react';
 import {ArrowLeft,Check,Package} from 'lucide-react';
 import ProductScanner,{emptyInfo,type ProductInfo} from './ProductScanner';
 import BrandPreview from './BrandPreview';
+import {useAccount} from './AuthContext';
+import {canPublish} from '../shared/access';
 import {categories,fieldLabels,type FieldName} from '../shared/analysis';
 import {canAddProduct,type FarmerProfile,type BrandKit} from '../shared/branding';
 
 type Product=ProductInfo & {photo:string;price:string;story:string;live:boolean};
 type Screen='add'|'details'|'review'|'saved'|'listing';
-type Props={farmProfile:FarmerProfile;brandKit:BrandKit|null;startAt:'add'|'listing';onSaved:()=>void;onExit:()=>void;onBranding:()=>void};
+type Props={farmProfile:FarmerProfile;brandKit:BrandKit|null;startAt:'add'|'listing';onSaved:()=>void;onExit:()=>void;onBranding:()=>void;onCreateAccount:()=>void};
 const labels:Record<Screen,string>={add:'Add product',details:'Product details',review:'Review product',saved:'Product saved',listing:'Your listing'};
-export default function ProductFlow({farmProfile,brandKit,startAt,onSaved,onExit,onBranding}:Props){
+export default function ProductFlow({farmProfile,brandKit,startAt,onSaved,onExit,onBranding,onCreateAccount}:Props){
+ const {identity}=useAccount();
  const empty:Product={...emptyInfo(),photo:'',price:'',story:farmProfile.story,live:false};
- const [product,setProduct]=useState<Product>(()=>{if(startAt==='listing')try{return {...empty,...JSON.parse(localStorage.getItem('farmily-draft')||'{}')};}catch{/* start an empty draft */}return empty;});
+ const [product,setProduct]=useState<Product>(()=>{if(startAt==='listing')try{return {...empty,...JSON.parse(workspaceStorage.getItem('farmily-draft')||'{}')};}catch{/* start an empty draft */}return empty;});
  const [screen,setScreen]=useState<Screen>(startAt);
  const [reviewed,setReviewed]=useState(false);const [error,setError]=useState('');
  const go=(next:Screen)=>{setScreen(next);setError('');if(next==='details')setReviewed(false);window.scrollTo({top:0,behavior:'instant'});};
  const update=(key:keyof Product,value:string)=>{setProduct(p=>({...p,[key]:value}));setReviewed(false);};
  const valid=product.name.trim()&&product.category.trim()&&product.ingredients.trim()&&product.allergens.trim()&&product.quantity.trim()&&Number(product.price)>0;
- const save=(live=false)=>{if(!canAddProduct(farmProfile,brandKit)){setError('Create and save your brand identity before saving a product or publishing its packaging.');return;}const next={...product,live,brandIdentity:brandKit};try{localStorage.setItem('farmily-draft',JSON.stringify(next));setProduct(next);onSaved();go(live?'listing':'saved');}catch{setError('Browser storage is full. Please use a smaller photo or free some space before saving.');}};
+ const save=(live=false)=>{if(live&&!canPublish(identity)){onCreateAccount();return;}if(!canAddProduct(farmProfile,brandKit)){setError('Create and save your brand identity before saving a product or publishing its packaging.');return;}const next={...product,live,brandIdentity:brandKit};try{workspaceStorage.setItem('farmily-draft',JSON.stringify(next));setProduct(next);onSaved();go(live?'listing':'saved');}catch{setError('Browser storage is full. Please use a smaller photo or free some space before saving.');}};
  const scan=(info:ProductInfo,photo:string)=>{setProduct({...empty,...info,photo});go('details');};
  const sample=()=>{setProduct({...empty,name:'Heirloom Tomatoes',category:'Vegetables',ingredients:'Heirloom tomatoes',allergens:'None declared',quantity:'1 lb',price:'4.50',photo:`${import.meta.env.BASE_URL}images/tomatoes.jpg`});go('details');setError('Sample product data — no AI analysis was performed. Review before saving.');};
  const price=`$${Number(product.price||0).toFixed(2)}`;
@@ -35,6 +39,6 @@ export default function ProductFlow({farmProfile,brandKit,startAt,onSaved,onExit
   </form></>}
   {screen==='review'&&<><p>A final look before saving your product.</p>{productCard}<button className="text-button" onClick={()=>go('details')}>Edit product information</button>{branding}<section className="card"><h2>Your farm story</h2><p>{farmProfile.story||'No farm story added yet.'}</p><small>From your farmer profile · reused across your products.</small></section><button className="button primary" onClick={()=>save()}>Save product to catalogue</button></>}
   {screen==='saved'&&<div className="saved-screen"><div className="success-icon"><Check/></div><h2>Your product is ready</h2><p>Saved as a local draft. Your onboarding progress has been updated.</p>{productCard}<div className="actions"><button className="button primary" onClick={onExit}>Back to home</button><button className="button secondary" onClick={()=>go('listing')}>Preview my listing</button></div></div>}
-  {screen==='listing'&&<><div className="soft-callout">{product.live?'Published in this local prototype':'Draft listing · only visible in this browser'}</div>{productCard}{branding}<section className="card"><h2>Meet {farmProfile.farmName}</h2><p>{farmProfile.story||'Your farm story will appear here.'}</p><p>{farmProfile.philosophy}</p>{farmProfile.photos.map(photo=><figure className="reference-photo" key={photo.id}><img src={photo.url} alt={`Original ${photo.kind} photo supplied by the farmer`}/><figcaption>Original photo supplied by the farmer</figcaption></figure>)}</section><div className="actions"><button className="button secondary" onClick={()=>go('details')}>Edit product</button><button className="button primary" onClick={()=>save(!product.live)}>{product.live?'Return to draft':'Publish locally'}</button><button className="text-button" onClick={onExit}>Back to home</button></div></>}
+  {screen==='listing'&&<><div className="soft-callout">{product.live?'Published in this local prototype':'Draft listing · only visible in this browser'}</div>{productCard}{branding}<section className="card"><h2>Meet {farmProfile.farmName}</h2><p>{farmProfile.story||'Your farm story will appear here.'}</p><p>{farmProfile.philosophy}</p>{farmProfile.photos.map(photo=><figure className="reference-photo" key={photo.id}><img src={photo.url} alt={`Original ${photo.kind} photo supplied by the farmer`}/><figcaption>Original photo supplied by the farmer</figcaption></figure>)}</section><div className="actions"><button className="button secondary" onClick={()=>go('details')}>Edit product</button><button className="button primary" onClick={()=>save(!product.live)}>{product.live?'Return to draft':identity?'Publish locally':'Create an account to publish'}</button><button className="text-button" onClick={onExit}>Back to home</button></div></>}
  </main></div>;
 }

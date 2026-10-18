@@ -1,5 +1,5 @@
 import type {IncomingMessage,ServerResponse} from 'node:http';
-import {timingSafeEqual} from 'node:crypto';
+import {createClient} from '@supabase/supabase-js';
 import {bodyOf,validateImage} from './analyze.ts';
 import {brandingSchema,validConcept,validProfile} from '../shared/branding.ts';
 
@@ -8,9 +8,12 @@ export default async function handler(req:IncomingMessage & {body?:unknown},res:
   const send=(status:number,data:unknown)=>{res.statusCode=status;res.end(JSON.stringify(data));};
   if(req.method!=='POST'){res.setHeader('Allow','POST');return send(405,{error:'Use POST to create branding ideas.'});}
   if(!req.headers['content-type']?.startsWith('application/json'))return send(415,{error:'Send a JSON request.'});
-  const token=process.env.AI_SCAN_TOKEN;
-  if(process.env.VERCEL&&!token)return send(503,{error:'Branding generation has not been enabled by the app owner.'});
-  if(token){const supplied=Buffer.from(String(req.headers['x-scan-token']||'')),expected=Buffer.from(token);if(supplied.length!==expected.length||!timingSafeEqual(supplied,expected))return send(401,{error:'Enter the AI access code provided by the app owner.'});}
+  const token=/^Bearer (\S+)$/.exec(String(req.headers.authorization||''))?.[1];
+  if(!token)return send(401,{error:'Create an account or sign in to generate and save your brand.'});
+  const url=process.env.SUPABASE_URL||process.env.VITE_SUPABASE_URL;
+  const key=process.env.SUPABASE_PUBLISHABLE_KEY||process.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+  if(!url||!key)return send(503,{error:'Account verification is not configured yet. You can still explore sample concepts.'});
+  try{const client=createClient(url,key,{auth:{persistSession:false,autoRefreshToken:false},global:{fetch:(...args)=>fetch(...args)}});const {data,error}=await client.auth.getUser(token);if(error||!data.user||data.user.is_anonymous)return send(401,{error:'Please sign in again before generating your brand.'});}catch{return send(503,{error:'Account verification is unavailable. Please try again.'});}
   let data;
   try{
     const body=await bodyOf(req) as {profile?:unknown;action?:unknown;concept?:unknown};
