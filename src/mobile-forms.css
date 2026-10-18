@@ -1,0 +1,11 @@
+.app-shell .field input:not([type="checkbox"]):not([type="color"]),
+.app-shell .field textarea,
+.app-shell .field select,
+.app-shell .product-tags-entry input{font-size:16px;min-height:44px;max-width:100%;scroll-margin-top:100px;scroll-margin-bottom:110px}
+.app-shell .field textarea{line-height:1.6}
+.app-shell .check-row{display:flex;align-items:flex-start;gap:12px;min-height:44px;padding:12px 0;cursor:pointer;line-height:1.6}
+.app-shell .check-row input[type="checkbox"]{width:22px;height:22px;min-width:22px;flex-shrink:0;margin:2px 0 0;accent-color:var(--green)}
+.app-shell .palette input[type="color"]{min-height:44px}
+.app-shell .icon-button{min-width:44px;min-height:44px}
+.app-shell .scan-access summary,.app-shell .extra-details summary{min-height:44px;display:flex;align-items:center;gap:6px}
+.app-shell .field input,.app-shell .field textarea,.app-shell .field select{touch-action:manipulation}

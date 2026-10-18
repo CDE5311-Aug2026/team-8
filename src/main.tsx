@@ -9,4 +9,5 @@ import './styles.css';
 import './farmer.css';
 import './role.css';
 import './account.css';
+import './mobile-forms.css';
 createRoot(document.getElementById('root')!).render(<React.StrictMode><AccountProvider><App/></AccountProvider></React.StrictMode>);

@@ -1,3 +1,4 @@
+import {advanceField,productPlaceholders,multilineProductFields} from './mobileForms';
 import DevBadge from './DevBadge';
 import { useEffect, useRef, useState } from 'react';
 import { Camera } from 'lucide-react';
@@ -43,14 +44,14 @@ export default function ProductScanner({ onUse, onSample }: { onUse: (info: Prod
     reader.onerror = () => { setError('We could not open this photo. Please choose another.'); setReading(false); };
     reader.readAsDataURL(file);
   }
-  return <section aria-label="Product photo analysis">
+  return <section aria-label="Product photo analysis" onKeyDown={advanceField}>
     <input ref={input} type="file" accept="image/jpeg,image/png,image/webp" hidden onChange={e => { select(e.target.files?.[0]); e.target.value = ''; }} />
     <input ref={camera} type="file" accept="image/jpeg,image/png,image/webp" capture="environment" hidden onChange={e => { select(e.target.files?.[0]); e.target.value = ''; }} />
     {photo ? <div className="scan-photo"><img src={photo} alt="Selected product to analyze" />{busy && <><span className="scan-badge">✦ AI</span><div className="scan-line" /></>}</div> : <button className="photo-drop" onClick={() => input.current?.click()}><span className="camera-circle"><Camera size={44} strokeWidth={1.4} /></span><span>Add a clear photo of your product or its label</span></button>}
     <div className="two-buttons"><button className="button secondary" disabled={busy || reading} onClick={() => camera.current?.click()}>Take a photo</button><button className="button secondary" disabled={busy || reading} onClick={() => input.current?.click()}>Upload a photo</button></div>
     <div className="ai-callout"><strong>✦ Farmily AI</strong><p>Have a label? We’ll read its details. No label? We’ll suggest basic product information. You’ll check everything before using it.</p></div>
     <p className="fine-print">When you choose Analyze photo, this image is sent to OpenAI for analysis. Missing information stays blank.</p>
-    <details className="scan-access"><summary><DevBadge/> Demo scan access code</summary><label className="field"><span>Scan access code</span><input type="password" autoComplete="off" value={token} onChange={e => setToken(e.target.value)} /></label></details>
+    <details className="scan-access"><summary><DevBadge/> Demo scan access code</summary><label className="field"><span>Scan access code</span><input type="password" name="scanAccessCode" placeholder="Enter demo access code" autoCapitalize="none" spellCheck={false} enterKeyHint="done" autoComplete="off" value={token} onChange={e => setToken(e.target.value)} /></label></details>
     {error && <div className="scan-error" role="alert">{error}</div>}
     <div aria-live="polite">{reading && <p>Opening photo…</p>}{busy && <p>Reading your photo… This may take a moment.</p>}</div>
     {busy ? <button className="button secondary" onClick={() => active.current?.abort()}>Cancel analysis</button> : photo && <button className="button primary" disabled={reading} onClick={() => void analyze()}>{analysis ? 'Analyze again' : 'Analyze photo'}</button>}
@@ -60,7 +61,7 @@ export default function ProductScanner({ onUse, onSample }: { onUse: (info: Prod
       <small>AI certainty: {analysis.confidence}. Please verify all details.</small>
       {analysis.questions.length > 0 && <div className="scan-questions"><strong>A little more information</strong>{analysis.questions.map((q, i) => <p key={i}>{q}</p>)}<small>Answer these by editing the fields below, or try another photo.</small></div>}
       {analysis.warnings.map((warning, i) => <p className="fine-print" key={i}>{warning}</p>)}
-      {fieldNames.map(key => <label className="field" key={key}><span>{fieldLabels[key]}</span>{key === 'category' ? <select value={values.category} onChange={e => { setValues(v => ({ ...v, category: e.target.value })); setConfirmed(false); }}><option value="">Choose a category</option>{categories.map(category => <option key={category}>{category}</option>)}</select> : <textarea rows={key === 'ingredients' || key === 'nutrition' ? 3 : 2} value={values[key]} placeholder="Not identified — add if known" onChange={e => { setValues(v => ({ ...v, [key]: e.target.value })); setConfirmed(false); }} />}<small>{analysis.fields[key].source === 'label' ? `Read from label: “${analysis.fields[key].evidence || analysis.fields[key].value}”` : analysis.fields[key].source === 'visual' ? 'Suggested from appearance — confirm or correct' : 'Not identified from this photo'}</small></label>)}
+      {fieldNames.map(key => <label className="field" key={key}><span>{fieldLabels[key]}</span>{key === 'category' ? <select name="category" value={values.category} onChange={e => { setValues(v => ({ ...v, category: e.target.value })); setConfirmed(false); }}><option value="">Choose a category</option>{categories.map(category => <option key={category}>{category}</option>)}</select> : !multilineProductFields.includes(key)?<input name={key} value={values[key]} placeholder={productPlaceholders[key]} autoComplete="off" autoCapitalize="sentences" enterKeyHint={key==='origin'?'done':'next'} onChange={e=>{setValues(v=>({...v,[key]:e.target.value}));setConfirmed(false);}}/> : <textarea name={key} autoCapitalize="sentences" rows={key === 'ingredients' || key === 'nutrition' ? 3 : 2} value={values[key]} placeholder={productPlaceholders[key]} onChange={e => { setValues(v => ({ ...v, [key]: e.target.value })); setConfirmed(false); }} />}<small>{analysis.fields[key].source === 'label' ? `Read from label: “${analysis.fields[key].evidence || analysis.fields[key].value}”` : analysis.fields[key].source === 'visual' ? 'Suggested from appearance — confirm or correct' : 'Not identified from this photo'}</small></label>)}
       <label className="check-row"><input type="checkbox" checked={confirmed} onChange={e => setConfirmed(e.target.checked)} />I’ve reviewed these suggestions. Missing ingredients, allergens and dates still need checking.</label>
       <button className="button primary" disabled={!confirmed || !values.name.trim()} onClick={() => onUse(values, photo)}>Use reviewed details</button>
     </section>}
