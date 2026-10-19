@@ -2,8 +2,10 @@ import {useId,useRef,useState} from 'react';
 import {X} from 'lucide-react';
 import {addProducts} from '../shared/products';
 
-export default function ProductTags({value,onChange}:{value:string;onChange:(value:string)=>void}){
- const id=useId();const [input,setInput]=useState('');const [error,setError]=useState('');
+export default function ProductTags({value,onChange,pendingValue,onPendingChange}:{value:string;onChange:(value:string)=>void;pendingValue?:string;onPendingChange?:(value:string)=>void}){
+ const id=useId();const [localInput,setLocalInput]=useState('');const [error,setError]=useState('');
+ const input=pendingValue??localInput;
+ const setInput=(value:string)=>{setLocalInput(value);onPendingChange?.(value);};
  const inputRef=useRef<HTMLInputElement>(null);
  const products=value.split(',').map(item=>item.trim()).filter(Boolean);
  function add(){
