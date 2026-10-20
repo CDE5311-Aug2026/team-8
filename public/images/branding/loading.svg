@@ -1,0 +1,7 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="34" height="48" viewBox="0 0 34 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Static loading indicator">
+<circle id="Loading dot" opacity="0.75" cx="3" cy="24" r="3" fill="#415B51"/>
+<circle id="Loading dot_2" opacity="0.6" cx="17" cy="24" r="5" fill="#415B51"/>
+<circle id="Loading dot_3" opacity="0.55" cx="31" cy="24" r="3" fill="#415B51"/>
+</g>
+</svg>

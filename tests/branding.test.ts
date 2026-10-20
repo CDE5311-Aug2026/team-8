@@ -45,6 +45,12 @@ test('branding endpoint uses profile and optional photos, gates credentials, and
    const photo={id:'one',name:'farm.png',kind:'farm',url:'data:image/png;base64,iVBORw0KGgo='};
    assert.equal((await post({action:'concepts',profile:{...sampleProfile,photos:[photo]}})).status,200);assert.ok(JSON.stringify(payload.input).includes(photo.url));assert.ok(JSON.stringify(payload.input).includes('User-provided farm reference'));
   });
+  await t.test('refinements include the current concept and requested change without changing the farm profile',async()=>{
+   assert.equal((await post({action:'concepts',profile:sampleProfile,concept:sampleConcepts[0],refinement:'Use warmer colors'})).status,200);
+   const text=JSON.stringify(payload.input);assert.ok(text.includes('Use warmer colors'));assert.ok(text.includes(sampleConcepts[0].tagline));assert.ok(text.includes(sampleProfile.farmName));
+   assert.equal((await post({action:'concepts',profile:sampleProfile,concept:sampleConcepts[0],refinement:'x'.repeat(501)})).status,400);
+   assert.equal((await post({action:'concepts',profile:sampleProfile,refinement:'Change the colors'})).status,400);
+  });
   await t.test('image response is explicitly AI-origin and based on the written brief',async()=>{
    provider=()=>Response.json({data:[{b64_json:'iVBORw0KGgo='}]});const result=await(await post({action:'image',profile:sampleProfile,concept:sampleConcepts[0]})).json();
    assert.equal(result.source,'ai');assert.ok(result.image.startsWith('data:image/png;base64,'));assert.ok(destination.endsWith('/images/generations'));assert.ok(payload.prompt.includes(sampleProfile.philosophy));assert.ok(payload.prompt.includes('not portray a real farm'));
