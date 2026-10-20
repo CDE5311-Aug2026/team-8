@@ -11,10 +11,11 @@ import {brandPalettes,buildBrand,demoConcepts,designStyles,existingBrand,restore
 import './brand-identity.css';
 
 const asset=(file:string)=>`${import.meta.env.BASE_URL}images/branding/${file}`;
-type Props={profile:FarmerProfile|null;brand:BrandKit|null;onExit:()=>void;onHome:()=>void;onAddProduct:()=>void;onCreateAccount:()=>void;onEditProfile:()=>void;onSaveProfile:(profile:FarmerProfile)=>boolean;onSaveBrand:(brand:BrandKit,profile:FarmerProfile)=>boolean};
+type Props={startNew?:boolean;profile:FarmerProfile|null;brand:BrandKit|null;onExit:()=>void;onHome:()=>void;onAddProduct:()=>void;onCreateAccount:()=>void;onEditProfile:()=>void;onSaveProfile:(profile:FarmerProfile)=>boolean;onSaveBrand:(brand:BrandKit,profile:FarmerProfile)=>boolean};
 
-function initialWork(profile:FarmerProfile,brand:BrandKit|null):BrandWork{
- try{const work=restoreBrandWork(JSON.parse(workspaceStorage.getItem('farmily-brand-work')||'null'),profile);if(work)return work.stage==='saved'&&!canAddProduct(profile,brand)?{...work,stage:work.concepts.length?'preview':'setup'}:work;}catch{/* start from the saved profile */}
+function initialWork(profile:FarmerProfile,brand:BrandKit|null,startNew=false):BrandWork{
+ if(startNew)brand=null;
+ else try{const work=restoreBrandWork(JSON.parse(workspaceStorage.getItem('farmily-brand-work')||'null'),profile);if(work)return work.stage==='saved'&&!canAddProduct(profile,brand)?{...work,stage:work.concepts.length?'preview':'setup'}:work;}catch{/* start from the saved profile */}
  const current=canAddProduct(profile,brand);
  return {version:2,stage:current?'saved':'setup',choice:brand?.origin==='existing'?'existing':'create',profile,concepts:current&&brand&&brand.origin!=='existing'?[brand.concept]:[],selected:0,palette:-1,style:brand?.designStyle?designStyles.indexOf(brand.designStyle):0,handwritten:brand?.handwritten||false,image:brand?.imageSource==='ai'?brand.image:null,origin:brand?.origin==='ai'?'ai':'sample',basis:brand?.profileSignature||'',refinement:''};
 }
@@ -25,8 +26,8 @@ function Mockup({brand,profile,packaging=false}:{brand:BrandKit;profile:FarmerPr
  return <div className={`brand-mockup live-mockup ${packaging?'packaging-mockup':''}`}><BrandPreview brand={brand} profile={profile}/>{brand.imageSource==='ai'&&<span className="brand-image-label">✦ AI-generated</span>}</div>;
 }
 
-export default function BrandIdentityFlow({profile,brand,onExit,onHome,onAddProduct,onCreateAccount,onEditProfile,onSaveProfile,onSaveBrand}:Props){
- const {identity}=useAccount();const [work,setWork]=useState(()=>initialWork(profile||blankProfile,brand));
+export default function BrandIdentityFlow({startNew=false,profile,brand,onExit,onHome,onAddProduct,onCreateAccount,onEditProfile,onSaveProfile,onSaveBrand}:Props){
+ const {identity}=useAccount();const [work,setWork]=useState(()=>initialWork(profile||blankProfile,brand,startNew));
  const [saved,setSaved]=useState(brand);const [error,setError]=useState('');const [storageError,setStorageError]=useState('');const [uploading,setUploading]=useState(false);const [previewIndex,setPreviewIndex]=useState(0);const [status,setStatus]=useState('');
  const controller=useRef<AbortController|null>(null);const timer=useRef<ReturnType<typeof setTimeout>|null>(null);const reader=useRef<FileReader|null>(null);const fileInput=useRef<HTMLInputElement>(null);const heading=useRef<HTMLHeadingElement>(null);const carousel=useRef<HTMLDivElement>(null);
  const workRef=useRef(work);workRef.current=work;
