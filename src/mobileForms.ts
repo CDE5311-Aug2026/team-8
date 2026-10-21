@@ -2,11 +2,11 @@ import type {KeyboardEvent} from 'react';
 import type {FieldName} from '../shared/analysis';
 
 export const productPlaceholders:Record<FieldName,string>={
- name:'e.g. Tomatoes',category:'Choose a category',description:'Describe your product',
- brand:'Your product’s brand',ingredients:'List the ingredients',allergens:'Copy the allergen statement from your label',
+ name:'e.g. Tomatoes',category:'Choose a category',description:'',
+ brand:'',ingredients:'List the ingredients',allergens:'Copy the allergen statement from your label',
  quantity:'e.g. 500 g or 1 litre',nutrition:'Copy the nutrition information from your label',
- storage:'How should this product be stored?',expiry:'Enter the date exactly as shown on the label',
- producer:'Producer name and details',origin:'e.g. Singapore',
+ storage:'',expiry:'Enter the date exactly as shown on the label',
+ producer:'',origin:'e.g. Singapore',
 };
 export const multilineProductFields:FieldName[]=['description','ingredients','allergens','nutrition','storage','producer'];
 

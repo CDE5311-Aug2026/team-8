@@ -1,7 +1,7 @@
 export type FarmPhoto = { id: string; kind: 'farm' | 'products' | 'process'; url: string; name: string };
 export type FarmerProfile = { farmerName: string; farmName: string; location: string; story: string; products: string; philosophy: string; photos: FarmPhoto[] };
 export type BrandConcept = { id: string; name: string; tagline: string; rationale: string; colors: string[]; typography: 'serif' | 'sans'; packaging: string; imagePrompt: string };
-export type BrandKit = { concept: BrandConcept; origin: 'ai' | 'sample'; image: string | null; imageSource: 'ai' | 'uploaded' | 'none'; profileSignature: string };
+export type BrandKit = { concept: BrandConcept; origin: 'ai' | 'sample' | 'existing'; image: string | null; imageSource: 'ai' | 'uploaded' | 'none'; profileSignature: string; designStyle?:'Minimal'|'Rustic'|'Playful'; handwritten?:boolean };
 export const blankProfile: FarmerProfile = { farmerName:'',farmName:'',location:'',story:'',products:'',philosophy:'',photos:[] };
 export const sampleProfile: FarmerProfile = { farmerName:'Alex',farmName:'Green Valley Farm',location:'Singapore',story:'We started growing vegetables as a family and now share our seasonal harvest with our neighbours.',products:'Tomatoes, leafy greens and fresh herbs',philosophy:'Care for the soil, grow with the seasons, and keep good food close to home.',photos:[] };
 // Photo IDs change on replacement; do not duplicate base64 files in every saved signature.
