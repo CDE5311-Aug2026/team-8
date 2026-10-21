@@ -1,3 +1,4 @@
+import RequiredMark from './RequiredMark';
 import {advanceField} from './mobileForms';
 import DevBadge from './DevBadge';
 import {useEffect,useRef,useState} from 'react';
@@ -27,9 +28,9 @@ export default function AccountGate({onBack,initialMode='signin'}:{onBack?:()=>v
   finally{setBusy(false);}
  }
  const form=<form className="welcome-signin-form" onKeyDown={advanceField} onSubmit={e=>{e.preventDefault();void submit();}}>
-   <label className="field"><span>Email</span><input type="email" name="email" inputMode="email" autoCapitalize="none" spellCheck={false} enterKeyHint="next" placeholder="you@example.com" autoComplete="email" required disabled={busy} value={email} onChange={e=>setEmail(e.target.value)}/></label>
-   <label className="field"><span>Password</span><input type="password" name="password" autoCapitalize="none" spellCheck={false} enterKeyHint={mode==='signup'?'next':'go'} placeholder={mode==='signup'?'Choose a password':'Your password'} autoComplete={mode==='signup'?'new-password':'current-password'} required minLength={mode==='signup'?8:1} disabled={busy} value={password} onChange={e=>setPassword(e.target.value)}/></label>
-   {mode==='signup'&&<><small>Use at least 8 characters.</small><label className="field"><span>Confirm password</span><input type="password" name="passwordConfirmation" autoCapitalize="none" spellCheck={false} enterKeyHint="go" autoComplete="new-password" required minLength={8} disabled={busy} value={confirmation} onChange={e=>setConfirmation(e.target.value)}/></label></>}
+   <label className="field"><span>Email<RequiredMark/></span><input type="email" name="email" inputMode="email" autoCapitalize="none" spellCheck={false} enterKeyHint="next" placeholder="you@example.com" autoComplete="email" required disabled={busy} value={email} onChange={e=>setEmail(e.target.value)}/></label>
+   <label className="field"><span>Password<RequiredMark/></span><input type="password" name="password" autoCapitalize="none" spellCheck={false} enterKeyHint={mode==='signup'?'next':'go'} placeholder={mode==='signup'?'Choose a password':'Your password'} autoComplete={mode==='signup'?'new-password':'current-password'} required minLength={mode==='signup'?8:1} disabled={busy} value={password} onChange={e=>setPassword(e.target.value)}/></label>
+   {mode==='signup'&&<><small>Use at least 8 characters.</small><label className="field"><span>Confirm password<RequiredMark/></span><input type="password" name="passwordConfirmation" autoCapitalize="none" spellCheck={false} enterKeyHint="go" autoComplete="new-password" required minLength={8} disabled={busy} value={confirmation} onChange={e=>setConfirmation(e.target.value)}/></label></>}
    {hasDrafts&&<p className="soft-callout">{mode==='signup'?'Your farm profile and drafts will be saved to your account.':'If your guest drafts differ from your saved account progress, we’ll ask which to use after you sign in.'}</p>}
    {!authClient&&<p className="soft-callout"><DevBadge/> Account creation and sign-in aren’t connected yet. Return to the previous screen to keep exploring.</p>}
    {error&&<p className="scan-error" role="alert">{error}</p>}{message&&<p className="soft-callout" role="status">{message}</p>}

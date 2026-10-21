@@ -1,3 +1,4 @@
+import RequiredMark from './RequiredMark';
 import {useId,useRef,useState} from 'react';
 import {X} from 'lucide-react';
 import {addProducts} from '../shared/products';
@@ -13,7 +14,7 @@ export default function ProductTags({value,onChange,pendingValue,onPendingChange
   catch(err){setError((err as Error).message);}
  }
  return <div className="field product-tags-field">
-  <label htmlFor={id}>Your products</label>
+  <label htmlFor={id}>Your products<RequiredMark/></label>
   <small id={`${id}-note`}>Start with a few products. You can add more later.</small>
   <div className="product-tags-entry"><input ref={inputRef} id={id} name="pendingProducts" value={input} required={!products.length} maxLength={2500} placeholder="e.g. Tomatoes" autoComplete="off" autoCapitalize="words" enterKeyHint="enter" aria-describedby={`${id}-note`} onChange={event=>{setInput(event.target.value);setError('');}} onKeyDown={event=>{if(event.key==='Enter'&&!event.nativeEvent.isComposing){event.preventDefault();add();}}}/><button type="button" className="button secondary" disabled={!input.trim()} onPointerDown={event=>event.preventDefault()} onClick={add}>Add</button></div>
 

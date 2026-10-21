@@ -1,0 +1,6 @@
+import {useEffect,useRef,type ReactNode} from 'react';
+export default function MobileDialog({open,onCancel,title,children}:{open:boolean;onCancel:()=>void;title:string;children:ReactNode}){
+ const ref=useRef<HTMLDialogElement>(null);
+ useEffect(()=>{const dialog=ref.current;if(!dialog)return;if(!open){dialog.close();return;}const align=()=>{const frame=dialog.parentElement?.getBoundingClientRect();if(!frame)return;const top=Math.max(0,frame.top);Object.assign(dialog.style,{left:`${frame.left}px`,top:`${top}px`,width:`${frame.width}px`,height:`${Math.max(0,Math.min(innerHeight,frame.bottom)-top)}px`});};align();dialog.showModal();dialog.querySelector<HTMLButtonElement>('[data-initial-focus]')?.focus();window.addEventListener('resize',align);window.addEventListener('scroll',align,{passive:true});return()=>{window.removeEventListener('resize',align);window.removeEventListener('scroll',align);};},[open]);
+ return <dialog ref={ref} className="pf-mobile-dialog" aria-label={title} onCancel={onCancel}><div><h2>{title}</h2>{children}</div></dialog>;
+}
