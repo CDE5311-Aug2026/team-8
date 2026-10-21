@@ -23,3 +23,16 @@ test('ingredient badges preserve order and compound ingredient commas',()=>{
  assert.equal(addIngredients('',''),'');
  assert.throws(()=>addIngredients('', 'a'.repeat(2001)));
 });
+
+test('allergen-free is an explicit producer declaration and clears conflicting selections',async()=>{
+ const {setAllergenFree}=await import('../shared/productFields.ts');
+ const previous={status:'selected' as const,contains:['Milk'],mayContain:['Peanuts'],original:'May contain peanuts',includeOriginal:true};
+ const confirmed=setAllergenFree(previous,true);
+ assert.equal(confirmed.status,'free');assert.deepEqual(confirmed.contains,[]);assert.deepEqual(confirmed.mayContain,[]);
+ assert.equal(allergenStatement(confirmed),'Allergen-free (producer declared)');
+ assert.equal(validAllergenSelection(confirmed),true);
+ assert.equal(validAllergenSelection({...confirmed,contains:['Milk']}),false);
+ assert.equal(setAllergenFree(confirmed,false).status,'unknown');
+ assert.equal(allergenStatement(setAllergenFree(confirmed,false)),'');
+ assert.notEqual(initialAllergens('None declared').status,'free');
+});

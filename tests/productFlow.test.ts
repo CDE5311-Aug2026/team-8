@@ -10,7 +10,10 @@ const product:ProductDraft={...Object.fromEntries(fieldNames.map(key=>[key,'']))
 const brand=existingBrand(sampleProfile);
 test('saving requires reviewed details, a valid price and a matching brand',()=>{
  assert.equal(productCanSave(product,sampleProfile,brand,true),true);
- assert.equal(productCanSave({...product,ingredients:''},sampleProfile,brand,true),true);
+ assert.equal(productCanSave({...product,ingredients:''},sampleProfile,brand,true),false);
+ assert.equal(productCanSave({...product,ingredients:'',ingredientsNotApplicable:true},sampleProfile,brand,true),true);
+ assert.equal(validProduct({...product,ingredientsNotApplicable:true}),false);
+ assert.equal(validProduct({...product,ingredients:'',ingredientsNotApplicable:true,ingredientInput:'Milk'}),false);
  assert.equal(productCanSave(product,sampleProfile,brand,false),false);
  assert.equal(productCanSave(product,sampleProfile,null,true),false);
  assert.equal(productCanSave(product,{...sampleProfile,farmName:'Another farm'},brand,true),false);

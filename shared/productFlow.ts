@@ -2,7 +2,7 @@ import {allergenStatement,validAllergenSelection,type AllergenSelection} from '.
 import {canAddProduct,signature,validConcept,type BrandKit,type FarmerProfile} from './branding.ts';
 import {fieldNames,validateAnalysis,type Analysis,type FieldName} from './analysis.ts';
 type ProductInfo=Record<FieldName,string>;
-export type ProductDraft=ProductInfo&{photo:string;price:string;story:string;live:boolean;sample?:boolean;ingredientInput?:string;allergenDetails?:AllergenSelection;brandIdentity?:BrandKit;packagingMode?:'photo'|'3d'};
+export type ProductDraft=ProductInfo&{photo:string;price:string;currency?:'SGD';story:string;live:boolean;sample?:boolean;ingredientInput?:string;ingredientsNotApplicable?:boolean;allergenDetails?:AllergenSelection;brandIdentity?:BrandKit;packagingMode?:'photo'|'3d'};
 export const productWorkKey='farmily-product-work';
 export function restoreProductWork(value:unknown,profile:FarmerProfile){
  if(!value||typeof value!=='object')return null;
@@ -19,7 +19,7 @@ export function restoreProductWork(value:unknown,profile:FarmerProfile){
   return {product,screen,reviewed,analysis} as {product:ProductDraft;screen:'add'|'details'|'packaging';reviewed:boolean;analysis:Analysis|null};
  }catch{return null;}
 }
-export function validProduct(product:ProductDraft){return (!product.allergenDetails||validAllergenSelection(product.allergenDetails)&&product.allergenDetails.status!=='unknown'&&allergenStatement(product.allergenDetails)===product.allergens)&&['name','category','allergens','quantity'].every(key=>!!product[key as keyof ProductDraft]?.toString().trim())&&/^\d+(\.\d{1,2})?$/.test(product.price)&&Number.isFinite(Number(product.price))&&Number(product.price)>0;}
+export function validProduct(product:ProductDraft){return (product.ingredientsNotApplicable===true?!product.ingredients.trim()&&!product.ingredientInput?.trim():!!product.ingredients.trim())&&(!product.allergenDetails||validAllergenSelection(product.allergenDetails)&&product.allergenDetails.status!=='unknown'&&allergenStatement(product.allergenDetails)===product.allergens)&&['name','category','allergens','quantity'].every(key=>!!product[key as keyof ProductDraft]?.toString().trim())&&/^\d+(\.\d{1,2})?$/.test(product.price)&&Number.isFinite(Number(product.price))&&Number(product.price)>0;}
 export function productCanSave(product:ProductDraft,profile:FarmerProfile,brand:BrandKit|null,reviewed:boolean){return reviewed&&validProduct(product)&&canAddProduct(profile,brand);}
 const escapeXml=(value:string)=>value.replace(/[<>&"']/g,char=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&apos;'}[char]!));
 export function labelSvg(product:ProductDraft,profile:FarmerProfile,brand:BrandKit){

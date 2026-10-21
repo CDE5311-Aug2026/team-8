@@ -1,1 +1,10 @@
 .required-mark{display:inline!important;color:#b42318!important;font:inherit;line-height:inherit;margin-inline-start:.2em}
+
+:root{--input-corner-radius:2px}
+/* Apply one input shape across account, profile, branding and product forms. */
+.app-shell input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="file"]):not([type="hidden"]),
+.app-shell textarea,
+.app-shell select,
+.app-shell .brand-refinement-form,
+.app-shell .pf-combobox-options,
+.app-shell .pf-combobox-options>li{border-radius:var(--input-corner-radius)!important}

@@ -1,11 +1,11 @@
 .brand-identity-flow{--brand-bg:#fffcf2;--brand-surface:#ebeeea;--brand-primary:#415b51;--brand-body:#4f6154;--green:var(--brand-primary);--ivory:var(--brand-bg);background:var(--brand-bg);color:var(--brand-body);font-family:'Palanquin','Lato',sans-serif;min-height:100dvh;padding-bottom:0;display:flex;flex-direction:column}
-.brand-identity-flow .brand-device-status{height:62px;flex-shrink:0;padding:0 39px 0 53px;justify-content:space-between;display:flex;align-items:center}
-.brand-device-status>img{display:block;width:77.3237px;height:12.9929px}.brand-device-status b{font-size:17px;color:#090909}.brand-device-status .island{top:14px}
+
+
 .brand-flow-header{height:54px;flex-shrink:0;background:var(--brand-bg);border:0;display:flex;align-items:center;justify-content:center}
 .brand-flow-header h1{font-family:'Silom','Bree Serif',serif;font-size:24px;line-height:30px;letter-spacing:1px;color:var(--brand-primary);margin:0}.brand-flow-header h1:focus{outline:none}
-.brand-exit-dialog{position:fixed;inset:auto;margin:0;max-width:none;max-height:none;border:0;padding:16px;background:#16251dcc;color:var(--brand-body);font-family:'Palanquin',sans-serif;overflow:hidden}.brand-exit-dialog[open]{display:flex;align-items:center;justify-content:center}.brand-exit-dialog::backdrop{background:transparent}.brand-exit-card{width:100%;max-width:360px;max-height:100%;overflow-y:auto;border-radius:20px;padding:24px;background:var(--brand-bg);box-shadow:0 16px 64px #0003}@media(min-width:600px){.brand-exit-dialog{border-radius:25px}}.brand-exit-dialog h2{margin:0 0 12px;font-family:'Bree Serif',serif;color:var(--brand-primary);font-size:24px;line-height:30px}.brand-exit-dialog p{font-size:16px;line-height:24px;margin:0 0 24px}.brand-exit-dialog .text-button{min-height:44px}.brand-exit-dialog .scan-error{margin:16px 0 0}
+.brand-exit-dialog{position:fixed;inset:auto;margin:0;max-width:none;max-height:none;border:0;padding:16px;background:#16251dcc;color:var(--brand-body);font-family:'Palanquin',sans-serif;overflow:hidden}.brand-exit-dialog[open]{display:flex;align-items:center;justify-content:center}.brand-exit-dialog::backdrop{background:transparent}.brand-exit-card{width:100%;max-width:360px;max-height:100%;overflow-y:auto;border-radius:20px;padding:24px;background:var(--brand-bg);box-shadow:0 16px 64px #0003}.brand-exit-dialog h2{margin:0 0 12px;font-family:'Bree Serif',serif;color:var(--brand-primary);font-size:24px;line-height:30px}.brand-exit-dialog p{font-size:16px;line-height:24px;margin:0 0 24px}.brand-exit-dialog .text-button{min-height:44px}.brand-exit-dialog .scan-error{margin:16px 0 0}
 .brand-flow-header .brand-close{position:absolute;right:4px;opacity:.65}.brand-flow-header .brand-close svg{width:18px;height:18px}
-.brand-flow-main{padding:0 20px 30px;min-height:max(736px,calc(100dvh - 116px));display:flex;flex-direction:column;flex:1;min-width:0}
+.brand-flow-main{padding:0 20px 30px;min-height:calc(100dvh - 54px);display:flex;flex-direction:column;flex:1;min-width:0}
 .brand-flow-main h2{font-family:'Silom','Bree Serif',serif;color:var(--brand-primary);font-size:14px;line-height:20px;font-weight:400;letter-spacing:.3px;margin:0}
 .brand-flow-main p{color:var(--brand-body);font-size:12px;line-height:16px;margin:0}.brand-flow-main small{font-size:10px;line-height:14px;color:var(--brand-body)}
 .brand-flow-progress{margin:0 0 14px}.brand-flow-progress>span{font-size:12px;line-height:14px;display:block}.brand-flow-progress>div{height:6px;background:#e5e7df;border-radius:5px;margin-top:7px;overflow:hidden}.brand-flow-progress i{display:block;height:100%;background:var(--brand-primary);border-radius:5px;transition:width .2s}
@@ -39,7 +39,7 @@
 @media(max-width:360px){.brand-flow-main{padding-left:16px;padding-right:16px}.brand-style-options,.brand-palette-options{gap:8px}.brand-font-summary{gap:10px}.brand-font-summary small{font-size:10px}.brand-flow-header h1{font-size:22px}.brand-refinement-suggestions button{font-size:11px;padding:8px 10px}}
 @media(prefers-reduced-motion:reduce){.brand-generating>img{animation:none}.brand-flow-progress i{transition:none}}
 :root:has(.brand-identity-flow){scrollbar-width:none}:root:has(.brand-identity-flow)::-webkit-scrollbar{display:none}
-.brand-style-section{margin-top:5px}@media(max-width:360px){.brand-identity-flow .brand-device-status{padding:0 20px 0 28px}.brand-device-status .island{width:105px}}
+.brand-style-section{margin-top:5px}
 @media(max-width:360px){.brand-preview-carousel{margin-right:-16px;padding-right:16px}}
 
 .brand-exit-dialog h2{margin-bottom:24px}.brand-exit-dialog .brand-discard{color:#a3332b;border-color:#a3332b}

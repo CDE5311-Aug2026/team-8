@@ -4,14 +4,16 @@ export const allergenGroups=[
  {label:'Tree nuts',options:['Almonds','Hazelnuts','Walnuts','Cashews','Pecans','Brazil nuts','Pistachios','Macadamias']},
  {label:'Sulphites',options:['Sulphites (10 mg/kg or more)']},
 ];
-export type AllergenSelection={status:'label'|'selected'|'none'|'unknown';contains:string[];mayContain:string[];original:string;includeOriginal?:boolean};
+export type AllergenSelection={status:'label'|'selected'|'none'|'unknown'|'free';contains:string[];mayContain:string[];original:string;includeOriginal?:boolean};
 export function validAllergenSelection(value:unknown):value is AllergenSelection{
  if(!value||typeof value!=='object')return false;const selection=value as AllergenSelection;
- return ['label','selected','none','unknown'].includes(selection.status)&&typeof selection.original==='string'&&selection.original.length<=2000&&[selection.contains,selection.mayContain].every(items=>Array.isArray(items)&&items.length<=50&&items.every(item=>typeof item==='string'&&!!item.trim()&&item.length<=200));
+ return ['label','selected','none','unknown','free'].includes(selection.status)&&typeof selection.original==='string'&&selection.original.length<=2000&&[selection.contains,selection.mayContain].every(items=>Array.isArray(items)&&items.length<=50&&items.every(item=>typeof item==='string'&&!!item.trim()&&item.length<=200))&&(selection.status!=='free'||!selection.contains.length&&!selection.mayContain.length&&!selection.includeOriginal);
 }
+export function setAllergenFree(value:AllergenSelection,confirmed:boolean):AllergenSelection{return {...value,status:confirmed?'free':'unknown',contains:[],mayContain:[],includeOriginal:false};}
 export function initialAllergens(statement:string):AllergenSelection{return {status:statement.trim()?'label':'unknown',contains:[],mayContain:[],original:statement};}
 export function allergenStatement(value:AllergenSelection):string{
  if(value.status==='label')return value.original;
+ if(value.status==='free')return 'Allergen-free (producer declared)';
  if(value.status==='none')return 'None declared';
  if(value.status==='unknown')return '';
  return [value.includeOriginal?value.original:'',value.contains.length?`Contains: ${value.contains.join(', ')}.`:'',value.mayContain.length?`May contain: ${value.mayContain.join(', ')}.`:''].filter(Boolean).join(' ');

@@ -1,5 +1,5 @@
 import SearchMultiSelect,{type SelectChoice} from './SearchMultiSelect';
-import {allergenGroups,type AllergenSelection} from '../shared/productFields';
+import {allergenGroups,setAllergenFree,type AllergenSelection} from '../shared/productFields';
 const allergens=allergenGroups.flatMap(group=>group.options);
 export default function AllergenPicker({value,onChange,labelEvidence}:{value:AllergenSelection;onChange:(value:AllergenSelection)=>void;labelEvidence?:string}){
  const none={id:'none',label:'None declared'};const unknown={id:'unknown',label:'Not sure yet'};
@@ -16,5 +16,5 @@ export default function AllergenPicker({value,onChange,labelEvidence}:{value:All
   const includeOriginal=items.some(item=>item.id==='label');
   onChange({...value,status:regular.length?'selected':includeOriginal?'label':'unknown',includeOriginal,contains,mayContain});
  }
- return <div className="pf-allergen-simple"><SearchMultiSelect required label="Allergens" placeholder="Search and select allergens" helper="Select all that apply, or choose None declared." options={options} selected={selected} customChoice={text=>({id:text.toLowerCase().startsWith('may contain:')?`may:${text.slice(12).trim()}`:`contains:${text}`,label:text})} onChange={change}/>{labelEvidence&&<details className="pf-original-allergens"><summary>Original label wording</summary><blockquote>{labelEvidence}</blockquote></details>}{value.status==='none'&&<small>“None declared” does not mean allergen-free.</small>}{value.status==='unknown'&&<small>Not confirmed yet. You can save a draft and complete this later.</small>}</div>;
+ return <div className="pf-allergen-simple"><SearchMultiSelect required disabled={value.status==='free'} label="Allergens" placeholder="Search and select allergens" options={options} selected={selected} customChoice={text=>({id:text.toLowerCase().startsWith('may contain:')?`may:${text.slice(12).trim()}`:`contains:${text}`,label:text})} onChange={change} afterInput={<label className="pf-field-checkbox"><input type="checkbox" checked={value.status==='free'} onChange={event=>onChange(setAllergenFree(value,event.target.checked))}/><span>Allergen-free</span></label>}/>{labelEvidence&&<details className="pf-original-allergens"><summary>Original label wording</summary><blockquote>{labelEvidence}</blockquote></details>}{value.status==='none'&&<small>“None declared” does not mean allergen-free.</small>}</div>;
 }
