@@ -10,6 +10,7 @@ const clarityScript = `(function(c,l,a,r,i,t,y){
 })(window, document, "clarity", "script", "z1hrlazsy1");`;
 
 export default defineConfig({
+  define: { 'import.meta.env.VITE_DEV_TESTING': JSON.stringify(clarityEnabled) },
   plugins: [
     react(),
     {

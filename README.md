@@ -98,3 +98,6 @@ Guest profile/branding/product data stays in the original browser workspace. Sig
 No real-account or cloud-saving success has been verified without project credentials. Automated permission/storage tests and guest browser checks run without creating remote users or sending emails.
 
 Existing accounts use their own saved workspace. Returning farmers with a valid profile enter Home directly. Legacy deferred-setup preferences are respected on reload; explicitly choosing Start selling opens onboarding when the profile is incomplete. The first product stays locked until brand identity is ready. The customer route remains a WIP notice.
+
+## Temporary dev testing access
+Vercel deployments from the dev branch allow guests and demo accounts to generate branding and analyze product photos without signing in or entering a scan code. AI calls still require the server OPENAI_API_KEY and use its quota. Other branches retain their account and scan-code checks. Guest work remains in the browser, and marketplace publishing remains an unconnected prototype. Remove this temporary bypass before opening dev to general use.
