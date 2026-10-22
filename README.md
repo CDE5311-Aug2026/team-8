@@ -7,7 +7,6 @@ Quick access to the hosted previews:
 
 [![Production](https://img.shields.io/badge/Production-Open%20Farmily%20App-brightgreen)](https://farmily-sg.vercel.app) [![Development](https://img.shields.io/badge/Development-Open%20Farmily%20Dev-yellow)](https://farmily-git-dev-reldhas.vercel.app)
 
-**Team 8:** Minh, _(add remaining team member names here)_
 
 # Farmily local prototype
 
