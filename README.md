@@ -17,6 +17,10 @@ Open the localhost address printed by Vite. `npm run build` checks TypeScript an
 
 Build `dist/` with `npm run build` before previewing. On this computer, `Preview.ps1` uses the bundled Node runtime when available, so you can run the prototype without changing your installed Node version.
 
+## Demo sign-in
+
+When Supabase is not configured, sign in with `farmer@example.com` / `123456`. This public DEV account opens a separate sample farmer workspace, remembers the session across reloads, and supports signing out. Progress stays on this browser; no real account, cloud access or marketplace permission is created. Guest progress remains separate.
+
 ## Farmer onboarding and product flow
 
 The current prototype follows the revised [farmer onboarding frame](https://www.figma.com/design/kowdyJKqaPGqrG9qWD2Lb9/Farmily---UI?node-id=430-995). Profile creation leads to the farmer home, with independently tracked steps for profile, brand identity and the first saved product. Photos, story and philosophy are optional during profile creation; the farmer can add them later.

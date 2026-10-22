@@ -1,3 +1,5 @@
+import {demoAccount,demoSessionKey,matchesDemoAccount} from '../shared/demoAccount';
+import {sampleProfile} from '../shared/branding';
 import {createContext,useContext,useEffect,useRef,useState,type ReactNode} from 'react';
 import {Leaf} from 'lucide-react';
 import {authClient} from './authClient';
@@ -5,7 +7,7 @@ import {restore,setStorageOwner,snapshot} from './accountStorage';
 import {workspaceKey,workspaceKeys,type Identity} from '../shared/access';
 import {guestTransferAction,type Workspace} from '../shared/workspace';
 
-type AccountState={identity:Identity;loading:boolean;sync:'local'|'saving'|'saved'|'error';syncError:string;signOut:()=>Promise<void>;prepareGuestTransfer:(email:string|null)=>void};
+type AccountState={signInDemo:(email:string,password:string)=>boolean;identity:Identity;loading:boolean;sync:'local'|'saving'|'saved'|'error';syncError:string;signOut:()=>Promise<void>;prepareGuestTransfer:(email:string|null)=>void};
 type Conflict={id:string;email:string;guest:Workspace;account:Workspace;version:number};
 const pendingKey='farmily-pending-account-transfer';
 const AccountContext=createContext<AccountState|null>(null);
@@ -13,7 +15,7 @@ export function useAccount(){const value=useContext(AccountContext);if(!value)th
 function prepareGuestTransfer(email:string|null){if(email)localStorage.setItem(pendingKey,JSON.stringify({email:email.toLowerCase(),at:Date.now()}));else localStorage.removeItem(pendingKey);}
 function pendingTransfer(email:string){try{const pending=JSON.parse(localStorage.getItem(pendingKey)||'null');return pending?.email===email.toLowerCase()&&Date.now()-pending.at<24*60*60*1000;}catch{return false;}}
 export function AccountProvider({children}:{children:ReactNode}){
- const [identity,setIdentity]=useState<Identity>(null);const [loading,setLoading]=useState(!!authClient);
+ const [identity,setIdentity]=useState<Identity>(()=>{try{if(!authClient&&localStorage.getItem(demoSessionKey)==='active'){setStorageOwner(demoAccount.id);return demoAccount;}}catch{/* use guest workspace */}setStorageOwner(null);return null;});const [loading,setLoading]=useState(!!authClient);
  const [sync,setSync]=useState<AccountState['sync']>('local');const [syncError,setSyncError]=useState('');
  const [conflict,setConflict]=useState<Conflict|null>(null);const [resolving,setResolving]=useState(false);
  const active=useRef<string|null>(null);const sequence=useRef(0);const conflictRef=useRef<Conflict|null>(null);
@@ -59,18 +61,23 @@ export function AccountProvider({children}:{children:ReactNode}){
   finally{setResolving(false);}
  }
  useEffect(()=>{
-  if(!authClient){setStorageOwner(null);return;}
+  if(!authClient){setStorageOwner(identity?.demo?demoAccount.id:null);return;}
   let mounted=true;
   const {data}=authClient.auth.onAuthStateChange(()=>{if(mounted)window.setTimeout(()=>{if(mounted)void connect();},0);});
   void connect();
   return()=>{mounted=false;sequence.current++;data.subscription.unsubscribe();};
  },[]);
  useEffect(()=>{
-  if(!identity||!authClient)return;
+  if(!identity||identity.demo||!authClient)return;
   let timer:ReturnType<typeof setTimeout>|undefined;let disposed=false;
   const save=()=>{clearTimeout(timer);setSync('saving');timer=setTimeout(async()=>{try{const result=await authClient!.from('farmer_workspaces').upsert({user_id:identity.id,data:snapshot(identity.id)});if(!disposed){setSync(result.error?'error':'saved');setSyncError(result.error?'Cloud saving is unavailable. Your drafts stay in this browser.':'');}}catch{if(!disposed){setSync('error');setSyncError('Cloud saving is unavailable. Your drafts stay in this browser.');}}},600);};
   window.addEventListener('farmily-workspace-change',save);return()=>{disposed=true;clearTimeout(timer);window.removeEventListener('farmily-workspace-change',save);};
  },[identity?.id]);
- const signOut=async()=>{if(authClient){const {error}=await authClient.auth.signOut();if(error)throw error;}sequence.current++;active.current=null;setStorageOwner(null);setIdentity(null);setConflict(null);conflictRef.current=null;setSync('local');};
- return <AccountContext.Provider value={{identity,loading,sync,syncError,signOut,prepareGuestTransfer}}>{conflict?<div className="app-shell account-offer"><header className="farmer-header"><span className="farmily-logo"><Leaf size={22}/> Farmily</span></header><main className="farmer-main"><span className="eyebrow">WELCOME BACK</span><h1>Which progress would you like to use?</h1><p className="intro">Your account has saved progress that differs from the farm profile and drafts on this device.</p><section className="card"><h2>Keep my account progress</h2><p>Continue where you left off. Your guest drafts will stay on this device.</p><button className="button primary" disabled={resolving} onClick={()=>void resolveConflict(false)}>Use account progress</button></section><section className="card"><h2>Use my guest progress</h2><p>Replace this account’s farm profile, branding and product drafts with the guest progress from this device.</p><button className="button secondary" disabled={resolving} onClick={()=>void resolveConflict(true)}>Replace with guest progress</button></section>{syncError&&<p role="alert" className="scan-error">{syncError}</p>}</main></div>:loading?<div className="app-shell"><main className="farmer-main"><p role="status">Checking your account…</p></main></div>:<div key={identity?.id||'guest'} className="account-root">{children}</div>}</AccountContext.Provider>;
+ function signInDemo(email:string,password:string){
+  if(authClient||!matchesDemoAccount(email,password))return false;
+  if(!localStorage.getItem(workspaceKey('farmily-role',demoAccount.id))){restore(demoAccount.id,{'farmily-role':JSON.stringify('farmer'),'farmily-profile':JSON.stringify(sampleProfile)});}
+  localStorage.setItem(demoSessionKey,'active');setStorageOwner(demoAccount.id);active.current=demoAccount.id;setIdentity(demoAccount);setLoading(false);setSync('local');setSyncError('');return true;
+ }
+ const signOut=async()=>{localStorage.removeItem(demoSessionKey);if(authClient){const {error}=await authClient.auth.signOut();if(error)throw error;}sequence.current++;active.current=null;setStorageOwner(null);setIdentity(null);setConflict(null);conflictRef.current=null;setSync('local');};
+ return <AccountContext.Provider value={{signInDemo,identity,loading,sync,syncError,signOut,prepareGuestTransfer}}>{conflict?<div className="app-shell account-offer"><header className="farmer-header"><span className="farmily-logo"><Leaf size={22}/> Farmily</span></header><main className="farmer-main"><span className="eyebrow">WELCOME BACK</span><h1>Which progress would you like to use?</h1><p className="intro">Your account has saved progress that differs from the farm profile and drafts on this device.</p><section className="card"><h2>Keep my account progress</h2><p>Continue where you left off. Your guest drafts will stay on this device.</p><button className="button primary" disabled={resolving} onClick={()=>void resolveConflict(false)}>Use account progress</button></section><section className="card"><h2>Use my guest progress</h2><p>Replace this account’s farm profile, branding and product drafts with the guest progress from this device.</p><button className="button secondary" disabled={resolving} onClick={()=>void resolveConflict(true)}>Replace with guest progress</button></section>{syncError&&<p role="alert" className="scan-error">{syncError}</p>}</main></div>:loading?<div className="app-shell"><main className="farmer-main"><p role="status">Checking your account…</p></main></div>:<div key={identity?.id||'guest'} className="account-root">{children}</div>}</AccountContext.Provider>;
 }
