@@ -81,10 +81,14 @@ export default function BrandIdentityFlow({startNew=false,profile,brand,onExit,o
   update({stage:'generating',origin:'sample'});
   timer.current=setTimeout(()=>{setWork(value=>({...value,concepts:demoConcepts,selected:0,palette:0,style:0,handwritten:false,image:null,origin:'sample',basis:signature(value.profile),stage:'preview'}));timer.current=null;},1000);
  }
+ function fallbackToSamples(source:BrandWork){
+  setError('');setStatus('Brand generation is unavailable. Showing sample designs instead.');
+  setWork({...source,concepts:demoConcepts,selected:0,palette:0,style:0,handwritten:false,image:null,origin:'sample',basis:signature(source.profile),refinement:'',stage:'preview'});
+ }
  async function generate(action:'concepts'|'image'='concepts',refinement=''){
   if(work.stage==='generating'||uploading)return;
   if(!confirmProfile())return;
-  if(!identity&&!import.meta.env.VITE_DEV_TESTING){setError('Create an account to generate your own brand, or explore the sample preview below.');return;}
+  if((!identity||!authClient)&&!import.meta.env.VITE_DEV_TESTING){fallbackToSamples(work);return;}
   const source=work;const active=new AbortController();controller.current=active;
   update({stage:'generating'});
   const timeout=setTimeout(()=>active.abort(),action==='image'?100000:55000);
@@ -101,7 +105,7 @@ export default function BrandIdentityFlow({startNew=false,profile,brand,onExit,o
     if(data?.source!=='ai'||!Array.isArray(data.concepts)||data.concepts.length!==3)throw new Error('The brand directions could not be read.');
     setWork(value=>({...value,concepts:data.concepts.map(validConcept),selected:0,palette:refinement==='Try softer colors'?2:-1,style:refinement==='Make it more minimal'?0:refinement?value.style:0,handwritten:refinement==='Handwrite style'?true:refinement?value.handwritten:false,image:null,origin:'ai',basis:signature(source.profile),refinement:'',stage:'preview'}));
    }
-  }catch(err){if(controller.current===active){setError(err instanceof Error&&err.name==='AbortError'?'Generation stopped. Your farm details and previous design are still available.':(err as Error).message);setWork(value=>({...value,stage:source.concepts.length?'preview':'review'}));}}
+  }catch{if(controller.current===active)fallbackToSamples(source);}
   finally{clearTimeout(timeout);if(controller.current===active)controller.current=null;}
  }
  function refine(text=work.refinement){
