@@ -19,7 +19,7 @@ Build `dist/` with `npm run build` before previewing. On this computer, `Preview
 
 ## Demo sign-in
 
-When Supabase is not configured, sign in with `farmer@example.com` / `123456`. This public DEV account opens a separate sample farmer workspace, remembers the session across reloads, and supports signing out. Progress stays on this browser; no real account, cloud access or marketplace permission is created. Guest progress remains separate.
+When Supabase is not configured, sign in with `farmer@example.com` / `123456`. This public DEV account opens a separate sample farmer workspace, remembers the session across reloads, and supports signing out. Progress stays on this browser; no real account, cloud access or marketplace permission is created. Guest progress remains separate. Create Account also supports a DEV continuation: it copies the current guest workspace into a new local demo session without storing a password or registering a real account. Without an auth connection or scan access code, uploaded/captured product photos proceed directly to editable details; scan failures also fall back to manual entry instead of blocking the flow.
 
 ## Farmer onboarding and product flow
 
