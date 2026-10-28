@@ -1,8 +1,9 @@
+import type {ListingContent} from './publishing.ts';
 import {allergenStatement,validAllergenSelection,type AllergenSelection} from './productFields.ts';
 import {canAddProduct,signature,validConcept,type BrandKit,type FarmerProfile} from './branding.ts';
 import {fieldNames,validateAnalysis,type Analysis,type FieldName} from './analysis.ts';
 type ProductInfo=Record<FieldName,string>;
-export type ProductDraft=ProductInfo&{id?:string;createdAt?:string;packagingComplete?:boolean;photos?:string[];photo:string;price:string;currency?:'SGD';story:string;live:boolean;sample?:boolean;ingredientInput?:string;ingredientsNotApplicable?:boolean;allergenDetails?:AllergenSelection;brandIdentity?:BrandKit;packagingMode?:'photo'|'3d'};
+export type ProductDraft=ProductInfo&{id?:string;createdAt?:string;packagingComplete?:boolean;photos?:string[];listing?:ListingContent;photo:string;price:string;currency?:'SGD';story:string;live:boolean;sample?:boolean;ingredientInput?:string;ingredientsNotApplicable?:boolean;allergenDetails?:AllergenSelection;brandIdentity?:BrandKit;packagingMode?:'photo'|'3d'};
 export const productWorkKey='farmily-product-work';
 export function restoreProductWork(value:unknown,profile:FarmerProfile){
  if(!value||typeof value!=='object')return null;
