@@ -1,5 +1,5 @@
 export type FarmPhoto = { id: string; kind: 'farm' | 'products' | 'process'; url: string; name: string };
-export type FarmerProfile = { farmerName: string; farmName: string; location: string; story: string; products: string; philosophy: string; photos: FarmPhoto[] };
+export type FarmerProfile = { farmerName: string; farmName: string; location: string; address?:string; story: string; products: string; philosophy: string; photos: FarmPhoto[] };
 export type BrandConcept = { id: string; name: string; tagline: string; rationale: string; colors: string[]; typography: 'serif' | 'sans'; packaging: string; imagePrompt: string };
 export type BrandKit = { concept: BrandConcept; origin: 'ai' | 'sample' | 'existing'; image: string | null; imageSource: 'ai' | 'uploaded' | 'none'; profileSignature: string; designStyle?:'Minimal'|'Rustic'|'Playful'; handwritten?:boolean };
 export const blankProfile: FarmerProfile = { farmerName:'',farmName:'',location:'',story:'',products:'',philosophy:'',photos:[] };
@@ -12,6 +12,7 @@ export const imageDisclosure = (source: BrandKit['imageSource']) => source === '
 export function validProfile(value: unknown): FarmerProfile {
   if (!value || typeof value !== 'object') throw new Error('Please complete your farm profile first.');
   const p = value as FarmerProfile;
+  if(p.address!==undefined&&(typeof p.address!=='string'||p.address.length>2500))throw new Error('Keep your address under 2,500 characters.');
   for (const key of ['farmerName','farmName','location','story','products','philosophy'] as const) if (typeof p[key] !== 'string' || p[key].length > 2500) throw new Error('Check your farm profile. Keep each answer under 2,500 characters.');
   if (!p.farmerName.trim() || !p.farmName.trim() || !p.products.trim()) throw new Error('Add your name, farm name and products first.');
   if (!Array.isArray(p.photos) || p.photos.length>3 || p.photos.some(photo=>!photo || typeof photo.url!=='string' || typeof photo.id!=='string' || typeof photo.name!=='string' || !['farm','products','process'].includes(photo.kind))) throw new Error('Choose up to three farm, product or process photos.');
