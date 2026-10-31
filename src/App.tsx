@@ -5,19 +5,21 @@ import {entryStep,initialRole,roleKey,type UserRole} from '../shared/role';
 import {validProfile} from '../shared/branding';
 import {workspaceStorage} from './accountStorage';
 import {useAccount} from './AuthContext';
-import AccountGate from './AccountGate';
 import Welcome from './Welcome';
+import OnboardingV2 from './OnboardingV2';
 
 export default function App(){
  const account=useAccount();
  const [role,setRole]=useState<UserRole|null>(()=>{try{let hasProfile=false;try{validProfile(JSON.parse(workspaceStorage.getItem('farmily-profile')||'null'));hasProfile=true;}catch{/* new farmer */}return initialRole(workspaceStorage.getItem(roleKey),hasProfile);}catch{return null;}});
  const [guest,setGuest]=useState(()=>{try{return localStorage.getItem('farmily-guest-mode')==='true';}catch{return false;}});
  const [accountPrompt,setAccountPrompt]=useState<'signin'|'signup'|null>(null);
- const choose=(next:UserRole|null)=>{try{if(next)workspaceStorage.setItem(roleKey,next);else workspaceStorage.removeItem(roleKey);}catch{/* selection still works for this session */}setAccountPrompt(null);if(next&&!account.identity){try{localStorage.setItem('farmily-guest-mode','true');}catch{}setGuest(true);}setRole(next);window.scrollTo({top:0,behavior:'instant'});};
+ const [v2Complete,setV2Complete]=useState(()=>role==='farmer');
+ const choose=(next:UserRole|null)=>{try{if(next)workspaceStorage.setItem(roleKey,next);else workspaceStorage.removeItem(roleKey);}catch{/* selection still works for this session */}setAccountPrompt(null);if(!next)setV2Complete(false);if(next&&!account.identity){try{localStorage.setItem('farmily-guest-mode','true');}catch{}setGuest(true);}setRole(next);window.scrollTo({top:0,behavior:'instant'});};
  const startSelling=()=>{try{workspaceStorage.removeItem('farmily-onboarding-skipped');}catch{/* onboarding remains available from Home */}choose('farmer');};
  const signOut=async()=>{try{localStorage.removeItem('farmily-guest-mode');}catch{/* session only */}setGuest(false);await account.signOut();};
- const accountPage=accountPrompt?<AccountGate key={accountPrompt} initialMode={accountPrompt} onBack={()=>setAccountPrompt(null)}/>:null;
+ const accountPage=accountPrompt?<OnboardingV2 key={accountPrompt} accountMode={accountPrompt} onBuy={()=>choose('customer')} onComplete={()=>setAccountPrompt(null)} onAccountBack={()=>setAccountPrompt(null)}/>:null;
  const entry=entryStep(!!account.identity,guest,role);
+ if(!v2Complete&&entry!=='customer')return <OnboardingV2 onBuy={()=>choose('customer')} onComplete={()=>{setV2Complete(true);startSelling();}}/>;
  if(entry==='farmer')return <><div hidden={!!accountPrompt}><FarmerApp onChangeRole={()=>choose(null)} onCreateAccount={()=>setAccountPrompt('signup')} onSignIn={()=>setAccountPrompt('signin')} onSignOut={signOut}/></div>{accountPage}</>;
  if(entry==='customer')return <><div hidden={!!accountPrompt}><div className="app-shell role-choice"><main className="role-choice-body customer-wip"><p className="role-welcome">Welcome to Farmily</p><h1>Explore Farmily</h1><span className="badge"><DevBadge/> Work in progress</span><p>The customer marketplace is still being designed.</p><button className="button secondary" onClick={()=>choose(null)}>Back to welcome</button><button className="text-button" onClick={startSelling}>Start selling instead</button></main></div></div>{accountPage}</>;
  return <><div hidden={!!accountPrompt}><Welcome onExplore={()=>choose('customer')} onSell={startSelling} onSignIn={()=>setAccountPrompt('signin')}/></div>{accountPage}</>;
