@@ -2,6 +2,20 @@
 [Open Farmily app](https://farmily-sg.vercel.app)
 # Farmily local prototype
 
+## V2 onboarding
+
+The [V2 publish section](https://www.figma.com/design/kowdyJKqaPGqrG9qWD2Lb9/Farmily---UI?node-id=1153-3087) is available from the Home publishing task or a saved product’s Publish action. It includes editable details, optional three product/two process photos, voice description entry, independent Original/Polished wording, a swipeable gallery, listing preview and the confirmation screen. Wording assistance runs locally and preserves supplied facts; it does not call AI. Uploads accept JPG, PNG and WebP up to 512 KB each. Drafts are workspace-scoped and invalidate when the saved source product changes. Ingredient and allergen editing use the existing controls and preserve declaration qualifiers.
+
+Publish saves an explicitly labelled **local demo listing**, not a public marketplace listing. The success subtitle and preview footer state this; View in marketplace opens a local preview. Publishing preserves the existing saved-product format, adds listing photos and local-publication metadata, and completes the Home setup deck. No marketplace API is called. Figma’s exact sample imagery appears only for explicitly marked sample products; uploaded photos remain dynamic.
+
+The [V2 brand identity section](https://www.figma.com/design/kowdyJKqaPGqrG9qWD2Lb9/Farmily---UI?node-id=1153-3085) replaces the brand setup entry with the new start, farm review, creating, style picker, saved kit and leave sheet. Creation is the simulated preview specified in the Figma DEV notes; it makes no paid AI requests. The three packaging images are the exact downloaded sample references. Farm details, category, written preferences, all four palettes, style and handwriting preferences persist in a workspace draft. Existing-brand confirmation skips creation and does not claim uploaded artwork. Interrupted creation resumes at the editable farm step. Saving writes the existing brand kit and design library formats, unlocks product setup, and advances the Home task deck. Microphone fields support recording/review with typing as fallback. Freeform requests are retained as preferences; they do not generate custom artwork in this simulated flow.
+
+The [V2 first home section](https://www.figma.com/design/kowdyJKqaPGqrG9qWD2Lb9/Farmily---UI?node-id=1153-3084) is connected after onboarding. Returning farmers resume Home. The task deck follows actual saved profile, brand and product progress; completing a task animates its card away over 0.45 seconds, with reduced-motion support. Brand, product, order and profile actions open the existing flows. Sales stay empty until connected; tapping the sales card offers an explicitly labelled sample analytics preview. Home uses the exact local Figma icons and illustrations, with farmer details supplied by the saved profile.
+
+The entry flow now implements only the [V2 onboarding section](https://www.figma.com/design/kowdyJKqaPGqrG9qWD2Lb9/Farmily---UI?node-id=1153-3083): welcome, sign-in, create account, farm basics, story (including recording/review), photos, and account prompt. It uses locally bundled Figtree/Bricolage Grotesque fonts and downloaded Figma assets. The existing marketplace and farmer workspace remain the destinations after onboarding.
+
+Farm details, pending product text, story fields and photos are stored in the current workspace under `farmily-v2-onboarding`. This draft transfers with guest account progress. Photo uploads accept JPG, PNG and WebP up to 512 KB each. Story suggestion chips insert editable text locally. Voice entry uses the browser speech recognition service when available: Stop opens review, Use this replaces the selected field, and Close leaves the original field intact. Unsupported or blocked microphone access returns to typing. Recording controls were browser-tested with simulated recognition; actual microphone recognition depends on browser/device support.
+
 React + TypeScript + Vite reconstruction of the mobile screens visible in [Farmily — UI](https://www.figma.com/design/kowdyJKqaPGqrG9qWD2Lb9/Farmily---UI?node-id=189-476).
 
 ## Run
@@ -98,6 +112,23 @@ For optional real authentication, set `VITE_ENABLE_BACKEND=true`, `VITE_SUPABASE
 The default demo does not call these services. Local demo credentials, orders, publishing and generated exports are clearly marked development features.
 
 ## Temporary dev testing access
+
+## V2 daily-use screens
+
+The non-Home screens from Figma section `1153:3088` are implemented: product status lists, product overview, analytics and packaging tabs (including empty states), orders, and profile. Home is unchanged. The catalogue keeps multiple saved products and supports duplication, editing, local publication, unpublishing and deletion. Farm details and photos can be edited from Profile.
+
+Samples are an explicit preview. Sample order actions stay local and do not contact customers; analytics and reviews are examples, not measured farm results. Live orders, marketplace publishing and account deletion still require backend integration. Password updates use the configured Supabase account; guest/demo sessions do not fake password changes.
+
+Packaging downloads provide PDF label artwork, SVG label artwork and a PNG preview, individually or as a ZIP. These are prototype label exports, not manufacturing-ready structural dielines. The sample PNG uses the supplied Figma pouch reference. Exact Figma assets are stored in `public/daily-v2`.
+
+Validation: 58 automated tests, TypeScript and production build; isolated browser checks cover all new tabs and empty states, order actions, profile persistence, actual-product duplication/edit routing, image loading, narrow-screen overflow and the packaging ZIP download.
+## Temporary dev testing access
+
 Vercel deployments from the dev branch allow guests and demo accounts to generate branding and analyze product photos without signing in or entering a scan code. AI calls still require the server OPENAI_API_KEY and use its quota. Other branches retain their account and scan-code checks. Guest work remains in the browser, and marketplace publishing remains an unconnected prototype. Remove this temporary bypass before opening dev to general use.
 
 Browser dictation uses the [Web Speech API](https://developer.mozilla.org/en-US/docs/Web/API/SpeechRecognition), which is not supported by every browser and may use the browser vendor’s speech service. It starts only on a mic tap. Unsupported or denied dictation leaves typed editing available. No speech, image or text service is called by the local demo polishing tools.
+
+## Shorts in v2
+The central Shorts tab brings the earlier AI Brief concept into the v2 navigation. Swipe up/down or use the arrow controls to browse, swipe left or Explore to open an editable idea, and use Why this? for its evidence. Dismissal supports undo; reaching the end offers Home and revisiting ideas. Saved idea drafts, position and dismissals persist in the account-scoped workspace and transfer with guest progress. These are explicitly labelled sample insights; saving an idea does not publish products or overwrite the farm profile. The existing three concept ideas remain examples, without making AI requests or claiming live sales evidence.
+
+Validation: 60 tests, TypeScript and production build pass. Browser checks cover the explanation dialog, draft save/restore, dismissal/undo, swipe navigation, completion, reload and the 320px layout.
