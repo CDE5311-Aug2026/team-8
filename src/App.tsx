@@ -1,4 +1,4 @@
-import DevBadge from './DevBadge';
+import CustomerApp from './customer/CustomerApp';
 import {useState} from 'react';
 import FarmerApp from './FarmerApp';
 import {entryStep,initialRole,roleKey,type UserRole} from '../shared/role';
