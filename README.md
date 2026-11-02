@@ -1,5 +1,13 @@
-# Live Demo
-[Open Farmily app](https://farmily-sg.vercel.app)
+# Farmily — Live demos
+
+Quick access to the hosted previews:
+
+- **Production** — [Open Farmily app](https://farmily-sg.vercel.app)
+- **Development** — [Open Farmily dev](https://farmily-git-dev-reldhas.vercel.app)
+
+[![Production](https://img.shields.io/badge/Production-Open%20Farmily%20App-brightgreen)](https://farmily-sg.vercel.app) [![Development](https://img.shields.io/badge/Development-Open%20Farmily%20Dev-yellow)](https://farmily-git-dev-reldhas.vercel.app)
+
+
 # Farmily local prototype
 
 ## V2 onboarding
@@ -20,7 +28,7 @@ React + TypeScript + Vite reconstruction of the mobile screens visible in [Farmi
 
 ## Run
 
-Use Node.js 24 LTS. From this folder:
+Use Node.js 22.12+ (or 24 LTS). From this folder:
 
 ```sh
 npm install
