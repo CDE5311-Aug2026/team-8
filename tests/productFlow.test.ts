@@ -10,7 +10,7 @@ const product:ProductDraft={...Object.fromEntries(fieldNames.map(key=>[key,'']))
 const brand=existingBrand(sampleProfile);
 test('saving requires reviewed details, a valid price and a matching brand',()=>{
  assert.equal(productCanSave(product,sampleProfile,brand,true),true);
- assert.equal(productCanSave({...product,ingredients:''},sampleProfile,brand,true),false);
+ assert.equal(productCanSave({...product,ingredients:''},sampleProfile,brand,true),true);
  assert.equal(productCanSave({...product,ingredients:'',ingredientsNotApplicable:true},sampleProfile,brand,true),true);
  assert.equal(validProduct({...product,ingredientsNotApplicable:true}),false);
  assert.equal(validProduct({...product,ingredients:'',ingredientsNotApplicable:true,ingredientInput:'Milk'}),false);
@@ -19,6 +19,9 @@ test('saving requires reviewed details, a valid price and a matching brand',()=>
  assert.equal(productCanSave(product,{...sampleProfile,farmName:'Another farm'},brand,true),false);
  for(const price of ['-1','0','Infinity','1e3','1.234','NaN'])assert.equal(validProduct({...product,price}),false);
  assert.equal(validProduct({...product,allergens:''}),false);
+ assert.equal(validProduct({...product,name:''}),false);
+ assert.equal(validProduct({...product,quantity:''}),false);
+ assert.equal(validProduct({...product,ingredients:'Tomatoes (95%), basil\nA pinch of salt.'}),true);
  const unknown={...initialAllergens(''),status:'unknown' as const};
  assert.equal(validProduct({...product,allergens:'Not sure yet',allergenDetails:unknown}),false);
  const chosen={...unknown,status:'selected' as const,contains:['Milk'],mayContain:['Peanuts']};
@@ -41,4 +44,11 @@ test('downloaded labels retain allergen qualifiers and escape user content',()=>
  assert.ok(svg.includes('&lt;script&gt;'));
  assert.ok(svg.includes('Quantity: 1 kg'));
  assert.ok(!labelSvg({...product,ingredients:' '},sampleProfile,brand).includes('Ingredients:'));
+});
+
+test('v2 packaging choices resume without changing reviewed product declarations',()=>{
+ const work={product:{...product,brandIdentity:brand,v2PackagingTheme:1},profileSignature:brand.profileSignature,screen:'packaging',reviewed:true,analysis:null};
+ const restored=restoreProductWork(JSON.parse(JSON.stringify(work)),sampleProfile);
+ assert.equal(restored?.product.v2PackagingTheme,1);assert.equal(restored?.product.allergens,product.allergens);assert.equal(restored?.reviewed,true);
+ assert.equal(restoreProductWork({...work,product:{...work.product,v2PackagingTheme:99}},sampleProfile)?.product.v2PackagingTheme,undefined);
 });

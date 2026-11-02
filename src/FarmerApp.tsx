@@ -1,4 +1,6 @@
-import ShortsV2 from './ShortsV2';
+import {setupCompleteKey,setupWasCompleted} from '../shared/homeProgress';
+import MessagesV2 from './MessagesV2';
+import BriefV2 from './BriefV2';
 import HomeV2 from './HomeV2';
 import DailyUseV2,{type DailyProduct} from './DailyUseV2';
 import {catalogueKey,restoreCatalogue,upsertCatalogue} from '../shared/dailyV2';
@@ -8,7 +10,7 @@ import DevBadge from './DevBadge';
 import {workspaceStorage} from './accountStorage';
 import {useEffect,useRef,useState,type ChangeEvent} from 'react';
 import {ArrowLeft,ArrowRight,BarChart3,Check,Home,Package,Palette,UserRound,Leaf,Plus,X,ShoppingBag} from 'lucide-react';
-import ProductFlow from './ProductFlow';
+import ProductFlowV2 from './ProductFlowV2';
 import {useAccount} from './AuthContext';
 import {workspaceKeys} from '../shared/access';
 import BrandIdentityFlow from './BrandIdentityV2';
@@ -27,7 +29,7 @@ function read<T>(key:string,fallback:T):T{try{return JSON.parse(workspaceStorage
 function readProfile(){try{return validProfile(read('farmily-profile',null));}catch{return null;}}
 function readBrand():BrandKit|null{try{const value=read<BrandKit|null>('farmily-brand',null);if(!value||!['ai','sample','existing'].includes(value.origin)||!['ai','uploaded','none'].includes(value.imageSource)||typeof value.profileSignature!=='string')return null;validConcept(value.concept);return value;}catch{return null;}}
 function readDesigns(){const designs=restoreDesigns(read(brandLibraryKey,[]));const current=readBrand();const farm=readProfile();return current&&farm?keepDesign(designs,current,farm,null):designs;}
-type View='shorts'|'account-offer'|'home'|'profile'|'branding'|'products'|'orders'|'add'|'listing'|'performance';
+type View='messages'|'shorts'|'account-offer'|'home'|'profile'|'branding'|'products'|'orders'|'add'|'listing'|'performance';
 type SavedProduct=DailyProduct&{brandIdentity:BrandKit};
 function readProduct():SavedProduct|null{
  const product=read<SavedProduct|null>('farmily-draft',null);
@@ -57,12 +59,14 @@ export default function FarmerApp({onChangeRole,onCreateAccount,onSignIn,onSignO
  const [publishImmediately,setPublishImmediately]=useState(false);
  const [view,setView]=useState<View>(()=>readProfile()||read('farmily-onboarding-skipped',false)?'home':'profile');
  const [product,setProduct]=useState<SavedProduct|null>(readProduct);
+ const [setupComplete,setSetupComplete]=useState(()=>setupWasCompleted(read<boolean>(setupCompleteKey,false)===true,product,restoreCatalogue(read(catalogueKey,[])),read('farmily-products',[])));
+ useEffect(()=>{if(setupComplete||product?.live&&product.packagingComplete!==false){setSetupComplete(true);try{workspaceStorage.setItem(setupCompleteKey,'true');}catch{/* completion stays available for this visit */}}},[setupComplete,product?.live]);
  const [editProductImmediately,setEditProductImmediately]=useState(false);
  const activeCatalogueId=useRef<string|null>(product?.catalogueId||null);
  function rememberProduct(value:SavedProduct,id?:string|null){const items=restoreCatalogue(read(catalogueKey,[]));const key=id||value.catalogueId||items.find(item=>item.product.name===value.name)?.id||crypto.randomUUID();const next={...value,catalogueId:key};workspaceStorage.setItem(catalogueKey,JSON.stringify(upsertCatalogue(items,{id:key,product:next,draft:false})));workspaceStorage.setItem('farmily-draft',JSON.stringify(next));return next;}
  function productSaved(){const value=readProduct();if(!value)return;try{const next=rememberProduct(value,activeCatalogueId.current);activeCatalogueId.current=next.catalogueId;setProduct(next);}catch{setProduct(value);}}
- const lastHomeCount=useRef(1+Number(canAddProduct(savedProfile,brand))+Number(canAddProduct(savedProfile,brand)&&!!product)+Number(canAddProduct(savedProfile,brand)&&!!product?.live));
- useEffect(()=>{if(view==='home')lastHomeCount.current=1+Number(canAddProduct(savedProfile,brand))+Number(canAddProduct(savedProfile,brand)&&!!product)+Number(canAddProduct(savedProfile,brand)&&!!product?.live);},[view,savedProfile,brand,product]);
+ const lastHomeCount=useRef(setupComplete?4:1+Number(canAddProduct(savedProfile,brand))+Number(canAddProduct(savedProfile,brand)&&!!product)+Number(canAddProduct(savedProfile,brand)&&!!product?.live));
+ useEffect(()=>{if(view==='home')lastHomeCount.current=setupComplete?4:1+Number(canAddProduct(savedProfile,brand))+Number(canAddProduct(savedProfile,brand)&&!!product)+Number(canAddProduct(savedProfile,brand)&&!!product?.live);},[view,savedProfile,brand,product,setupComplete]);
  const [error,setError]=useState('');const [notice,setNotice]=useState('');
  const [confirmDelete,setConfirmDelete]=useState(false);
  const [uploading,setUploading]=useState(false);
@@ -94,12 +98,13 @@ export default function FarmerApp({onChangeRole,onCreateAccount,onSignIn,onSignO
  };
  const brandCurrent=canAddProduct(savedProfile,brand);
  const completion=onboardingCount(savedProfile,brand,!!product);
- if(view==='shorts'&&savedProfile)return <ShortsV2 onNavigate={next=>move(next)}/>;
- if(view==='home'&&savedProfile)return <HomeV2 profile={savedProfile} brandReady={brandCurrent} product={product} signedIn={!!identity} animateFrom={lastHomeCount.current} onCreateAccount={onCreateAccount} onBranding={()=>move('branding')} onAddProduct={()=>move('add')} onPublish={()=>{move('listing');setPublishImmediately(true);}} onProducts={()=>move('products')} onOrders={()=>move('orders')} onProfile={()=>{setDraft(profile);move('profile');}} onPerformance={()=>move('performance')} onShorts={()=>move('shorts')}/>;
+ if(view==='messages')return <MessagesV2 onBack={()=>move('home')}/>;
+ if(view==='shorts'&&savedProfile)return <BriefV2 onNavigate={next=>move(next)}/>;
+ if(view==='home'&&savedProfile)return <HomeV2 setupComplete={setupComplete} profile={savedProfile} brandReady={brandCurrent} product={product} signedIn={!!identity} animateFrom={lastHomeCount.current} onCreateAccount={onCreateAccount} onBranding={()=>move('branding')} onAddProduct={()=>move('add')} onPublish={()=>{move('listing');setPublishImmediately(true);}} onProducts={()=>move('products')} onOrders={()=>move('orders')} onProfile={()=>{setDraft(profile);move('profile');}} onPerformance={()=>move('performance')} onShorts={()=>move('shorts')} onMessages={()=>move('messages')}/>;
 if(savedProfile&&!onboarding&&(['products','orders','profile','performance'] as View[]).includes(view))return <DailyUseV2 key={view} page={view==='performance'?'detail':view as 'products'|'orders'|'profile'} profile={savedProfile} brand={brand} designs={brandDesigns} currentProduct={product} onNavigate={next=>move(next)} onAdd={()=>move('add')} onEditProduct={next=>{workspaceStorage.setItem('farmily-draft',JSON.stringify(next));setProduct(next as SavedProduct);move('listing');activeCatalogueId.current=next.catalogueId||null;setEditProductImmediately(true);}} onPublishProduct={next=>{workspaceStorage.setItem('farmily-draft',JSON.stringify(next));setProduct(next as SavedProduct);move('listing');activeCatalogueId.current=next.catalogueId||null;setPublishImmediately(true);}} onBranding={startNew=>{move('branding');setStartNewBrand(startNew);}} onSaveProfile={next=>{try{validProfile(next);if(!store('farmily-profile',next))return false;setProfile(next);setDraft(next);return true;}catch{return false;}}} onSignOut={async()=>{await onSignOut();onChangeRole();}} onCreateAccount={onCreateAccount} onDeleteData={deleteProfile} onRefresh={()=>setProduct(readProduct())}/>;
 if(view==='account-offer')return <div className="app-shell account-offer"><header className="farmer-header"><span className="farmily-logo"><Leaf size={22}/> Farmily</span></header><main className="farmer-main"><div className="profile-saved-icon"><Check size={32}/></div><h1 ref={profileHeading} tabIndex={-1}>Your farm profile is ready</h1><p className="intro">Create an account to save your farm across devices.</p><section className="card saved-profile-summary"><Leaf size={23}/><div><h2>{profile.farmName}</h2><p>Your farm profile is saved in this browser.</p></div><Check size={19}/></section><div className="welcome-actions"><button className="button primary" onClick={onCreateAccount}>Create account</button><p className="account-signin-link">Already have an account? <button className="text-button" onClick={onSignIn}>Sign in</button></p><button className="button secondary" onClick={()=>{dismissAccount();move('home');}}>Continue as guest</button><button className="text-button" onClick={()=>{setDraft(profile);setOnboarding(true);setProfileStep(2);move('profile');}}>Edit farm profile</button></div></main></div>;
  if(view==='branding')return <BrandIdentityFlow startNew={startNewBrand} profile={savedProfile} brand={brand} onExit={()=>move(brandReturn.current)} onHome={()=>move('home')} onAddProduct={()=>move('add')} onCreateAccount={onCreateAccount} onEditProfile={()=>{setDraft(profile);move('profile');}} onSaveProfile={farm=>{try{validProfile(farm);if(!store('farmily-profile',farm))return false;setProfile(farm);setDraft(farm);return true;}catch{return false;}}} onSaveBrand={(kit,farm)=>{try{validProfile(farm);validConcept(kit.concept);if(kit.profileSignature!==signature(farm))return false;const designs=keepDesign(brandDesigns,kit,farm);if(!store(brandLibraryKey,designs)||!store('farmily-profile',farm)||!store('farmily-brand',kit))return false;setBrandDesigns(designs);setProfile(farm);setDraft(farm);setBrand(kit);return true;}catch{return false;}}}/>;
- if((view==='add'||view==='listing')&&profile&&(view==='listing'||brandCurrent))return <ProductFlow editOnOpen={editProductImmediately} publishOnOpen={publishImmediately} onCatalogue={()=>move('products')} onPerformance={()=>move('performance')} onCreateAccount={onCreateAccount} key={view} farmProfile={profile} brandKit={brandCurrent?brand:null} startAt={view==='listing'?'listing':'add'} onExit={()=>move(view==='listing'?'products':'home')} onBranding={()=>move('branding')} onSaved={productSaved}/>;
+ if((view==='add'||view==='listing')&&profile&&(view==='listing'||brandCurrent))return <ProductFlowV2 editOnOpen={editProductImmediately} publishOnOpen={publishImmediately} onCatalogue={()=>move('products')} onPerformance={()=>move('performance')} onCreateAccount={onCreateAccount} key={view} farmProfile={profile} brandKit={brandCurrent?brand:null} startAt={view==='listing'?'listing':'add'} onExit={()=>move(view==='listing'?'products':'home')} onBranding={()=>move('branding')} onSaved={productSaved}/>;
  return <div className="app-shell farmer-shell">
   <input ref={pick} type="file" accept="image/jpeg,image/png,image/webp" hidden onChange={uploadPhoto}/>
   <header className="farmer-header">{onboarding&&profileStep===0&&<button type="button" className="icon-button back" aria-label={profileStep>0?'Previous step':setupDeferred?'Back to home':'Back to welcome'} disabled={uploading} onClick={()=>{if(profileStep>0){setProfileStep(step=>step-1);setError('');}else if(setupDeferred){setOnboarding(false);move('home');}else onChangeRole();}}><ArrowLeft/></button>}<span className="farmily-logo"><Leaf size={22}/> Farmily</span>{onboarding?null:<span className="farmer-role">{identity?.demo?<><DevBadge/> Demo farmer</>:identity?'Farmer':'Guest · Farmer'}</span>}</header>

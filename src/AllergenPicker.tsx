@@ -1,7 +1,7 @@
 import SearchMultiSelect,{type SelectChoice} from './SearchMultiSelect';
 import {allergenGroups,setAllergenFree,type AllergenSelection} from '../shared/productFields';
 const allergens=allergenGroups.flatMap(group=>group.options);
-export default function AllergenPicker({value,onChange,labelEvidence}:{value:AllergenSelection;onChange:(value:AllergenSelection)=>void;labelEvidence?:string}){
+export default function AllergenPicker({value,onChange,labelEvidence,inlineOptions=false}:{value:AllergenSelection;onChange:(value:AllergenSelection)=>void;labelEvidence?:string;inlineOptions?:boolean}){
  const none={id:'none',label:'None declared'};const unknown={id:'unknown',label:'Not sure yet'};
  const original={id:'label',label:value.original};
  const options:SelectChoice[]=[none,unknown,...allergens.map(item=>({id:`contains:${item}`,label:item})),...allergens.map(item=>({id:`may:${item}`,label:`May contain: ${item}`})),...(value.original?[original]:[])];
@@ -16,5 +16,5 @@ export default function AllergenPicker({value,onChange,labelEvidence}:{value:All
   const includeOriginal=items.some(item=>item.id==='label');
   onChange({...value,status:regular.length?'selected':includeOriginal?'label':'unknown',includeOriginal,contains,mayContain});
  }
- return <div className="pf-allergen-simple"><SearchMultiSelect required disabled={value.status==='free'} label="Allergens" placeholder="Search and select allergens" options={options} selected={selected} customChoice={text=>({id:text.toLowerCase().startsWith('may contain:')?`may:${text.slice(12).trim()}`:`contains:${text}`,label:text})} onChange={change} afterInput={<label className="pf-field-checkbox"><input type="checkbox" checked={value.status==='free'} onChange={event=>onChange(setAllergenFree(value,event.target.checked))}/><span>Allergen-free</span></label>}/>{labelEvidence&&<details className="pf-original-allergens"><summary>Original label wording</summary><blockquote>{labelEvidence}</blockquote></details>}{value.status==='none'&&<small>“None declared” does not mean allergen-free.</small>}</div>;
+ return <div className="pf-allergen-simple"><SearchMultiSelect inlineOptions={inlineOptions} required disabled={value.status==='free'} label="Allergens" placeholder="Search and select allergens" options={options} selected={selected} customChoice={text=>({id:text.toLowerCase().startsWith('may contain:')?`may:${text.slice(12).trim()}`:`contains:${text}`,label:text})} onChange={change} afterInput={<label className="pf-field-checkbox"><input type="checkbox" checked={value.status==='free'} onChange={event=>onChange(setAllergenFree(value,event.target.checked))}/><span>Allergen-free</span></label>}/>{labelEvidence&&<details className="pf-original-allergens"><summary>Original label wording</summary><blockquote>{labelEvidence}</blockquote></details>}{value.status==='none'&&<small>“None declared” does not mean allergen-free.</small>}</div>;
 }

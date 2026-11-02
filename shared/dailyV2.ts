@@ -8,6 +8,12 @@ export type CatalogueStatus='Published'|'Unpublished'|'Draft';
 export function catalogueStatus(item:CatalogueItem):CatalogueStatus{return item.draft?'Draft':item.product.live?'Published':'Unpublished';}
 export function restoreCatalogue(value:unknown):CatalogueItem[]{if(!Array.isArray(value))return [];return value.filter((item):item is CatalogueItem=>{try{return !!item&&typeof item.id==='string'&&typeof item.draft==='boolean'&&typeof item.product?.name==='string'&&typeof item.product.photo==='string'&&typeof item.product.live==='boolean'&&(!item.product.brandIdentity||!!validConcept(item.product.brandIdentity.concept));}catch{return false;}});}
 export function upsertCatalogue(items:CatalogueItem[],item:CatalogueItem){return [...items.filter(p=>p.id!==item.id),item];}
+export function currentCatalogueItem(product:LocalProduct&{catalogueId?:string},items:CatalogueItem[]):CatalogueItem{
+ const existing=items.find(item=>product.catalogueId?item.id===product.catalogueId:item.product.name===product.name);
+ const supplied=Object.fromEntries(Object.entries(product).filter(([,value])=>value!==undefined));
+ const merged={...existing?.product,...supplied} as LocalProduct;
+ return {id:product.catalogueId||existing?.id||`current-${product.name}`,product:merged,draft:merged.packagingComplete===undefined?existing?.draft??!merged.brandIdentity:!merged.packagingComplete};
+}
 export function isProductDraft(product:ProductDraft,brand:BrandKit|null){try{return !validProduct(product)||!brand;}catch{return true;}}
 export type OrderStatus='New'|'Preparing'|'On the way'|'Completed'|'Cancelled';
 export type SampleOrder={id:string;customer:string;items:string;total:string;delivery:string;status:OrderStatus};

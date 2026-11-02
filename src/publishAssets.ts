@@ -1,4 +1,5 @@
 export const publishAssets = {
+  "1143:2690_imgSprout": "/publish-v2/sprout-success.svg",
   "1143:2343_imgChevron": "/publish-v2/79f30037-cd82-40d6-9099-608a6dacc604.svg",
   "1143:2343_imgIcon": "/publish-v2/74cf2cee-fb3c-47d6-83ae-ae561f0b2f24.svg",
   "1143:2343_imgIconSparkle": "/publish-v2/17c55c4b-2020-43bd-bf7f-a346a3a8bc19.svg",
