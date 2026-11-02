@@ -1,0 +1,44 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {validProduct,productCanSave,restoreProductWork,labelSvg,productWorkKey,type ProductDraft} from '../shared/productFlow.ts';
+import {fieldNames} from '../shared/analysis.ts';
+import {sampleProfile} from '../shared/branding.ts';
+import {existingBrand} from '../shared/brandFlow.ts';
+import {workspaceKeys} from '../shared/access.ts';
+import {allergenStatement,initialAllergens} from '../shared/productFields.ts';
+const product:ProductDraft={...Object.fromEntries(fieldNames.map(key=>[key,''])) as Record<(typeof fieldNames)[number],string>,name:'Heirloom Tomatoes',category:'Vegetables',ingredients:'Tomatoes',allergens:'May contain traces of peanuts and tree nuts',quantity:'1 kg',price:'4.50',photo:'',story:'',live:false};
+const brand=existingBrand(sampleProfile);
+test('saving requires reviewed details, a valid price and a matching brand',()=>{
+ assert.equal(productCanSave(product,sampleProfile,brand,true),true);
+ assert.equal(productCanSave({...product,ingredients:''},sampleProfile,brand,true),false);
+ assert.equal(productCanSave({...product,ingredients:'',ingredientsNotApplicable:true},sampleProfile,brand,true),true);
+ assert.equal(validProduct({...product,ingredientsNotApplicable:true}),false);
+ assert.equal(validProduct({...product,ingredients:'',ingredientsNotApplicable:true,ingredientInput:'Milk'}),false);
+ assert.equal(productCanSave(product,sampleProfile,brand,false),false);
+ assert.equal(productCanSave(product,sampleProfile,null,true),false);
+ assert.equal(productCanSave(product,{...sampleProfile,farmName:'Another farm'},brand,true),false);
+ for(const price of ['-1','0','Infinity','1e3','1.234','NaN'])assert.equal(validProduct({...product,price}),false);
+ assert.equal(validProduct({...product,allergens:''}),false);
+ const unknown={...initialAllergens(''),status:'unknown' as const};
+ assert.equal(validProduct({...product,allergens:'Not sure yet',allergenDetails:unknown}),false);
+ const chosen={...unknown,status:'selected' as const,contains:['Milk'],mayContain:['Peanuts']};
+ assert.equal(validProduct({...product,allergens:allergenStatement(chosen),allergenDetails:chosen}),true);
+});
+test('product drafts restore review state and selected design without inventing label details',()=>{
+ const work={product:{...product,brandIdentity:brand},profileSignature:brand.profileSignature,screen:'packaging',reviewed:true,analysis:null};
+ assert.equal(restoreProductWork(work,sampleProfile)?.screen,'packaging');
+ assert.equal(restoreProductWork({...work,product:{...product,allergens:''}},sampleProfile)?.screen,'details');
+ assert.equal(restoreProductWork({...work,reviewed:false},sampleProfile)?.screen,'details');
+ assert.equal(restoreProductWork(work,{...sampleProfile,farmName:'Other farm'}),null);
+ assert.equal(restoreProductWork({product:{}},sampleProfile),null);
+ assert.ok(workspaceKeys.includes(productWorkKey));
+});
+test('downloaded labels retain allergen qualifiers and escape user content',()=>{
+ const svg=labelSvg({...product,name:'<script>alert("x")</script>',ingredients:'Tomatoes & basil'},sampleProfile,brand);
+ assert.ok(svg.includes('May contain traces of peanuts and tree nuts'));
+ assert.ok(svg.includes('Tomatoes &amp; basil'));
+ assert.ok(!svg.includes('<script>'));
+ assert.ok(svg.includes('&lt;script&gt;'));
+ assert.ok(svg.includes('Quantity: 1 kg'));
+ assert.ok(!labelSvg({...product,ingredients:' '},sampleProfile,brand).includes('Ingredients:'));
+});
