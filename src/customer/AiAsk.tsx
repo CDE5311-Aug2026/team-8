@@ -1,3 +1,4 @@
+import Sprout from '../Sprout';
 import {useEffect,useState,type FormEvent} from 'react';
 import {answerFor,thinkingMs} from './aiAnswers';
 import {SendIcon,SparkleIcon} from './icons';
@@ -18,19 +19,19 @@ export default function AiAsk({onSelectProduct}:{onSelectProduct:(id:string)=>vo
  const reset=()=>{setQuestion(null);setThinking(false);};
  return <>
   <div className="cx-ai-ask">
-   <div className="cx-ai-ask-title"><SparkleIcon className="cx-ai-mark"/><h3>Not sure what to pick?</h3></div>
-   <p className="cx-ai-ask-hint">Tell Farmily AI what you’re cooking</p>
+   <div className="cx-ai-ask-title"><Sprout size="tiny"/><h3>Not sure what to pick?</h3></div>
+   <p className="cx-ai-ask-hint">Tell Sprout what you’re cooking</p>
    {question===null&&<div className="cx-ai-chips">
     {aiPromptChips.map(text=><button key={text} type="button" className="cx-chip cx-chip-prompt" onClick={()=>ask(text)}>{text}</button>)}
    </div>}
   </div>
   {question===null&&<form className="cx-ai-input" onSubmit={send}>
-   <input type="text" placeholder="Ask Farmily AI" aria-label="Ask Farmily AI" value={draft} onChange={e=>setDraft(e.target.value)}/>
+   <input type="text" placeholder="Ask Sprout" aria-label="Ask Sprout" value={draft} onChange={e=>setDraft(e.target.value)}/>
    <button type="submit" className="cx-ai-send" aria-label="Send"><SendIcon/></button>
   </form>}
   {question!==null&&<div className="cx-ai-answer" aria-live="polite">
    <p className="cx-ai-question">{question}</p>
-   <p className="cx-ai-label"><SparkleIcon size={16}/>Farmily AI</p>
+   <p className="cx-ai-label"><Sprout size="tiny"/>Sprout</p>
    {thinking?<p className="cx-ai-thinking">Thinking…</p>:<>
     <div className="cx-ai-rows">
      {answerFor(question).map(({productId,reason})=>{

@@ -1,3 +1,5 @@
+import CompletedHomeV2 from './CompletedHomeV2';
+import useCardSwipe from './useCardSwipe';
 import {DailyNav} from './DailyPrimitives';
 import {useEffect,useRef,useState} from 'react';
 import {homeAssets} from './homeAssets';
@@ -6,27 +8,29 @@ import type {FarmerProfile} from '../shared/branding';
 import MobileDialog from './MobileDialog';
 
 type HomeProduct={name:string;photo:string;price:string;quantity:string;live:boolean;publication?:'local-demo'};
-type Props={profile:FarmerProfile;brandReady:boolean;product:HomeProduct|null;signedIn:boolean;animateFrom:number;onCreateAccount:()=>void;onBranding:()=>void;onAddProduct:()=>void;onPublish:()=>void;onProducts:()=>void;onOrders:()=>void;onProfile:()=>void;onPerformance:()=>void;onShorts:()=>void};
+type Props={profile:FarmerProfile;brandReady:boolean;product:HomeProduct|null;signedIn:boolean;animateFrom:number;onCreateAccount:()=>void;onBranding:()=>void;onAddProduct:()=>void;onPublish:()=>void;onProducts:()=>void;onOrders:()=>void;onProfile:()=>void;onPerformance:()=>void;onShorts:()=>void;onMessages:()=>void};
 function Icon({name}:{name:keyof typeof homeAssets}){return <img src={homeAssets[name]} alt=""/>;}
 const tasks=[
  {step:2,title:'Create your brand',description:'Colours, personality and packaging',illustration:'imgIllustration1'},
  {step:3,title:'Add your first product',description:'Snap a photo, we fill in the rest',illustration:'nextIllustration'},
  {step:4,title:'Publish your first product',description:'Go live in the marketplace',illustration:'imgIllustration'},
 ] as const;
-export default function HomeV2({profile,brandReady,product,signedIn,animateFrom,onCreateAccount,onBranding,onAddProduct,onPublish,onProducts,onOrders,onProfile,onPerformance,onShorts}:Props){
+export default function HomeV2({profile,brandReady,product,signedIn,animateFrom,onCreateAccount,onBranding,onAddProduct,onPublish,onProducts,onOrders,onProfile,onPerformance,onShorts,onMessages}:Props){
  const count=1+Number(brandReady)+Number(brandReady&&!!product)+Number(brandReady&&!!product?.live);
  const [leaving,setLeaving]=useState(()=>count>animateFrom&&animateFrom>0);
  const [sample,setSample]=useState(false);const [analytics,setAnalytics]=useState(false);const previewButton=useRef<HTMLButtonElement>(null);
  useEffect(()=>{if(!leaving)return;const timer=window.setTimeout(()=>setLeaving(false),450);return()=>clearTimeout(timer);},[leaving]);
  const current=Math.min(count-1,2);
  const start=()=>{if(!brandReady)onBranding();else if(!product)onAddProduct();else onPublish();};
+ const swipe=useCardSwipe(()=>start());
  const values=sample?['8','SGD 18.50','128','24','7','1']:['—','—','—','—','—','—'];
  const metrics=['Orders','Avg. order','Shop views','Followers','Customers','Repeat buyers'];
- function taskCard(index:number,layer:number,done=false){const task=tasks[index];return <article key={done?'done':task.step} className={`home-v2-task ${layer===0?'current':'queued'} ${done?'leaving':''} ${leaving&&!done&&layer===0?'rising':''}`} style={{'--layer':layer} as React.CSSProperties} aria-hidden={layer>0||done?true:undefined}>
+ function taskCard(index:number,layer:number,done=false){const task=tasks[index];return <article key={done?'done':task.step}  {...(layer===0&&!done?swipe.handlers:{})} className={`home-v2-task ${layer===0?'current':'queued'} ${done?'leaving':''} ${leaving&&!done&&layer===0?'rising':''} ${layer===0&&!done?swipe.className:''}`} style={{'--layer':layer,...(layer===0&&!done?swipe.style:{})} as React.CSSProperties} aria-hidden={layer>0||done?true:undefined}>
   <small>{done?'Done':`Step ${task.step} of 4`}</small><h3>{done?(index===0?'Your brand is ready':index===1?'Your product is ready':'Your product is published'):task.title}</h3><p>{task.description}</p>
-  {layer===0&&!done&&<button type="button" className="home-v2-start" onClick={start}>{count===3?'Review':'Start'}</button>}
+  {layer===0&&!done&&<button type="button" className="home-v2-start" disabled={swipe.busy} onClick={()=>swipe.animate(1,start)}>{count===3?'Review':'Start'}</button>}
   <div className="home-v2-illustration"><Icon name={done?'doneIllustration':layer>0?'imgIllustration':task.illustration}/></div>
  </article>;}
+ if(count>=4)return <CompletedHomeV2 {...{profile,product,onProducts,onOrders,onProfile,onShorts,onBranding,onAddProduct,onPerformance,onMessages}}/>;
  return <div className="app-shell v2 home-v2">
   <header className="home-v2-header"><div className="v2-wordmark"><Icon name="imgIconLeaf"/>Farmily</div>{!signedIn&&<button type="button" className="home-v2-account" onClick={onCreateAccount}>Create account</button>}</header>
   <main className="home-v2-content">

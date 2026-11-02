@@ -1,3 +1,4 @@
+import Sprout from '../Sprout';
 import ProductCard from './ProductCard';
 import AiAsk from './AiAsk';
 import type {Product} from './products';

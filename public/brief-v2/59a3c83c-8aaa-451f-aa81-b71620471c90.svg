@@ -1,0 +1,8 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="72" height="80.64" viewBox="0 0 72 80.64" fill="none" xmlns="http://www.w3.org/2000/svg">
+<g id="Sprout">
+<circle id="Body" cx="36" cy="44.64" r="36" fill="#19A35A"/>
+<path id="Leaf" d="M34.56 15.84C34.56 5.76 41.76 0 53.28 0C53.28 10.08 46.08 15.84 34.56 15.84Z" fill="#074226"/>
+<path id="Eye" d="M23.184 30.654C26.208 26.286 29.232 26.286 32.256 30.654" stroke-width="2.52" stroke-linecap="round" stroke="white"/>
+<path id="Eye_2" d="M40.464 30.654C43.488 26.286 46.512 26.286 49.536 30.654" stroke-width="2.52" stroke-linecap="round" stroke="white"/>
+</g>
+</svg>
