@@ -1,0 +1,34 @@
+.pf-mobile-dialog.v2-dialog{inset:auto;margin:0;padding:0;max-width:100vw;max-height:none;border:0;background:#0d140f66;color:#1a1a18;font:400 14px/20px 'Figtree',sans-serif;overflow:hidden}
+.pf-mobile-dialog.v2-dialog[open]{display:flex;flex-direction:column;align-items:stretch;justify-content:flex-end}
+.pf-mobile-dialog.v2-dialog::backdrop{background:transparent}
+.pf-mobile-dialog.v2-dialog>.v2-dialog-panel{display:flex;flex-direction:column;gap:16px;width:100%;max-width:none;max-height:calc(100% - 24px);padding:10px 16px max(24px,env(safe-area-inset-bottom));border:1px solid #e0e0dc;border-bottom:0;border-radius:24px 24px 0 0;background:#fff;box-shadow:0 -8px 32px #07422614;overflow:hidden}
+.v2-dialog .v2-dialog-handle{flex:none;width:36px;height:4px;margin:0 auto;background:#c9c9c4;border-radius:999px}
+.v2-dialog .v2-dialog-header{display:flex;align-items:center;gap:12px;min-height:32px;padding:0;background:transparent;flex:none}
+.v2-dialog .v2-dialog-header h2{flex:1;min-width:0;margin:0;font:700 20px/26px 'Bricolage Grotesque',sans-serif;letter-spacing:-.2px;color:#1a1a18;overflow-wrap:anywhere}
+.v2-dialog .v2-dialog-close{display:grid;place-items:center;flex:none;width:32px;height:32px;min-height:32px;padding:0;border:0;border-radius:50%;background:#f1f1ee;color:#55554f}
+.v2-dialog .v2-dialog-body{display:flex;flex-direction:column;gap:16px;min-height:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;padding:0 2px 2px}
+.v2-dialog .v2-dialog-body p{margin:0;font:400 14px/20px 'Figtree',sans-serif;color:#55554f;overflow-wrap:anywhere}
+.v2-dialog .v2-dialog-body small{font:400 12px/18px 'Figtree',sans-serif;color:#6e6e69}
+.v2-dialog .v2-dialog-body :is(.v2-primary,.v2-secondary,.button){display:flex;align-items:center;justify-content:center;gap:8px;flex:none;width:100%;min-height:48px;height:auto;padding:12px 16px;border:1px solid #074226;border-radius:12px;background:#074226;color:white;box-shadow:none;font:600 16px/22px 'Figtree',sans-serif;letter-spacing:0;text-transform:none;white-space:normal}
+.v2-dialog .v2-dialog-body :is(.v2-secondary,.button.secondary){border-color:#c9c9c4;background:white;color:#1a1a18}
+.v2-dialog .v2-dialog-body :is(.v2-link,.text-button){display:flex;align-items:center;justify-content:center;gap:6px;width:100%;min-height:40px;height:auto;border:0;border-radius:8px;background:transparent;padding:8px 12px;color:#0e6b3b;font:600 14px/20px 'Figtree',sans-serif;letter-spacing:0;text-transform:none;box-shadow:none}
+.v2-dialog .v2-dialog-body :is(.v2-primary,.button).v2-danger{border-color:#d92d20;background:#d92d20;color:white}
+.v2-dialog .v2-dialog-body .danger{color:#d92d20}
+.v2-dialog .v2-dialog-body button:disabled{opacity:.45;cursor:default}
+.v2-dialog .v2-dialog-body :is(.daily-dialog-actions,.daily-edit-form,.ap-exit-actions,.fp-dialog-actions){display:flex;flex-direction:column;gap:12px}
+.v2-dialog .v2-dialog-body form{display:flex;flex-direction:column;gap:16px;min-width:0}
+.v2-dialog .v2-dialog-body label:not(.pf-field-checkbox){display:flex;flex-direction:column;gap:6px;margin:0;font:600 14px/20px 'Figtree',sans-serif;letter-spacing:0;text-transform:none;color:#1a1a18}
+.v2-dialog .v2-dialog-body .field>span,.v2-dialog .v2-dialog-body .pf-field>label:not(.pf-field-checkbox){font:600 14px/20px 'Figtree',sans-serif;letter-spacing:0;text-transform:none;color:#1a1a18}
+.v2-dialog .v2-dialog-body :is(input:not([type=checkbox]):not([type=radio]):not([type=file]),textarea,select){width:100%;min-width:0;min-height:48px;padding:11px 14px;border:1px solid #c9c9c4;border-radius:12px;background:#fff;color:#1a1a18;font:400 16px/24px 'Figtree',sans-serif}
+.v2-dialog .v2-dialog-body textarea{min-height:112px;resize:vertical}
+.v2-dialog .v2-dialog-body .pf-field-checkbox{display:flex;flex-direction:row;align-items:center;gap:8px;font:400 14px/20px 'Figtree',sans-serif;text-transform:none;letter-spacing:0}
+.v2-dialog .v2-dialog-body input[type=checkbox]{width:16px;height:16px;min-width:16px;min-height:16px;margin:0;padding:0;flex:none;accent-color:#074226}
+.v2-dialog .v2-dialog-body :is(.v2-error,.scan-error){padding:12px;border-radius:12px;background:#fff0ed;color:#b42318;font:400 13px/18px 'Figtree',sans-serif}
+.v2-dialog .v2-dialog-summary{display:flex;flex-direction:column;gap:0;margin:0;border:1px solid #e0e0dc;border-radius:12px;padding:0 12px;background:#f5f5f2}
+.v2-dialog .v2-dialog-summary>div{display:flex;align-items:flex-start;gap:16px;padding:12px 0;border-bottom:1px solid #e0e0dc}
+.v2-dialog .v2-dialog-summary>div:last-child{border-bottom:0}
+.v2-dialog .v2-dialog-summary dt{color:#6e6e69;flex:none}
+.v2-dialog .v2-dialog-summary dd{margin:0 0 0 auto;text-align:right;overflow-wrap:anywhere;font-weight:600}
+.v2-dialog :focus-visible{outline:2px solid #19a35a;outline-offset:3px}
+@media(prefers-reduced-motion:no-preference){.v2-dialog[open]>.v2-dialog-panel{animation:v2-dialog-enter .18s ease-out}@keyframes v2-dialog-enter{from{transform:translateY(24px);opacity:0}to{transform:translateY(0);opacity:1}}}
+.pf-mobile-dialog.v2-dialog:not([open]){display:none}.v2-dialog .v2-dialog-header{height:auto;width:100%}
