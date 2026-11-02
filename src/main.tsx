@@ -23,3 +23,10 @@ import './publish-v2.css';
 import './daily-v2.css';
 createRoot(document.getElementById('root')!).render(<React.StrictMode><AccountProvider><App/></AccountProvider></React.StrictMode>);
 import './shorts-v2.css';
+import './brief-v2.css';
+
+import './card-swipe.css';
+import './add-product-v2.css';
+
+import './sprout-v2.css';
+import './dialog-v2.css';
