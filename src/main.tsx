@@ -29,3 +29,4 @@ import './card-swipe.css';
 import './add-product-v2.css';
 
 import './sprout-v2.css';
+import './dialog-v2.css';
