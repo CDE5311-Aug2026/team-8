@@ -12,6 +12,8 @@ Quick access to the hosted previews:
 
 ## V2 onboarding
 
+Sample mode is shared across Home, Products, Orders and product Analytics through the built-in demo account (`farmer@example.com`, password `123456`). Choosing Samples signs into that account, opens its completed workspace and keeps the mode after a refresh. Sample products and edits use the same account workspace across tabs. Exit sample restores the previous guest or local account workspace (or reconnects the existing cloud session); personal data is kept separate.
+
 The [V2 publish section](https://www.figma.com/design/kowdyJKqaPGqrG9qWD2Lb9/Farmily---UI?node-id=1153-3087) is available from the Home publishing task or a saved product’s Publish action. It includes editable details, optional three product/two process photos, voice description entry, independent Original/Polished wording, a swipeable gallery, listing preview and the confirmation screen. Wording assistance runs locally and preserves supplied facts; it does not call AI. Uploads accept JPG, PNG and WebP up to 512 KB each. Drafts are workspace-scoped and invalidate when the saved source product changes. Ingredient and allergen editing use the existing controls and preserve declaration qualifiers.
 
 Publish saves an explicitly labelled **local demo listing**, not a public marketplace listing. The success subtitle and preview footer state this; View in marketplace opens a local preview. Publishing preserves the existing saved-product format, adds listing photos and local-publication metadata, and completes the Home setup deck. No marketplace API is called. Figma’s exact sample imagery appears only for explicitly marked sample products; uploaded photos remain dynamic.
