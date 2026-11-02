@@ -1,0 +1,8 @@
+import {joinFarmStory,splitFarmStory,storySectionOverhead} from '../shared/farmStory';
+import type {FarmerProfile} from '../shared/branding';
+type Story=Pick<FarmerProfile,'story'|'philosophy'>;
+export default function FarmStoryFields({value,onChange}:{value:Story;onChange:(patch:Story)=>void}){
+ const sections=splitFarmStory(value.story);
+ const edit=(key:'beginnings'|'dailyLife',text:string)=>onChange({story:joinFarmStory({...sections,[key]:text}),philosophy:value.philosophy});
+ return <div className="farm-story-fields"><label className="field"><span>Our beginnings</span><textarea name="farmBeginnings" autoCapitalize="sentences" rows={3} maxLength={Math.max(0,2500-(sections.dailyLife?sections.dailyLife.length+storySectionOverhead:0))} placeholder="e.g. A family farm started in 2018, growing food for our neighbours." value={sections.beginnings} onChange={event=>edit('beginnings',event.target.value)}/></label><label className="field"><span>Life on the farm</span><textarea name="farmDailyLife" autoCapitalize="sentences" rows={3} maxLength={Math.max(0,2500-sections.beginnings.length-storySectionOverhead)} placeholder="e.g. We grow seasonal vegetables in small batches and harvest by hand." value={sections.dailyLife} onChange={event=>edit('dailyLife',event.target.value)}/></label><label className="field"><span>Our values</span><textarea name="farmPhilosophy" autoCapitalize="sentences" rows={3} maxLength={2500} placeholder="e.g. Healthy soil, less waste, and fresh food for our community." value={value.philosophy} onChange={event=>onChange({story:value.story,philosophy:event.target.value})}/></label></div>;
+}
