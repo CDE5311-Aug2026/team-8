@@ -1,0 +1,3 @@
+export const messagesKey='farmily-sample-messages-v2';
+export type MessageState={replies:Record<string,string[]>;rules:Record<string,string>};
+export function restoreMessages(v:unknown):MessageState{const empty={replies:{},rules:{}};try{const x=v as MessageState;if(!x||typeof x.replies!=='object'||!x.replies||!x.rules||typeof x.rules!=='object')return empty;const replies:MessageState['replies']={};const rules:MessageState['rules']={};for(const name of ['Minh','Sara','James']){if(Array.isArray(x.replies[name])&&x.replies[name].every(s=>typeof s==='string'&&s.length<=2000))replies[name]=x.replies[name];if(typeof x.rules[name]==='string'&&x.rules[name].length<=2000)rules[name]=x.rules[name];}return {replies,rules};}catch{return empty;}}

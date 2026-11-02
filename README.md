@@ -136,7 +136,27 @@ Vercel deployments from the dev branch allow guests and demo accounts to generat
 
 Browser dictation uses the [Web Speech API](https://developer.mozilla.org/en-US/docs/Web/API/SpeechRecognition), which is not supported by every browser and may use the browser vendor’s speech service. It starts only on a mic tap. Unsupported or denied dictation leaves typed editing available. No speech, image or text service is called by the local demo polishing tools.
 
-## Shorts in v2
-The central Shorts tab brings the earlier AI Brief concept into the v2 navigation. Swipe up/down or use the arrow controls to browse, swipe left or Explore to open an editable idea, and use Why this? for its evidence. Dismissal supports undo; reaching the end offers Home and revisiting ideas. Saved idea drafts, position and dismissals persist in the account-scoped workspace and transfer with guest progress. These are explicitly labelled sample insights; saving an idea does not publish products or overwrite the farm profile. The existing three concept ideas remain examples, without making AI requests or claiming live sales evidence.
+## Brief in v2
+The central Brief tab now follows Figma section `1389:3904`, replacing the earlier Shorts presentation. New ideas use a photo card deck: swipe right to try, left to skip, and flip Why this? to inspect the example evidence. The three editable workflows are a breakfast bundle (product selection, price, saved draft, customer preview, local publication), a Pandan Kaya taster (size, price and jar count), and free delivery (area, minimum order and duration).
 
-Validation: 60 tests, TypeScript and production build pass. Browser checks cover the explanation dialog, draft save/restore, dismissal/undo, swipe navigation, completion, reload and the 320px layout.
+Trying keeps saved drafts and active or paused examples. It supports resume, edit, unpublish and confirmed deletion, plus product details and sample analytics. State persists in the account-scoped `farmily-brief-v2` workspace key and participates in guest-progress transfer. The older Shorts data remains untouched under its original key.
+
+The supplied products, evidence and performance figures are samples, identified through the Sample control and results notes. Publishing and delivery actions are local previews: they do not contact shoppers, change the real catalogue, charge delivery costs or schedule check-ins. The confirmation screens state that distinction. Exact Figma assets are stored in `public/brief-v2`.
+
+Validation: 85 tests, TypeScript and production build. Isolated browser checks cover all three workflows, card flip, price adjustment, adding/removing bundle products, saved drafts, customer preview, pause/resume, edits, confirmed deletion, swipe actions, reload, 320px layout, image loading and intrinsic SVG dimensions.
+
+Brief and homepage onboarding cards now follow horizontal pointer/touch drags, snap back below the threshold, and animate out before opening a workflow or skipping an idea. Brief buttons and keyboard actions use the same motion, and the next idea rises into the stack. Homepage swipes and Start open the current incomplete setup step without changing completion status. Completed setup cards swipe out when returning Home. Reduced-motion preferences bypass the animation delay. Browser checks cover drag/snap-back, exit transitions, both destinations and reduced-motion behavior.
+
+## V2 add product
+Home setup, the Products add button, draft resume, and product editing now use `ProductFlowV2`, following Figma section `1153:3086`. The flow includes camera/upload, explicit photo review, reading, reviewed product details, 3D/photo packaging, saved themes, label download, and the saved confirmation linking directly to v2 publishing. Product declarations and ingredient/allergen controls retain their existing validation and evidence. Unknown allergens are never filled from appearance. Sample artwork appears only on the explicit sample path; real uploads keep the user's photo and saved brand. Theme selection and draft stage resume after leaving/reloading.
+
+The obsolete `ProductFlow.tsx` creation page and unused legacy `ProductDetails.tsx` page were removed. Shared camera, scanning, packaging and ingredient/allergen controls remain in use. Camera capture requires device permission; failed access keeps close/upload available. Local scanning previews are identified and require manual details. Marketplace publication remains the existing labelled local demo.
+
+Ingredients in v2 creation and publishing are now optional free text with voice entry. Blank ingredients do not block saving and do not appear on exported labels. Multiline wording is preserved. Product name and quantity remain required and show required markers.
+
+## Completed Home, messages and Sprout
+After all four setup tasks are complete, Home uses Figma node `1103:498`: farm summary, Brief shortcut, product carousel, sales, customer reviews/regions and packaging design banner. Samples explicitly previews the supplied design data; actual farm details/products remain dynamic and unconnected analytics stay empty. The message button opens the new inbox and conversation screens from section `1309:3223`.
+
+Messages are labelled sample conversations. Filters, suggestion chips, editable text/voice replies, local reply history and explicitly saved Sprout guidelines work within the account-scoped `farmily-sample-messages-v2` workspace. They do not send messages to real shoppers or activate automatic replies. Message badge state updates after returning Home. Sprout branding and its supplied icon replace AI suggestion labels throughout onboarding, branding, publishing, product analytics and customer assistance. Product analytics now uses “Sprout’s read” and “Ideas from Sprout”.
+
+Validation: 88 tests, TypeScript and production build; isolated browser checks cover completion routing, sample Home, inbox filters, suggestions, local replies, teaching Sprout, persistence, visible SVG dimensions and 320px layouts.
