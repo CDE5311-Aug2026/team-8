@@ -22,7 +22,7 @@ test('catalogue restores valid entries and replaces by identity without overwrit
 });
 test('sample order actions enforce lifecycle transitions and preserve fixtures',()=>{
  const accepted=changeSampleOrder(sampleOrders,'#1042','Preparing');assert.equal(accepted[0].status,'Preparing');assert.equal(sampleOrders[0].status,'New');
- assert.deepEqual(changeSampleOrder(sampleOrders,'#1042','Completed'),sampleOrders);
- const delivered=changeSampleOrder(changeSampleOrder(accepted,'#1042','On the way'),'#1042','Completed');assert.equal(delivered[0].status,'Completed');assert.deepEqual(changeSampleOrder(delivered,'#1042','New'),delivered);
+ assert.deepEqual(changeSampleOrder(sampleOrders,'#1042','Delivered'),sampleOrders);
+ const delivered=changeSampleOrder(changeSampleOrder(accepted,'#1042','Ready'),'#1042','Delivered');assert.equal(delivered[0].status,'Delivered');assert.deepEqual(changeSampleOrder(delivered,'#1042','New'),delivered);
  assert.equal(changeSampleOrder(sampleOrders,'#1041','Cancelled')[1].status,'Cancelled');
 });

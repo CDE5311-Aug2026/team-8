@@ -1,0 +1,54 @@
+.onboarding-expanded .v2-setup{display:flex;flex-direction:column;gap:24px;padding:8px 16px 24px;flex:1;min-width:0}
+.onboarding-expanded .v2-title{min-height:34px;margin:0;align-items:center}
+.onboarding-expanded .v2-title h1{font:700 28px/34px 'Bricolage Grotesque',sans-serif;letter-spacing:-.56px;flex:1;min-width:0;overflow-wrap:anywhere}
+.onboarding-expanded .v2-title>span{font:600 12px/16px 'Figtree',sans-serif;background:#f1f1ee;border-radius:6px;color:#3b3b38;padding:2px 8px}
+.onboarding-expanded .farm-onboarding-intro{font:400 16px/24px 'Figtree',sans-serif;color:#55554f;margin:-18px 0 0}
+.farm-sprout-label{display:flex;align-items:center;gap:6px;min-width:0;font:600 12px/16px 'Figtree',sans-serif;color:#074226}
+.farm-sprout-label>img{display:block;flex:none;max-width:none}
+.farm-practice-chips{display:flex;flex-wrap:wrap;gap:8px;min-width:0}
+.farm-practice-chips>button{display:flex;align-items:center;gap:6px;padding:0 16px;height:36px;min-height:36px;border:1px solid #e0e0dc;border-radius:999px;background:white;color:#3b3b38;font:600 14px/20px 'Figtree',sans-serif;text-align:left}
+.farm-practice-chips>button[aria-pressed=true]{background:#074226;border-color:#074226;color:white}
+.farm-practice-icon{display:block;width:16px;height:16px;flex:none;background:currentColor;mask-position:center;mask-repeat:no-repeat;mask-size:contain;-webkit-mask-position:center;-webkit-mask-repeat:no-repeat;-webkit-mask-size:contain}
+.farm-certificate-choices{display:flex;flex-direction:column;gap:12px;min-width:0}
+.farm-certificate-choices>button{display:flex;flex-direction:column;align-items:stretch;gap:12px;width:100%;padding:16px;border:1px solid #e0e0dc;border-radius:16px;background:white;text-align:left;color:#1a1a18;font-family:'Figtree',sans-serif}
+.farm-certificate-choices>button[aria-checked=true]{border:2px solid #19a35a;padding:15px}
+.farm-certificate-choice-top{display:flex;justify-content:space-between;align-items:flex-start}
+.farm-certificate-icon{display:grid;place-items:center;width:40px;height:40px;border-radius:50%;background:#f1f1ee;flex:none}
+.farm-certificate-icon>img{display:block;max-width:none;flex:none}
+.farm-certificate-check{width:20px;height:20px;border:1.5px solid #c9c9c4;border-radius:50%;display:grid;place-items:center;flex:none}
+.farm-certificate-choices>button[aria-checked=true] .farm-certificate-check{background:#19a35a;border-color:#19a35a}
+.farm-certificate-choices>button>span:last-child{display:flex;flex-direction:column;gap:2px}
+.farm-certificate-choices strong{font:600 16px/24px 'Figtree',sans-serif;color:#1a1a18}
+.farm-certificate-choices small{font:400 12px/16px 'Figtree',sans-serif;color:#6e6e69}
+.farm-certificate-file{display:flex;align-items:center;gap:12px;width:100%;min-height:64px;padding:12px 16px;border:0;border-bottom:1px solid #e0e0dc;background:white;text-align:left;color:#1a1a18;font-family:'Figtree',sans-serif}
+.farm-certificate-file>span:nth-child(2){display:flex;flex-direction:column;gap:2px;min-width:0;flex:1}
+.farm-certificate-file strong{font:600 16px/22px 'Figtree',sans-serif;color:#1a1a18;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.farm-certificate-file small{font:400 12px/16px 'Figtree',sans-serif;color:#6e6e69}
+.farm-certificate-file>img{display:block;max-width:none;flex:none}
+.farm-certificate-fields{display:flex;flex-direction:column;gap:16px;min-width:0}
+.farm-certificate-fields>label{display:flex;flex-direction:column;gap:6px;font:600 14px/20px 'Figtree',sans-serif;color:#1a1a18}
+.farm-certificate-fields input{font:400 16px/24px 'Figtree',sans-serif;color:#1a1a18;border:1px solid #c9c9c4;border-radius:12px;padding:11px 16px;height:48px;min-width:0;background:white;width:100%}
+.farm-certificate-demo{font:400 12px/16px 'Figtree',sans-serif;color:#6e6e69}
+.onboarding-expanded .farm-certificate-review-footer{margin-top:auto}
+.onboarding-expanded .farm-certificate-review-footer>small{white-space:normal;text-align:center;font:400 12px/16px 'Figtree',sans-serif}
+.farm-onboarding-portrait{display:flex;align-items:center;gap:12px;min-width:0}
+.farm-portrait-avatar{width:40px;height:40px;display:grid;place-items:center;border-radius:50%;background:#074226;color:white;font:600 14px/20px 'Figtree',sans-serif;flex:none;overflow:hidden}
+.farm-portrait-avatar>img{width:40px;height:40px;object-fit:cover}
+.farm-onboarding-portrait>span:nth-child(2){flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
+.farm-onboarding-portrait strong{font:400 12px/16px 'Figtree',sans-serif;color:#1a1a18}
+.farm-onboarding-portrait small{font:400 12px/16px 'Figtree',sans-serif;color:#6e6e69}
+.farm-onboarding-portrait>.v2-secondary{height:32px;min-height:32px;flex:none;padding:0 12px;border-radius:8px;font:600 12px/16px 'Figtree',sans-serif;background:white;color:#1a1a18;white-space:nowrap}
+.onboarding-expanded input[hidden],.farm-detail-fields input[hidden]{display:none}
+.onboarding-expanded .v2-live-card{width:100%;margin-bottom:0}
+.onboarding-expanded .v2-live-card .v2-farm-card{width:100%}
+.onboarding-expanded .v2-photo-slots{width:100%}
+.onboarding-expanded .v2-photo-slot{flex:1;min-width:0}
+.onboarding-expanded .v2-photo-help{margin-top:0}
+.onboarding-expanded .v2-footer .v2-actions{width:100%;display:flex;gap:12px}
+.onboarding-expanded .v2-footer .v2-actions>.v2-secondary{flex:none}
+.onboarding-expanded .v2-footer .v2-actions>.v2-primary{flex:1;min-width:0}
+.farm-credentials-profile{display:flex;flex-direction:column;gap:16px;min-width:0}
+.farm-detail-fields .farm-certificate-upload-label{position:relative;display:inline-flex;align-self:flex-start;align-items:center;justify-content:center;min-height:40px;padding:8px 12px;border:1px solid #c9c9c4;border-radius:8px;background:white;color:#1a1a18;font:600 14px/20px 'Figtree',sans-serif;cursor:pointer;overflow:hidden}
+.farm-certificate-upload-label input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer}
+.farm-certificate-upload-label:focus-within{outline:3px solid #19a35a;outline-offset:3px}
+@media(max-width:360px){.farm-practice-chips>button{font-size:13px;padding:0 12px}.farm-onboarding-portrait{gap:8px}.farm-onboarding-portrait>.v2-secondary{padding:0 8px}.farm-onboarding-portrait small{font-size:11px;line-height:15px}}
