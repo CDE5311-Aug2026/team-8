@@ -1,8 +1,11 @@
+import {isRefinedBrand,brandPalettes,readableBrandInk} from '../shared/brandRefined';
+import {BrandLogo,BrandPattern} from './BrandBoard';
 import {useEffect,useState,type CSSProperties} from 'react';
 import type {BrandKit,FarmerProfile} from '../shared/branding';
 import type {ProductDraft} from '../shared/productFlow';
 import {productAsset as asset} from './productAssets';
 export function ProductLabel({product,profile,brand}:{product:ProductDraft;profile:FarmerProfile;brand:BrandKit}){
+ if(isRefinedBrand(brand)){const selection=brand.refined.selection,palette=brandPalettes[selection.palette],ink=readableBrandInk(palette.light,palette.main);return <div className="pf-product-label refined-product-label" style={{background:palette.light,color:ink}}><BrandPattern pattern={selection.pattern}/><BrandLogo selection={selection} name={profile.farmName} slot="small" ink={ink}/><strong>{product.name||'Your product'}</strong><small>{product.quantity}</small></div>;}
  return <div className="pf-product-label" style={{background:brand.concept.colors[1],color:brand.concept.colors[0],fontFamily:brand.handwritten?'Comic Sans MS,cursive':brand.designStyle==='Rustic'?'Lora,Georgia,serif':brand.concept.typography==='serif'?'Bree Serif,serif':'Palanquin,sans-serif'}}><small>{profile.farmName}</small><strong>{product.name||'Your product'}</strong><i style={{background:brand.concept.colors[2]}}/><small>{product.quantity}</small></div>;
 }
 export default function ProductPackaging({product,profile,brand,mode='photo',saved=false,initialAngle=-24}:{product:ProductDraft;profile:FarmerProfile;brand:BrandKit;mode?:'photo'|'3d';saved?:boolean;initialAngle?:number}){
