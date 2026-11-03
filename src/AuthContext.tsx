@@ -1,3 +1,4 @@
+import {upgradeSampleProduct} from '../shared/samplePackaging';
 import {authenticateLocal,saveLocalCredentials,removeLocalAccount} from './localAccounts';
 import {demoAccount,demoSessionKey,matchesDemoAccount} from '../shared/demoAccount';
 import {demoWorkspace,demoProducts,demoProfile} from '../shared/demoDashboard';
@@ -13,10 +14,13 @@ type Conflict={id:string;email:string;guest:Workspace;account:Workspace;version:
 const previousSessionKey='farmily-before-sample-session';
 const pendingKey='farmily-pending-account-transfer';
 function seedDemoWorkspace(){
- const current=snapshot(demoAccount.id);if(current['farmily-demo-seed-version']==='4')return;
- if(current['farmily-products']){let products=[];try{products=JSON.parse(current['farmily-products']);}catch{}if(Array.isArray(products))products=products.map(p=>{const fixture=demoProducts.find(f=>f.id===p.id);return fixture?{...p,photo:p.photo||fixture.photo,description:p.description||fixture.description,ingredients:p.ingredients==='See product label'?fixture.ingredients:p.ingredients,packagingComplete:p.packagingComplete??fixture.packagingComplete,live:p.packagingComplete===undefined?fixture.live:p.live}:p;});restore(demoAccount.id,{...current,'farmily-products':JSON.stringify(products),'farmily-demo-seed-version':'4'});}
- else restore(demoAccount.id,current['farmily-draft']?{...current,'farmily-demo-seed-version':'4'}:{...current,...demoWorkspace()});
+ const current=snapshot(demoAccount.id);if(current['farmily-demo-seed-version']==='5')return;
+ if(!current['farmily-products']&&!current['farmily-draft']){restore(demoAccount.id,{...current,...demoWorkspace()});return;}
+ const next:Record<string,string>={...current,'farmily-demo-seed-version':'5'};
+ for(const key of ['farmily-products','farmily-catalogue-v2','farmily-draft']){try{const value=JSON.parse(current[key]||'null');if(key==='farmily-catalogue-v2'&&Array.isArray(value))next[key]=JSON.stringify(value.map(item=>({...item,product:upgradeSampleProduct(item.product)})));else if(Array.isArray(value))next[key]=JSON.stringify(value.map(upgradeSampleProduct));else if(value&&key==='farmily-draft')next[key]=JSON.stringify(upgradeSampleProduct(value));}catch{/* Preserve malformed records for their own restore guards. */}}
+ restore(demoAccount.id,next);
 }
+
 const AccountContext=createContext<AccountState|null>(null);
 export function useAccount(){const value=useContext(AccountContext);if(!value)throw new Error('AccountProvider is required');return value;}
 function prepareSampleWorkspace(){seedDemoWorkspace();const current=snapshot(demoAccount.id);if(!current['farmily-draft'])restore(demoAccount.id,{...current,'farmily-draft':JSON.stringify(demoProducts[0])});}

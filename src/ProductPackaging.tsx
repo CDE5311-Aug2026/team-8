@@ -1,3 +1,5 @@
+import {samplePackagingFor} from '../shared/samplePackaging';
+import SamplePackagingPreview from './SamplePackagingPreview';
 import {isRefinedBrand,brandPalettes,readableBrandInk} from '../shared/brandRefined';
 import {BrandLogo,BrandPattern} from './BrandBoard';
 import {useEffect,useState,type CSSProperties} from 'react';
@@ -10,6 +12,7 @@ export function ProductLabel({product,profile,brand}:{product:ProductDraft;profi
 }
 export default function ProductPackaging({product,profile,brand,mode='photo',saved=false,initialAngle=-24}:{product:ProductDraft;profile:FarmerProfile;brand:BrandKit;mode?:'photo'|'3d';saved?:boolean;initialAngle?:number}){
  const [angle,setAngle]=useState(initialAngle);useEffect(()=>setAngle(initialAngle),[initialAngle]);
+ const spec=samplePackagingFor(product);if(spec)return <div className="pf-packaging-preview"><SamplePackagingPreview spec={spec} label={<ProductLabel product={product} profile={profile} brand={brand}/>} mode={mode} angle={angle} onAngle={setAngle}/></div>;
  const sample=product.sample&&brand.origin==='sample'&&profile.farmName==='Green Valley Farm'&&product.name==='Heirloom Tomatoes'&&(!brand.designStyle||brand.designStyle==='Minimal')&&!brand.handwritten&&brand.concept.colors.join(',')==='#415b51,#a8ba9a,#f5f0df';
  return <div className={`pf-packaging-preview ${mode==='3d'?'pf-three-d':''} ${sample&&mode==='photo'?'pf-sample-packaging':''}`}>
   {sample&&mode==='photo'?<img src={asset(saved?'sample-saved.png':'sample-packaging.png')} alt="AI-generated Figma sample packaging reference"/>:mode==='photo'?<><div className="pf-real-product-photo">{product.photo?<img src={product.photo} alt={product.name}/>:<span>No photo added</span>}</div><div className="pf-photo-brand-label"><ProductLabel product={product} profile={profile} brand={brand}/></div></>:<><div className="pf-box-scene"><div className="pf-box" style={{'--box-angle':`${angle}deg`,'--box-color':brand.concept.colors[0]} as CSSProperties}><div className="pf-box-top">{product.photo&&<img src={product.photo} alt="Product inside packaging concept"/>}</div><div className="pf-box-front"><ProductLabel product={product} profile={profile} brand={brand}/></div><div className="pf-box-side"><span>{profile.farmName}</span><small>{brand.concept.tagline}</small></div></div></div><label className="pf-rotate-label">Rotate packaging<input type="range" min={-45} max={25} value={angle} onChange={event=>setAngle(Number(event.target.value))}/></label></>}

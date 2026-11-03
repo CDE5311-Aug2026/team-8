@@ -1,9 +1,11 @@
+import {samplePackagingFor} from './samplePackaging.ts';
+import type {SamplePackaging} from './samplePackaging.ts';
 import type {ListingContent} from './publishing.ts';
 import {allergenStatement,validAllergenSelection,type AllergenSelection} from './productFields.ts';
 import {canAddProduct,signature,validConcept,type BrandKit,type FarmerProfile} from './branding.ts';
 import {fieldNames,validateAnalysis,type Analysis,type FieldName} from './analysis.ts';
 type ProductInfo=Record<FieldName,string>;
-export type ProductDraft=ProductInfo&{id?:string;createdAt?:string;packagingComplete?:boolean;photos?:string[];listing?:ListingContent;photo:string;price:string;currency?:'SGD';story:string;live:boolean;sample?:boolean;ingredientInput?:string;ingredientsNotApplicable?:boolean;allergenDetails?:AllergenSelection;brandIdentity?:BrandKit;v2PackagingTheme?:number;packagingMode?:'photo'|'3d'};
+export type ProductDraft=ProductInfo&{samplePackaging?:SamplePackaging;id?:string;createdAt?:string;packagingComplete?:boolean;photos?:string[];listing?:ListingContent;photo:string;price:string;currency?:'SGD';story:string;live:boolean;sample?:boolean;ingredientInput?:string;ingredientsNotApplicable?:boolean;allergenDetails?:AllergenSelection;brandIdentity?:BrandKit;v2PackagingTheme?:number;packagingMode?:'photo'|'3d'};
 export const productWorkKey='farmily-product-work';
 export function restoreProductWork(value:unknown,profile:FarmerProfile){
  if(!value||typeof value!=='object')return null;
@@ -27,6 +29,6 @@ const escapeXml=(value:string)=>value.replace(/[<>&"']/g,char=>({'<':'&lt;','>':
 export function labelSvg(product:ProductDraft,profile:FarmerProfile,brand:BrandKit){
  const colors=brand.concept.colors;if(colors.some(color=>!/^#[0-9a-f]{6}$/i.test(color)))throw new Error('Invalid brand colors.');
  const lines=[`Farm: ${profile.farmName}`,`Product: ${product.name}`,`Quantity: ${product.quantity}`,...(product.ingredients.trim()?[`Ingredients: ${product.ingredients}`]:[]),`Allergens: ${product.allergens}`,...(['storage','expiry','producer','origin','nutrition'] as const).filter(key=>product[key]).map(key=>`${key}: ${product[key]}`)].flatMap(text=>text.match(/.{1,58}(?:\s|$)|.{1,58}/g)||[]);
- const height=160+lines.length*32;
- return `<svg xmlns="http://www.w3.org/2000/svg" width="960" height="${height}" viewBox="0 0 960 ${height}"><rect width="960" height="${height}" fill="${colors[1]}"/><rect x="20" y="20" width="920" height="${height-40}" fill="none" stroke="${colors[0]}"/><text x="52" y="74" fill="${colors[0]}" font-family="Georgia,serif" font-size="28">${escapeXml(brand.concept.name)}</text><path d="M52 96H908" stroke="${colors[2]}" stroke-width="3"/>${lines.map((text,index)=>`<text x="52" y="${140+index*32}" fill="${colors[0]}" font-family="sans-serif" font-size="23">${escapeXml(text)}</text>`).join('')}</svg>`;
+ const height=160+lines.length*32;const spec=samplePackagingFor(product);
+ return `<svg xmlns="http://www.w3.org/2000/svg" width="${spec?`${spec.labelWidthMm}mm`:960}" height="${spec?`${spec.labelHeightMm}mm`:height}" viewBox="0 0 960 ${height}"><rect width="960" height="${height}" fill="${colors[1]}"/><rect x="20" y="20" width="920" height="${height-40}" fill="none" stroke="${colors[0]}"/><text x="52" y="74" fill="${colors[0]}" font-family="Georgia,serif" font-size="28">${escapeXml(brand.concept.name)}</text><path d="M52 96H908" stroke="${colors[2]}" stroke-width="3"/>${lines.map((text,index)=>`<text x="52" y="${140+index*32}" fill="${colors[0]}" font-family="sans-serif" font-size="23">${escapeXml(text)}</text>`).join('')}</svg>`;
 }
