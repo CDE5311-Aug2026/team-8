@@ -1,0 +1,5 @@
+.v2-dialog-handle,.brand-v2-handle,.v2-handle{cursor:grab;touch-action:none}
+.v2-dialog-header,.brand-v2-sheet-copy,.brand-exit-card>h2{cursor:grab}
+.drawer-dragging{user-select:none;cursor:grabbing}
+.v2-modal.drawer-overlay{width:100%;max-width:none;margin:0}
+.v2-modal.drawer-overlay>.v2-voice{left:50%;right:auto;width:min(402px,100%);translate:-50% 0}

@@ -1,3 +1,4 @@
+import useDrawerDismiss from './useDrawerDismiss';
 import RefinedBrandFlow from './RefinedBrandFlow';
 import Sprout from './Sprout';
 import {useEffect,useRef,useState,type ChangeEvent} from 'react';
@@ -19,6 +20,7 @@ export default function BrandIdentityV2({startNew=false,profile,brand,onExit,onH
  const [refinedFresh,setRefinedFresh]=useState(startNew);
  const [work,setWork]=useState(()=>initial(profile||blankProfile,brand,startNew));const [saved,setSaved]=useState<V2BrandKit|null>(brand);const [error,setError]=useState('');const [storageError,setStorageError]=useState('');const [exitOpen,setExitOpen]=useState(false);const [status,setStatus]=useState('');const [phase,setPhase]=useState(0);const [uploading,setUploading]=useState(false);
  const closeButton=useRef<HTMLButtonElement>(null);const exitDialog=useRef<HTMLDialogElement>(null);const heading=useRef<HTMLHeadingElement>(null);const photoReader=useRef<FileReader|null>(null);const workRef=useRef(work);workRef.current=work;
+ useDrawerDismiss(exitDialog,exitOpen,()=>{setExitOpen(false);closeButton.current?.focus();},'.brand-v2-sheet');
  function update(patch:Partial<V2BrandWork>){setWork(w=>({...w,...patch}));setError('');setStatus('');}
  function persist(value:V2BrandWork){try{workspaceStorage.setItem(brandV2Key,JSON.stringify(value));setStorageError('');return true;}catch{setStorageError('Your progress could not be saved. Free some browser storage and try again.');return false;}}
  useEffect(()=>{persist(work);},[work]);

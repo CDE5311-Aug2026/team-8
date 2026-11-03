@@ -1,3 +1,4 @@
+import {printableLabelSvg} from './labelArtwork';
 import type {CatalogueProduct} from '../shared/catalogue';
 import type {FarmerProfile} from '../shared/branding';
 import {labelSvg} from '../shared/productFlow';
@@ -16,7 +17,7 @@ export async function downloadPackaging(format:'pdf'|'svg'|'png'|'all',product:C
  if(format==='png'||format==='all')files.push({name:base+'-mockup.png',bytes:decode(canvas.toDataURL('image/png')),type:'image/png'});
  if(format==='svg'||format==='all'){
   if(!product.brandIdentity)throw new Error('Complete packaging first.');
-  const label=labelSvg(product,profile,product.brandIdentity).replace('<svg ','<svg x="330" y="205" ');const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="960" height="720" viewBox="0 0 960 720"><rect width="960" height="720" fill="#fffdf0"/><g fill="none" stroke="#415b51" stroke-width="2"><rect x="180" y="100" width="600" height="480"/><path d="M330 100V580M630 100V580"/><path d="M330 180H630M330 500H630" stroke-dasharray="10 8"/></g><g transform="translate(225 145) scale(.32)">${label}</g><text x="480" y="640" text-anchor="middle" fill="#a53d32" font-family="sans-serif" font-size="18">DEMO DIELINE — NOT PRINT READY OR TO SCALE</text></svg>`;files.push({name:base+'-dieline.svg',bytes:new TextEncoder().encode(svg),type:'image/svg+xml'});
+  const label=(await printableLabelSvg(product,profile,product.brandIdentity)).replace('<svg ','<svg x="330" y="205" ');const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="960" height="720" viewBox="0 0 960 720"><rect width="960" height="720" fill="#fffdf0"/><g fill="none" stroke="#415b51" stroke-width="2"><rect x="180" y="100" width="600" height="480"/><path d="M330 100V580M630 100V580"/><path d="M330 180H630M330 500H630" stroke-dasharray="10 8"/></g><g transform="translate(225 145) scale(.32)">${label}</g><text x="480" y="640" text-anchor="middle" fill="#a53d32" font-family="sans-serif" font-size="18">DEMO DIELINE — NOT PRINT READY OR TO SCALE</text></svg>`;files.push({name:base+'-dieline.svg',bytes:new TextEncoder().encode(svg),type:'image/svg+xml'});
  }
  const file=format==='all'?{name:base+'-packaging.zip',bytes:storedZip(files),type:'application/zip'}:files[0];const url=URL.createObjectURL(new Blob([file.bytes.slice().buffer],{type:file.type}));const a=document.createElement('a');a.href=url;a.download=file.name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
 }

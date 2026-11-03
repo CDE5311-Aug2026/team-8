@@ -175,4 +175,10 @@ Profile supports multiple certificate files, manual details, re-upload after rej
 
 
 ## Sample product packaging
+Packaging previews rotate directly with horizontal mouse, pen or touch drags. The box, jar and carton previews share the same interaction, with pointer capture and bounded rotation. Vertical touch gestures retain page scrolling. Rotation sliders have been removed; arrow keys rotate and Home resets the view.
+
+Bottom drawers share outside-click and swipe-down dismissal across general dialogs, brand-exit sheets and recording/review popups. Dragging the handle/header works with mouse or touch; touch drags from non-interactive content also work when its scroll area is at the top. Short drags snap back, upward/horizontal gestures and form controls keep their normal behavior, and reduced-motion preferences skip the transition. Dismissal uses each popup’s existing Cancel action, preserving focus restoration and recording cleanup.
+
+New products use a Botanical label by default, with Minimal and Market alternatives in the packaging step. Label selection persists with the product draft and saved item, independently of the selected farm brand. Templates keep the saved brand palette and farm identity, use readable contrast, and preserve ingredient and allergen wording in SVG/PDF exports.
+
 All four farmer demo products have complete fictional listing details and suitable packaging: honey, pandan kaya and mango jam use glass jars with screw lids and tamper seals; lemongrass tea uses a paperboard carton for 20 tea bags. The generated studio mockups are stored in public/sample-packaging with their exact generation prompts. The Packaging tab also renders editable jar/carton concepts, and downloads use the matching mockup plus product-specific label dimensions. These are sample concepts, not production specifications. Kaya correctly declares eggs. Existing demo workspaces migrate once to seed version 5, retaining edited fields, custom images and publication/draft states. Real products are unaffected.

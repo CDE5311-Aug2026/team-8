@@ -1,3 +1,4 @@
+import useDrawerDismiss from './useDrawerDismiss';
 import {useEffect,useRef,useState} from 'react';
 import type {BrandKit,FarmerProfile} from '../shared/branding';
 import {brandLogoFonts,brandMarks,brandPalettes,brandPatterns,brandTabs,brandReason,isRefinedBrand,makeBrandLooks,makeRefinedBrand,newRefinedBrandWork,rankedBrandOptions,readableBrandInk,refinedBrandKey,restoreRefinedBrandWork,type BrandSelection,type BrandTab,type RefinedBrandWork} from '../shared/brandRefined';
@@ -23,6 +24,7 @@ function SproutLabel({text='Sprout suggestions'}:{text?:string}){return <span cl
 export default function RefinedBrandFlow({profile,brand,fresh=false,initialRequest='',category='',onBack,onExit,onHome,onAddProduct,onProducts,onProfile,onPackaging,onSaveBrand}:Props){
  const [work,setWork]=useState<RefinedBrandWork>(()=>{if(!fresh)try{const restored=restoreRefinedBrandWork(JSON.parse(workspaceStorage.getItem(refinedBrandKey)||'null'),profile);if(restored)return restored.stage==='kit'&&!isRefinedBrand(brand)?{...restored,stage:'tune'}:restored;}catch{}const next=newRefinedBrandWork(profile,fresh?null:brand);if(initialRequest&&!isRefinedBrand(brand)){next.directionRequest=initialRequest;next.looks=makeBrandLooks(profile,initialRequest);next.selection={...next.looks[0].selection};}return next;});
  const [error,setError]=useState('');const [exitOpen,setExitOpen]=useState(false);const heading=useRef<HTMLHeadingElement>(null);const closeButton=useRef<HTMLButtonElement>(null);const exitDialog=useRef<HTMLDialogElement>(null);const looks=useRef<HTMLDivElement>(null);
+ useDrawerDismiss(exitDialog,exitOpen,()=>{setExitOpen(false);closeButton.current?.focus();},'.brand-v2-sheet');
  function persist(value:RefinedBrandWork){try{workspaceStorage.setItem(refinedBrandKey,JSON.stringify(value));return true;}catch{setError('Your progress could not be saved. Please free some browser storage and try again.');return false;}}
  useEffect(()=>{persist(work);},[work]);
  useEffect(()=>{window.scrollTo({top:0,behavior:'instant'});heading.current?.focus({preventScroll:true});},[work.stage]);

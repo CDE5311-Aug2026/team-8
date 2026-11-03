@@ -15,7 +15,5 @@
 .sample-package-carton .sample-package-label{position:absolute;inset:12px 8px}
 .sample-package-carton .sample-package-lid{position:absolute;top:-24px;left:0;width:165px;height:48px;background:#c9b997;transform:rotateX(90deg);border:1px solid #b5a589}
 .sample-package-carton .sample-package-side{position:absolute;left:141px;top:0;width:48px;height:230px;background:#415c50;transform:rotateY(90deg);border:1px solid #304a3b}
-.sample-package-rotate{position:absolute;left:20%;right:20%;bottom:12px;display:flex;flex-direction:column;align-items:center;font:400 11px/16px 'Figtree',sans-serif;color:#55554f;gap:4px}
-.sample-package-rotate input{width:100%;accent-color:#074226;min-height:28px}
 .sample-packaging-note{font:400 12px/18px 'Figtree',sans-serif!important;color:#6e6e69}
 @media(prefers-reduced-motion:reduce){.sample-package-model{transition:none}}
