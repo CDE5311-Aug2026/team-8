@@ -1,3 +1,4 @@
+import {onboardingSampleWorkspace} from '../shared/onboardingSamples';
 import {upgradeSampleProduct} from '../shared/samplePackaging';
 import {authenticateLocal,saveLocalCredentials,removeLocalAccount} from './localAccounts';
 import {demoAccount,demoSessionKey,matchesDemoAccount} from '../shared/demoAccount';
@@ -9,7 +10,7 @@ import {restore,setStorageOwner,snapshot} from './accountStorage';
 import {workspaceKey,workspaceKeys,type Identity} from '../shared/access';
 import {guestTransferAction,type Workspace} from '../shared/workspace';
 
-type AccountState={sampleMode:boolean;setSampleMode:(enabled:boolean)=>Promise<void>;startDemoSignup:(email:string,password:string)=>Promise<void>;signInDemo:(email:string,password:string)=>Promise<boolean>;updateDemoAccount:(email:string,password?:string)=>Promise<void>;deleteDemoAccount:()=>Promise<void>;identity:Identity;loading:boolean;sync:'local'|'saving'|'saved'|'error';syncError:string;signOut:()=>Promise<void>;prepareGuestTransfer:(email:string|null)=>void};
+type AccountState={activateOnboardingSamples:()=>Promise<void>;sampleMode:boolean;setSampleMode:(enabled:boolean)=>Promise<void>;startDemoSignup:(email:string,password:string)=>Promise<void>;signInDemo:(email:string,password:string)=>Promise<boolean>;updateDemoAccount:(email:string,password?:string)=>Promise<void>;deleteDemoAccount:()=>Promise<void>;identity:Identity;loading:boolean;sync:'local'|'saving'|'saved'|'error';syncError:string;signOut:()=>Promise<void>;prepareGuestTransfer:(email:string|null)=>void};
 type Conflict={id:string;email:string;guest:Workspace;account:Workspace;version:number};
 const previousSessionKey='farmily-before-sample-session';
 const pendingKey='farmily-pending-account-transfer';
@@ -98,6 +99,12 @@ export function AccountProvider({children}:{children:ReactNode}){
  }
  async function updateDemoAccount(email:string,password?:string){if(!identity?.demo)throw new Error('DEV: Account editing is available for local demo accounts.');await saveLocalCredentials(identity.id,email,password);const next={...identity,email:email.trim().toLowerCase()};localStorage.setItem(demoSessionKey,JSON.stringify(next));setIdentity(next);}
  async function deleteDemoAccount(){if(!identity?.demo)throw new Error('DEV: Only a local demo account can be deleted here.');for(const key of workspaceKeys)localStorage.removeItem(workspaceKey(key,identity.id));removeLocalAccount(identity.id);localStorage.removeItem('farmily-guest-mode');await signOut();}
+ async function activateOnboardingSamples(){
+  if(identity?.id===demoAccount.id)return;
+  const source=snapshot(identity?.id||null);
+  restore(demoAccount.id,onboardingSampleWorkspace(source));
+  await signInDemo(demoAccount.email,'123456');
+ }
  async function setSampleMode(enabled:boolean){
   if(enabled){if(identity?.id!==demoAccount.id)await signInDemo(demoAccount.email,'123456');return;}
   if(identity?.id!==demoAccount.id)return;
@@ -106,5 +113,5 @@ export function AccountProvider({children}:{children:ReactNode}){
   active.current=null;setStorageOwner(null);setIdentity(null);setLoading(false);setSync('local');setSyncError('');if(authClient)await connect();
  }
  const signOut=async()=>{localStorage.removeItem(demoSessionKey);localStorage.removeItem(previousSessionKey);if(authClient&&!identity?.demo){const {error}=await authClient.auth.signOut();if(error)throw error;}sequence.current++;active.current=null;setStorageOwner(null);setIdentity(null);setConflict(null);conflictRef.current=null;setSync('local');};
- return <AccountContext.Provider value={{sampleMode:identity?.id===demoAccount.id,setSampleMode,startDemoSignup,signInDemo,updateDemoAccount,deleteDemoAccount,identity,loading,sync,syncError,signOut,prepareGuestTransfer}}>{conflict?<div className="app-shell account-offer"><header className="farmer-header"><span className="farmily-logo"><Leaf size={22}/> Farmily</span></header><main className="farmer-main"><span className="eyebrow">WELCOME BACK</span><h1>Which progress would you like to use?</h1><p className="intro">Your account has saved progress that differs from the farm profile and drafts on this device.</p><section className="card"><h2>Keep my account progress</h2><p>Continue where you left off. Your guest drafts will stay on this device.</p><button className="button primary" disabled={resolving} onClick={()=>void resolveConflict(false)}>Use account progress</button></section><section className="card"><h2>Use my guest progress</h2><p>Replace this account’s farm profile, branding and product drafts with the guest progress from this device.</p><button className="button secondary" disabled={resolving} onClick={()=>void resolveConflict(true)}>Replace with guest progress</button></section>{syncError&&<p role="alert" className="scan-error">{syncError}</p>}</main></div>:loading?<div className="app-shell"><main className="farmer-main"><p role="status">Checking your account…</p></main></div>:<div key={identity?.id||'guest'} className="account-root">{children}</div>}</AccountContext.Provider>;
+ return <AccountContext.Provider value={{activateOnboardingSamples,sampleMode:identity?.id===demoAccount.id,setSampleMode,startDemoSignup,signInDemo,updateDemoAccount,deleteDemoAccount,identity,loading,sync,syncError,signOut,prepareGuestTransfer}}>{conflict?<div className="app-shell account-offer"><header className="farmer-header"><span className="farmily-logo"><Leaf size={22}/> Farmily</span></header><main className="farmer-main"><span className="eyebrow">WELCOME BACK</span><h1>Which progress would you like to use?</h1><p className="intro">Your account has saved progress that differs from the farm profile and drafts on this device.</p><section className="card"><h2>Keep my account progress</h2><p>Continue where you left off. Your guest drafts will stay on this device.</p><button className="button primary" disabled={resolving} onClick={()=>void resolveConflict(false)}>Use account progress</button></section><section className="card"><h2>Use my guest progress</h2><p>Replace this account’s farm profile, branding and product drafts with the guest progress from this device.</p><button className="button secondary" disabled={resolving} onClick={()=>void resolveConflict(true)}>Replace with guest progress</button></section>{syncError&&<p role="alert" className="scan-error">{syncError}</p>}</main></div>:loading?<div className="app-shell"><main className="farmer-main"><p role="status">Checking your account…</p></main></div>:<div key={identity?.id||'guest'} className="account-root">{children}</div>}</AccountContext.Provider>;
 }

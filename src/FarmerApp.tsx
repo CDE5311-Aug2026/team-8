@@ -1,3 +1,4 @@
+import {onboardingSampleReturnKey} from '../shared/onboardingSamples';
 import {setupCompleteKey,setupWasCompleted} from '../shared/homeProgress';
 import MessagesV2 from './MessagesV2';
 import BriefV2 from './BriefV2';
@@ -41,7 +42,9 @@ function readProduct():SavedProduct|null{
  try{validConcept(product.brandIdentity.concept);return product;}catch{return null;}
 }
 export default function FarmerApp({onChangeRole,onCreateAccount,onSignIn,onSignOut}:{onChangeRole:()=>void;onCreateAccount:()=>void;onSignIn:()=>void;onSignOut:()=>Promise<void>}){
- const {identity,sync,syncError}=useAccount();
+ const {identity,sync,syncError,sampleMode,activateOnboardingSamples}=useAccount();
+ const [resumePublication]=useState(()=>read<boolean>(onboardingSampleReturnKey,false)===true);
+ useEffect(()=>{if(resumePublication)workspaceStorage.removeItem(onboardingSampleReturnKey);},[resumePublication]);
  const [accountCardDismissed,setAccountCardDismissed]=useState(()=>read('farmily-account-dismissed',false));
  const [restoredDraft]=useState(()=>parseOnboardingDraft(read(onboardingDraftKey,null)));
  const [profileStep,setProfileStep]=useState(()=>restoredDraft?.step||0);
@@ -56,15 +59,15 @@ export default function FarmerApp({onChangeRole,onCreateAccount,onSignIn,onSignO
  const [startNewBrand,setStartNewBrand]=useState(false);
  const [brand,setBrand]=useState<BrandKit|null>(readBrand);
  const [onboarding,setOnboarding]=useState(()=>!readProfile()&&!read('farmily-onboarding-skipped',false));
- const [publishImmediately,setPublishImmediately]=useState(false);
- const messagesReturn=useRef<View>('home');const [view,setView]=useState<View>(()=>readProfile()||read('farmily-onboarding-skipped',false)?'home':'profile');
+ const [publishImmediately,setPublishImmediately]=useState(resumePublication);
+ const messagesReturn=useRef<View>('home');const [view,setView]=useState<View>(()=>resumePublication?'listing':readProfile()||read('farmily-onboarding-skipped',false)?'home':'profile');
  const [product,setProduct]=useState<SavedProduct|null>(readProduct);
  const [setupComplete,setSetupComplete]=useState(()=>setupWasCompleted(read<boolean>(setupCompleteKey,false)===true,product,restoreCatalogue(read(catalogueKey,[])),read('farmily-products',[])));
  useEffect(()=>{if(setupComplete||product?.live&&product.packagingComplete!==false){setSetupComplete(true);try{workspaceStorage.setItem(setupCompleteKey,'true');}catch{/* completion stays available for this visit */}}},[setupComplete,product?.live]);
  const [editProductImmediately,setEditProductImmediately]=useState(false);
  const activeCatalogueId=useRef<string|null>(product?.catalogueId||null);
  function rememberProduct(value:SavedProduct,id?:string|null){const items=restoreCatalogue(read(catalogueKey,[]));const key=id||value.catalogueId||items.find(item=>item.product.name===value.name)?.id||crypto.randomUUID();const next={...value,catalogueId:key};workspaceStorage.setItem(catalogueKey,JSON.stringify(upsertCatalogue(items,{id:key,product:next,draft:false})));workspaceStorage.setItem('farmily-draft',JSON.stringify(next));return next;}
- function productSaved(){const value=readProduct();if(!value)return;try{const next=rememberProduct(value,activeCatalogueId.current);activeCatalogueId.current=next.catalogueId;setProduct(next);}catch{setProduct(value);}}
+ function productSaved(){const value=readProduct();if(!value)return;try{const next=rememberProduct(value,activeCatalogueId.current);activeCatalogueId.current=next.catalogueId;setProduct(next);if(next.live&&next.packagingComplete!==false&&!setupComplete&&!sampleMode)void activateOnboardingSamples().catch(()=>setError('Your product is saved. Samples could not be activated; use the Samples button to try again.'));}catch{setProduct(value);}}
  const lastHomeCount=useRef(setupComplete?4:1+Number(canAddProduct(savedProfile,brand))+Number(canAddProduct(savedProfile,brand)&&!!product)+Number(canAddProduct(savedProfile,brand)&&!!product?.live));
  useEffect(()=>{if(view==='home')lastHomeCount.current=setupComplete?4:1+Number(canAddProduct(savedProfile,brand))+Number(canAddProduct(savedProfile,brand)&&!!product)+Number(canAddProduct(savedProfile,brand)&&!!product?.live);},[view,savedProfile,brand,product,setupComplete]);
  const [error,setError]=useState('');const [notice,setNotice]=useState('');
