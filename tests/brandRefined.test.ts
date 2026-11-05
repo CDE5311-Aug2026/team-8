@@ -1,8 +1,31 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {sampleProfile,signature,validConcept} from '../shared/branding.ts';
-import {brandLogoFonts,brandMarks,brandPalettes,brandPatterns,contrastRatio,isRefinedBrand,makeBrandLooks,makeRefinedBrand,newRefinedBrandWork,rankedBrandOptions,readableBrandInk,refinedBrandKey,restoreRefinedBrandWork,validBrandSelection} from '../shared/brandRefined.ts';
+import {brandReason,brandReasonParts,brandLogoFonts,brandMarks,brandPalettes,brandPatterns,contrastRatio,isRefinedBrand,makeBrandLooks,makeRefinedBrand,newRefinedBrandWork,rankedBrandOptions,readableBrandInk,refinedBrandKey,restoreRefinedBrandWork,validBrandSelection} from '../shared/brandRefined.ts';
 import {workspaceKey,workspaceKeys} from '../shared/access.ts';
+import {farmBrandPrompts} from '../shared/brandFarmContext.ts';
+
+test('farm philosophy and story change visual rankings, explanations and refinement prompts',()=>{
+ const heritage={...sampleProfile,products:'Oranges',story:'Our family has tended this orchard for three generations.',philosophy:'We keep traditional methods alive.'};
+ const ecology={...heritage,story:'We grow with the surrounding ecosystem.',philosophy:'Biodiversity and regenerative soil guide every decision.'};
+ const a=makeBrandLooks(heritage),b=makeBrandLooks(ecology);
+ assert.notDeepEqual(a.map(look=>look.selection),b.map(look=>look.selection));
+ assert.deepEqual(a.map(look=>look.name),['Hand-picked','Market fresh','Clean greens']);
+ assert.equal(a[0].reason,'You grow Oranges. A soft, hand-written look.');
+ const parts=brandReasonParts(heritage,'Colour',1);
+ assert.ok(parts.reference.includes(heritage.philosophy));assert.ok(!parts.suggestion.includes(heritage.philosophy));
+ assert.ok(brandReason(heritage,'Colour',1).startsWith(parts.suggestion));
+ assert.notDeepEqual(farmBrandPrompts(heritage),farmBrandPrompts(ecology));
+ assert.ok(farmBrandPrompts(ecology).some(prompt=>prompt.includes('nature')));
+ for(const tab of ['Colour','Type','Logo','Pattern'] as const){
+  const reasons=rankedBrandOptions(ecology,tab).slice(0,2).map(index=>brandReason(ecology,tab,index));
+  assert.ok(reasons.every(reason=>!reason.includes('approved')&&!reason.includes('was picked from')));
+  assert.notEqual(reasons[0],reasons[1]);
+ }
+ const old={...newRefinedBrandWork(heritage),looks:a.map(look=>({...look,reason:'A warm friendly look'}))};
+ const restored=restoreRefinedBrandWork(old,heritage)!;
+ assert.deepEqual(restored.selection,old.selection);assert.equal(restored.looks[1].reason,'You grow Oranges. A warm, friendly market look.');
+});
 
 test('refined branding uses the exact approved inventory and three profile-grounded directions',()=>{
  assert.equal(brandPalettes.length,6);assert.equal(brandLogoFonts.length,6);assert.deepEqual(brandMarks,['Leaf','Sprout','Plant','Seed','Sun','Flower']);assert.deepEqual(brandPatterns,['Leaf line','Dots','Lines','Plain']);
