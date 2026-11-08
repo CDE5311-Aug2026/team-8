@@ -15,15 +15,16 @@ export function currentCatalogueItem(product:LocalProduct&{catalogueId?:string},
  return {id:product.catalogueId||existing?.id||`current-${product.name}`,product:merged,draft:merged.packagingComplete===undefined?existing?.draft??!merged.brandIdentity:!merged.packagingComplete};
 }
 export function isProductDraft(product:ProductDraft,brand:BrandKit|null){try{return !validProduct(product)||!brand;}catch{return true;}}
-export type OrderStatus='New'|'Preparing'|'On the way'|'Completed'|'Cancelled';
+export type OrderStatus='New'|'Preparing'|'Ready'|'Delivered'|'Cancelled';
 export type SampleOrder={id:string;customer:string;items:string;total:string;delivery:string;status:OrderStatus};
 export const sampleOrders:SampleOrder[]=[
- {id:'#1042',customer:'Mei L.',items:'2× Wildflower Honey',total:'28.00',delivery:'Delivery to Tampines',status:'New'},
- {id:'#1041',customer:'Daniel T.',items:'1× Lemongrass Tea',total:'6.00',delivery:'Pickup at farm',status:'New'},
+ {id:'#1042',customer:'Minh T.',items:'Wildflower Honey, Cherry tomatoes',total:'19.35',delivery:'Delivery to Toa Payoh',status:'New'},
+ {id:'#1041',customer:'Daniel T.',items:'1× Heirloom tomatoes',total:'4.50',delivery:'Delivery to Jurong',status:'New'},
  {id:'#1039',customer:'Sarah K.',items:'3× Pandan Kaya',total:'28.50',delivery:'Delivery',status:'Preparing'},
- {id:'#1037',customer:'Ahmad R.',items:'2× Lemongrass Tea',total:'12.00',delivery:'Delivery',status:'Preparing'},
- {id:'#1036',customer:'Priya N.',items:'1× Wildflower Honey',total:'14.00',delivery:'Delivery',status:'On the way'},
- {id:'#1030',customer:'Wei J.',items:'1× Wildflower Honey',total:'14.00',delivery:'Delivery',status:'Completed'},
+ {id:'#1037',customer:'Ahmad R.',items:'2× Heirloom tomatoes',total:'9.00',delivery:'Delivery',status:'Preparing'},
+ {id:'#1036',customer:'Priya N.',items:'1× Wildflower Honey',total:'14.00',delivery:'Delivery',status:'Ready'},
+ {id:'#1030',customer:'Wei J.',items:'1× Wildflower Honey',total:'14.00',delivery:'Delivery',status:'Delivered'},
  {id:'#1028',customer:'Tom H.',items:'1× Mango Jam',total:'8.00',delivery:'Pickup at farm',status:'Cancelled'},
 ];
-export function changeSampleOrder(orders:SampleOrder[],id:string,next:OrderStatus){return orders.map(order=>{if(order.id!==id)return order;const allowed:Record<OrderStatus,OrderStatus[]>={New:['Preparing','Cancelled'],Preparing:['On the way','Cancelled'],'On the way':['Completed'],Completed:[],Cancelled:[]};return allowed[order.status].includes(next)?{...order,status:next}:order;});}
+export function changeSampleOrder(orders:SampleOrder[],id:string,next:OrderStatus){return orders.map(order=>{if(order.id!==id)return order;const allowed:Record<OrderStatus,OrderStatus[]>={New:['Preparing','Cancelled'],Preparing:['Ready','Cancelled'],Ready:['Delivered'],Delivered:[],Cancelled:[]};return allowed[order.status]?.includes(next)?{...order,status:next}:order;});}
+export function restoreSampleOrders(value:unknown):SampleOrder[]{const saved=Array.isArray(value)?value:[];return sampleOrders.map(fixture=>{const old=saved.find(order=>order?.id===fixture.id);const status=old?.status==='On the way'?'Ready':old?.status==='Completed'?'Delivered':old?.status;return {...fixture,status:['New','Preparing','Ready','Delivered','Cancelled'].includes(status)?status:fixture.status};});}

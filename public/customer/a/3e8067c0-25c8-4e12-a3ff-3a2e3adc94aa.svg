@@ -1,0 +1,15 @@
+<svg preserveAspectRatio="none" overflow="visible" style="display: block;" width="36" height="46" viewBox="0 0 36 46" fill="none" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+<g id="Pin">
+<g id="Vector">
+<use xlink:href="#stroke0_0_59" fill="#074226"/>
+<mask id="stroke1_0_59" fill="white">
+<use xlink:href="#stroke0_0_59"/>
+</mask>
+<path d="M18 45C18 45 3 28 3 17C3 13.0218 4.58035 9.20644 7.3934 6.3934C10.2064 3.58035 14.0218 2 18 2C21.9782 2 25.7936 3.58035 28.6066 6.3934C31.4196 9.20644 33 13.0218 33 17C33 28 18 45 18 45Z" stroke-width="4" stroke="white" mask="url(#stroke1_0_59)"/>
+</g>
+<circle id="Dot" cx="18" cy="17" r="5" fill="white"/>
+</g>
+<defs>
+<path id="stroke0_0_59" d="M18 45C18 45 3 28 3 17C3 13.0218 4.58035 9.20644 7.3934 6.3934C10.2064 3.58035 14.0218 2 18 2C21.9782 2 25.7936 3.58035 28.6066 6.3934C31.4196 9.20644 33 13.0218 33 17C33 28 18 45 18 45Z"/>
+</defs>
+</svg>

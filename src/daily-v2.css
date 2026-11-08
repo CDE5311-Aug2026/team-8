@@ -7,3 +7,8 @@
 .product-actions-dropdown{position:fixed;inset:auto;margin:0;padding:6px;width:196px;max-width:calc(100vw - 16px);border:1px solid #e0e0dc;border-radius:12px;background:white;color:#1a1a18;box-shadow:0 8px 24px #07422626;overflow:hidden}.product-actions-dropdown:popover-open{display:flex;flex-direction:column}.product-actions-dropdown button{display:flex;align-items:center;gap:10px;width:100%;min-height:42px;padding:10px 12px;border:0;border-radius:8px;background:transparent;text-align:left;font:inherit;font-size:14px;color:inherit}.product-actions-dropdown button:hover,.product-actions-dropdown button:focus-visible{background:#f1f1ee;outline:0}.product-actions-dropdown button.danger{color:#d92d20}.product-actions-dropdown svg{flex:none}.daily-product-menu svg{color:#496b5d}
 
 .farm-detail-section:not(:last-child){border-bottom:1px solid #f1f1ee}.farm-detail-section>.daily-row:after{display:none}.farm-detail-section>.daily-row[aria-expanded="true"]>svg{transform:rotate(90deg)}.farm-detail-section>.daily-row>svg{color:#90908b;flex:none}.farm-detail-fields{padding:4px 16px 16px}.farm-detail-fields label{display:flex;flex-direction:column;gap:8px}.farm-detail-fields input{min-width:0}.farm-detail-fields small,.daily-no-reviews{color:#6e6e69;font-size:12px;line-height:18px}.inline-edit-actions{display:flex;align-items:center;gap:12px}.inline-edit-actions>.v2-primary{flex:1}.daily-no-reviews{padding:16px;margin:0}
+
+
+
+
+.daily-nav .growth-tab-icon{display:block;width:22px;height:22px;flex:none}.daily-nav button:not(.active)>.growth-tab-icon{filter:brightness(0) saturate(100%) invert(86%) sepia(12%) saturate(746%) hue-rotate(92deg) brightness(94%) contrast(89%)}

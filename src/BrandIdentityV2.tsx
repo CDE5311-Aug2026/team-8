@@ -1,3 +1,5 @@
+import useDrawerDismiss from './useDrawerDismiss';
+import RefinedBrandFlow from './RefinedBrandFlow';
 import Sprout from './Sprout';
 import {useEffect,useRef,useState,type ChangeEvent} from 'react';
 import {brandAssets as assets} from './brandAssets';
@@ -7,16 +9,18 @@ import {blankProfile,canAddProduct,signature,validProfile,type BrandKit,type Far
 import {designStyles} from '../shared/brandFlow';
 import {brandV2Key,makeV2Brand,newV2BrandWork,restoreV2BrandWork,v2Categories,v2Palettes,type V2BrandWork,type V2BrandKit,type V2Stage} from '../shared/brandV2';
 
-type Props={startNew?:boolean;profile:FarmerProfile|null;brand:BrandKit|null;onExit:()=>void;onHome:()=>void;onAddProduct:()=>void;onCreateAccount:()=>void;onEditProfile:()=>void;onSaveProfile:(profile:FarmerProfile)=>boolean;onSaveBrand:(brand:BrandKit,profile:FarmerProfile)=>boolean};
+type Props={startNew?:boolean;profile:FarmerProfile|null;brand:BrandKit|null;onExit:()=>void;onHome:()=>void;onAddProduct:()=>void;onCreateAccount:()=>void;onEditProfile:()=>void;onProducts:()=>void;onPackaging:()=>void;onSaveProfile:(profile:FarmerProfile)=>boolean;onSaveBrand:(brand:BrandKit,profile:FarmerProfile)=>boolean};
 function Icon({id}:{id:keyof typeof assets}){return <img src={assets[id]} alt=""/>;}
 function initial(profile:FarmerProfile,brand:BrandKit|null,startNew:boolean){if(!startNew)try{const restored=restoreV2BrandWork(JSON.parse(workspaceStorage.getItem(brandV2Key)||'null'),profile);if(restored)return restored.stage==='saved'&&!canAddProduct(profile,brand)?{...restored,stage:'style' as const}:restored;}catch{}return newV2BrandWork(profile,startNew?null:brand);}
 const images=[assets['1139:2079_imgPreview'],assets['1139:2079_imgPreview1'],assets['1139:2079_imgPreview2']];
 const includePrompts=['Hand-drawn feel','Earthy colours','Our farm animals','Clean and modern'];
 const refinePrompts=['More minimal','Softer colours','Handwritten'];
 
-export default function BrandIdentityV2({startNew=false,profile,brand,onExit,onHome,onAddProduct,onEditProfile,onSaveProfile,onSaveBrand}:Props){
+export default function BrandIdentityV2({startNew=false,profile,brand,onExit,onHome,onAddProduct,onEditProfile,onProducts,onPackaging,onSaveProfile,onSaveBrand}:Props){
+ const [refinedFresh,setRefinedFresh]=useState(startNew);
  const [work,setWork]=useState(()=>initial(profile||blankProfile,brand,startNew));const [saved,setSaved]=useState<V2BrandKit|null>(brand);const [error,setError]=useState('');const [storageError,setStorageError]=useState('');const [exitOpen,setExitOpen]=useState(false);const [status,setStatus]=useState('');const [phase,setPhase]=useState(0);const [uploading,setUploading]=useState(false);
  const closeButton=useRef<HTMLButtonElement>(null);const exitDialog=useRef<HTMLDialogElement>(null);const heading=useRef<HTMLHeadingElement>(null);const photoReader=useRef<FileReader|null>(null);const workRef=useRef(work);workRef.current=work;
+ useDrawerDismiss(exitDialog,exitOpen,()=>{setExitOpen(false);closeButton.current?.focus();},'.brand-v2-sheet');
  function update(patch:Partial<V2BrandWork>){setWork(w=>({...w,...patch}));setError('');setStatus('');}
  function persist(value:V2BrandWork){try{workspaceStorage.setItem(brandV2Key,JSON.stringify(value));setStorageError('');return true;}catch{setStorageError('Your progress could not be saved. Free some browser storage and try again.');return false;}}
  useEffect(()=>{persist(work);},[work]);
@@ -34,6 +38,7 @@ export default function BrandIdentityV2({startNew=false,profile,brand,onExit,onH
  const step=work.stage==='start'?0:work.stage==='farm'||work.stage==='creating'?1:2;const creating=work.stage==='creating';const farmPhoto=work.profile.photos.find(photo=>photo.kind==='farm');const kit=saved||brand as V2BrandKit|null;
  const savedColors=kit?.concept.colors||v2Palettes[work.palette];const savedStyle=kit?.designStyle||designStyles[work.style];
  const suggestions=(prompts:string[],action:(text:string)=>void)=><div className="brand-v2-suggestions"><small className="v2-ai"><Sprout size="tiny"/>Sprout suggestions</small><div className="v2-chips">{prompts.map(text=><button type="button" key={text} onClick={()=>action(text)}>{text}</button>)}</div></div>;
+ if(profile&&['style','saved'].includes(work.stage)&&work.choice!=='existing')return <RefinedBrandFlow profile={work.profile} brand={brand} fresh={refinedFresh} initialRequest={work.include} category={work.category} onBack={()=>{setRefinedFresh(false);go('farm');}} onExit={onExit} onHome={onHome} onAddProduct={onAddProduct} onProducts={onProducts} onProfile={onEditProfile} onPackaging={onPackaging} onSaveBrand={onSaveBrand}/>;
  if(!profile)return <div className="app-shell v2 brand-v2"><main className="brand-v2-content"><h1>Start with your farm</h1><p>Add your farm details before creating a brand.</p><button className="v2-primary" onClick={onEditProfile}>Edit farm profile</button><button className="v2-link" onClick={onExit}>Back to home</button></main></div>;
  return <div className={`app-shell v2 brand-v2 ${creating?'brand-v2-creating':''}`}>
  <header className="v2-setup-header brand-v2-header">{!creating&&work.stage!=='start'&&work.stage!=='saved'&&<button className="v2-icon-button" aria-label="Back" onClick={()=>go(work.stage==='style'?'farm':'start')}><Icon id="1139:1934_imgIcon2"/></button>}{work.stage!=='saved'&&<div className="v2-dots" aria-label={`Brand setup step ${step+1} of 3`}>{[0,1,2].map(n=><i key={n} className={`${n<=step?'done ':''}${n===step?'active':''}`}/>)}</div>}<button ref={closeButton} className="v2-icon-button brand-v2-close" aria-label="Close brand setup" onClick={close}><Icon id={creating?'1139:2045_imgIcon':'1139:1885_imgIcon1'}/></button></header>

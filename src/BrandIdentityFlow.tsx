@@ -1,3 +1,4 @@
+import useDrawerDismiss from './useDrawerDismiss';
 import {localDemo} from './demoMode';
 import FarmStoryFields from './FarmStoryFields';
 import RequiredMark from './RequiredMark';
@@ -40,6 +41,7 @@ export default function BrandIdentityFlow({preferSaved=false,startNew=false,prof
  const feedback=useRef<HTMLParagraphElement>(null);
  const update=(patch:Partial<BrandWork>)=>{setError('');setStatus('');setWork(value=>({...value,...patch}));};
  const persist=(value:BrandWork)=>{try{workspaceStorage.setItem('farmily-brand-work',JSON.stringify(value));setStorageError('');return true;}catch{setStorageError('Your design draft could not be saved. Remove a photo or keep this page open before continuing.');return false;}};
+ useDrawerDismiss(exitDialog,exitOpen,()=>setExitOpen(false),'.brand-exit-card');
  useEffect(()=>{persist(work);},[work]);
  useEffect(()=>{
   const dialog=exitDialog.current;

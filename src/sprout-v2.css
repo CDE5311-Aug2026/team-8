@@ -3,3 +3,5 @@
 .completed-home h2{color:#1a1a18}.daily-next-steps strong{font-size:16px;line-height:22px}.completed-chart{max-width:none}@media(max-width:401px){.completed-chart{zoom:calc((100vw - 64px)/338px)}}
 
 .completed-home .home-v2-setup h2,.completed-home .home-v2-task h3{font:700 20px/26px "Bricolage Grotesque",sans-serif;letter-spacing:-.2px;margin:0;color:inherit;font-variation-settings:"opsz" 14,"wdth" 100}.completed-header .home-v2-account{flex:none;font-size:11px;padding:0 8px}.completed-products-empty{border-radius:16px;background:white}.completed-home .home-v2-task p{margin:0}.completed-home .home-v2-deck{overflow:clip;border-radius:16px}
+
+.completed-brand>span{flex:none}.completed-brand .completed-portrait{display:block;width:48px;height:48px;object-fit:cover;border-radius:50%}

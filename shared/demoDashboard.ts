@@ -1,12 +1,13 @@
+import {samplePackaging,sampleProductDetails} from './samplePackaging.ts';
 import {sampleProfile,sampleConcepts,signature,type BrandKit} from './branding.ts';
 import {fieldNames} from './analysis.ts';
 import type {CatalogueProduct} from './catalogue.ts';
 
 export const demoProfile={...sampleProfile,farmerName:'Alex Tan',address:'Lim Chu Kang',products:'Wildflower honey, lemongrass tea, pandan kaya and mango jam'};
 export const demoBrand:BrandKit={concept:sampleConcepts[0],origin:'sample',image:null,imageSource:'none',profileSignature:signature(demoProfile),designStyle:'Minimal'};
-export const demoProducts:CatalogueProduct[]=[['honey','Wildflower Honey','14.00','250g',true],['tea','Lemongrass Tea','6.00','20 bags',true],['kaya','Pandan Kaya','9.50','200g',true],['jam','Mango Jam','8.00','220g',false]].map(([id,name,price,quantity,live])=>({...Object.fromEntries(fieldNames.map(key=>[key,''])),id:`demo-${id}`,name,price,quantity,category:'Other',ingredients:id==='honey'?'100% raw honey':'See product label',description:id==='honey'?'Raw honey from our hives, harvested by hand each season.':'',allergens:'None declared',ingredientsNotApplicable:false,story:demoProfile.story,currency:'SGD',brandIdentity:demoBrand,createdAt:'2026-10-01T09:00:00.000Z',packagingComplete:id!=='jam',live:id==='honey'||id==='tea',photo:`/images/farmer-pages/product-image${id==='honey'?'':id==='tea'?'1':id==='kaya'?'2':'3'}.png`} as CatalogueProduct));
+export const demoProducts:CatalogueProduct[]=[['honey','Wildflower Honey','14.00','250g',true],['tea','Lemongrass Tea','6.00','20 bags',true],['kaya','Pandan Kaya','9.50','200g',true],['jam','Mango Jam','8.00','220g',false]].map(([id,name,price,quantity,live])=>({...Object.fromEntries(fieldNames.map(key=>[key,''])),id:`demo-${id}`,name,price,quantity,category:'Other',ingredients:id==='honey'?'100% raw honey':'See product label',description:id==='honey'?'Raw honey from our hives, harvested by hand each season.':'',allergens:'None declared',ingredientsNotApplicable:false,story:demoProfile.story,currency:'SGD',brandIdentity:demoBrand,...sampleProductDetails[`demo-${id}`],samplePackaging:samplePackaging[`demo-${id}`],createdAt:'2026-10-01T09:00:00.000Z',packagingComplete:id!=='jam',live:id==='honey'||id==='tea',photo:samplePackaging[`demo-${id}`].image} as CatalogueProduct));
 export function demoWorkspace(){return {
- 'farmily-role':'farmer','farmily-profile':JSON.stringify(demoProfile),'farmily-brand':JSON.stringify(demoBrand),'farmily-products':JSON.stringify(demoProducts),'farmily-account-dismissed':'true','farmily-demo-seed-version':'4',
+ 'farmily-role':'farmer','farmily-profile':JSON.stringify(demoProfile),'farmily-brand':JSON.stringify(demoBrand),'farmily-products':JSON.stringify(demoProducts),'farmily-account-dismissed':'true','farmily-demo-seed-version':'5',
 };}
 const hash=(text:string)=>Array.from(text).reduce((value,char)=>(Math.imul(value,31)+char.charCodeAt(0))>>>0,7);
 const round=(n:number)=>Math.round(n*100)/100;

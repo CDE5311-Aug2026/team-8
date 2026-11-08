@@ -1,0 +1,45 @@
+.pf-product-label.label-template{position:relative;isolation:isolate;min-height:138px;height:100%;padding:18px 20px 14px;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:9px;border:1px solid currentColor;outline:1px solid color-mix(in srgb,currentColor 25%,transparent);outline-offset:-6px;border-radius:3px;overflow:hidden;text-align:center;container-type:inline-size}
+.label-template .label-farm{position:relative;z-index:1;display:flex;align-items:center;justify-content:center;min-width:0;width:100%;font:600 9px/13px 'Figtree',sans-serif;letter-spacing:1.5px;text-transform:uppercase;overflow-wrap:anywhere}
+.label-template .label-farm .refined-logo{font-size:12px;line-height:16px;letter-spacing:0;text-transform:none;justify-content:center;flex-wrap:wrap}
+.pf-product-label.label-template>strong{position:relative;z-index:1;font:400 clamp(17px,12cqw,32px)/1.08 Georgia,'Lora',serif;letter-spacing:-.5px;max-width:100%;text-wrap:balance;overflow-wrap:anywhere;margin:0}
+.label-template>.label-rule{height:1px;width:32px;background:currentColor;opacity:.5;flex:none;margin:0}
+.pf-product-label.label-template>.label-quantity{position:relative;z-index:1;font:600 10px/14px 'Figtree',sans-serif;letter-spacing:1px;text-transform:uppercase;color:inherit}
+.label-template>.label-category{font:400 8px/12px 'Figtree',sans-serif;letter-spacing:1.5px;text-transform:uppercase;color:inherit;opacity:.75}
+.label-template>.label-botanical{position:absolute;z-index:0;width:40px;height:54px;opacity:.48;pointer-events:none}
+.label-template>.label-botanical.first{top:8px;right:8px;transform:rotate(12deg)}
+.label-template>.label-botanical.last{bottom:8px;left:8px;transform:rotate(192deg)}
+.label-template.label-minimal{outline:none;border:0;border-top:5px solid currentColor;border-bottom:1px solid currentColor;border-radius:0;gap:12px}
+.pf-product-label.label-template.label-minimal>strong{font-family:'Bricolage Grotesque',sans-serif;font-weight:700;letter-spacing:-.6px}
+.label-template.label-market{border-width:2px;outline-style:dashed;outline-offset:-7px}
+.pf-product-label.label-template.label-market>strong{font-family:'Bricolage Grotesque',sans-serif;font-weight:700;letter-spacing:-.6px}
+.ap-themes .pf-product-label.label-template{height:168px;min-height:168px;padding:20px 12px 14px}
+.ap-themes .label-template>strong{font-size:21px}
+.pf-box-front .pf-product-label.label-template{min-height:0;padding:12px 20px 10px;gap:6px}
+.pf-box-front .pf-product-label.label-template>strong{font-size:21px;line-height:22px}
+.sample-package-label .pf-product-label.label-template{min-height:0;padding:12px 14px;gap:6px}
+.sample-package-label .label-template>strong{font-size:21px;line-height:22px}
+.pf-photo-brand-label .pf-product-label.label-template{height:auto;min-height:152px}
+.ap-label-options{display:flex;gap:8px;flex-wrap:wrap}
+.ap-label-options>button{min-height:36px;padding:8px 14px;border:1px solid #e0e0dc;border-radius:999px;background:white;color:#55554f;font:600 12px/18px 'Figtree',sans-serif}
+.ap-label-options>button[aria-pressed=true]{background:#074226;color:white;border-color:#074226}
+.pf-product-label.label-template.label-botanical{background-image:url('/label-templates/botanical-paper.png');background-size:cover;background-position:center;border:0;outline:0;border-radius:0;padding:18px 24px 16px;gap:10px}
+.label-template.label-botanical .label-farm{font-weight:500;letter-spacing:1.7px;font-size:10px;line-height:14px}
+.label-template.label-botanical>.label-rule{display:flex;align-items:center;justify-content:center;gap:8px;background:transparent;opacity:.85;width:70%;height:18px;margin:0}
+.label-template.label-botanical>.label-rule>span{height:1px;background:currentColor;flex:1;max-width:38px}
+.label-template.label-botanical>.label-rule>svg{display:block;flex:none}
+.label-template.label-botanical>strong{font:400 clamp(21px,14cqw,38px)/1.06 Georgia,'Lora',serif;letter-spacing:-.7px}
+.pf-product-label.label-template.label-botanical>.label-quantity{font:400 15px/19px Georgia,'Lora',serif;letter-spacing:0;text-transform:none}
+.ap-themes .pf-product-label.label-template.label-botanical{padding:18px 18px 14px;gap:10px}
+.ap-themes .label-template.label-botanical .label-farm{font-size:8px;line-height:12px;letter-spacing:1px}
+.ap-themes .label-template.label-botanical>strong{font-size:23px;line-height:1.03}
+.pf-box-front .pf-product-label.label-template.label-botanical{padding:10px 18px 8px;gap:5px}
+.pf-box-front .label-template.label-botanical .label-farm{font-size:8px;line-height:11px;letter-spacing:1.2px}
+.pf-box-front .label-template.label-botanical>.label-rule{height:12px}
+.pf-box-front .pf-product-label.label-template.label-botanical>strong{font-size:24px;line-height:24px}
+.pf-box-front .pf-product-label.label-template.label-botanical>.label-quantity{font-size:12px;line-height:14px}
+.sample-package-label .pf-product-label.label-template.label-botanical{padding:10px 16px;gap:5px}
+.sample-package-label .label-template.label-botanical .label-farm{font-size:8px;line-height:10px;letter-spacing:.8px}
+.sample-package-label .label-template.label-botanical>.label-rule{height:12px}
+.sample-package-label .pf-product-label.label-template.label-botanical>strong{font-size:24px;line-height:24px}
+.sample-package-label .pf-product-label.label-template.label-botanical>.label-quantity{font-size:12px;line-height:14px}
+.label-template:not(.label-botanical)>.label-rule>*{display:none}

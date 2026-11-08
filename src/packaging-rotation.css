@@ -1,0 +1,10 @@
+.model-rotation{cursor:grab;touch-action:pan-y pinch-zoom;user-select:none;-webkit-user-select:none;position:relative}
+.model-rotation[data-model-dragging=true]{cursor:grabbing}
+.model-rotation[data-model-dragging=true] .pf-box,.model-rotation[data-model-dragging=true] .sample-package-model{transition:none}
+.model-rotation:focus-visible{outline:3px solid #19a35a;outline-offset:-4px}
+.model-rotation img{-webkit-user-drag:none}
+.packaging-rotate-hint{position:absolute;left:16px;right:16px;bottom:14px;text-align:center;pointer-events:none;color:#6e6e69;font:400 11px/16px 'Figtree',sans-serif}
+.packaging-rotate-keyboard{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+.pf-packaging-preview>.pf-box-scene.model-rotation{height:100%;min-height:250px;padding:30px 20px 46px}
+.sample-package-scene.model-rotation{padding-bottom:44px}
+@media(prefers-reduced-motion:reduce){.model-rotation .pf-box,.model-rotation .sample-package-model{transition:none}}
