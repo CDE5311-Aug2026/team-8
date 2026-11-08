@@ -1,6 +1,6 @@
 import MobileDialog from './MobileDialog';
 import {useEffect,useId,useState} from 'react';
-import {ArrowRight,ChevronDown,CircleHelp,SlidersHorizontal} from 'lucide-react';
+import {ArrowRight,ChevronDown,CircleHelp} from 'lucide-react';
 import {type BriefKind,type BriefState,type BriefTrial} from '../shared/briefV2';
 import {defaultProjectionPlan,projectionKey,restoreProjectionPlan,salesProjection,type ProjectionPlan} from '../shared/briefProjection';
 import {workspaceStorage} from './accountStorage';
@@ -56,24 +56,22 @@ export default function BriefSalesDashboard({state,tab,onTab,onNavigate,onOpen,o
      {!sampleMode?<div className="brief-sales-empty"><p>Your sales and opportunities will appear here once connected data is available.</p><button className="v2-secondary" onClick={()=>void setSampleMode(true)}>Explore sample sales</button></div>:tab==='trying'?state.trials.length?state.trials.map(trial=>{
       const op=opportunities.find(item=>item.kind===trial.kind)!,isExpanded=expanded===trial.kind;
       return <article key={trial.kind} className="brief-opportunity brief-pinned-opportunity brief-pinned-trial">
-       <div className="brief-pinned-opportunity-row">
-        <div className="brief-pinned-trial-copy"><strong>{trial.name}</strong><small>{trial.status==='live'?'Active trial':trial.status==='paused'?'Paused':'Draft'} · {trial.kind==='bundle'?'Bundle':trial.kind==='taster'?'Taster size':'Delivery offer'}</small></div>
+       <button type="button" className="brief-pinned-opportunity-row brief-trial-toggle" aria-label={`Details for ${trial.name}`} aria-expanded={isExpanded} aria-controls={`brief-trial-${trial.kind}`} onClick={()=>setExpanded(isExpanded?null:trial.kind)}>
+        <span className="brief-pinned-trial-copy"><strong>{trial.name}</strong><small>{trial.status==='live'?'Active trial':trial.status==='paused'?'Paused':'Draft'} · {trial.kind==='bundle'?'Bundle':trial.kind==='taster'?'Taster size':'Delivery offer'}</small></span>
         <strong className="brief-pinned-uplift">+{currency(data.baselineTotal*plan.uplifts[trial.kind]/100)}</strong>
-        <button type="button" className="brief-expand-opportunity" aria-label={`Details for ${trial.name}`} aria-expanded={isExpanded} aria-controls={`brief-trial-${trial.kind}`} onClick={()=>setExpanded(isExpanded?null:trial.kind)}><ChevronDown size={17} aria-hidden="true"/></button>
-       </div>
+        <ChevronDown size={17} aria-hidden="true"/>
+       </button>
        {isExpanded&&<div id={`brief-trial-${trial.kind}`} className="brief-pinned-opportunity-detail brief-pinned-trial-detail"><p>{op.text}</p><div className="brief-opportunity-evidence">{op.evidence}</div><small>Local trial · sales impact is projected.</small><div className="brief-opportunity-actions"><button className="v2-secondary" onClick={()=>onDetails(trial)}>View details</button><button className="v2-link" onClick={()=>trial.status==='draft'?onOpen(trial.kind,trial):onStatus(trial)}>{trial.status==='live'?'Pause trial':trial.status==='paused'?'Resume trial':'Continue setup'}</button></div></div>}
       </article>;
      }):<div className="brief-sales-empty"><h3>No trials started</h3><p>Review an opportunity, then set up a local trial.</p><button className="v2-secondary" onClick={()=>onTab('ideas')}>View opportunities</button></div>:availableOpportunities.length?availableOpportunities.map(op=>{
       const saved=state.trials.find(trial=>trial.kind===op.kind),included=plan.selected.includes(op.kind),isExpanded=expanded===op.kind;
       return <article className={`brief-opportunity brief-pinned-opportunity ${included?'included':''}`} key={op.kind}>
        <div className="brief-pinned-opportunity-row">
-        <label className="brief-pinned-include"><input type="checkbox" aria-label={`Include ${op.title} in projection`} checked={included} onChange={e=>update({...plan,selected:e.target.checked?[...plan.selected,op.kind]:plan.selected.filter(kind=>kind!==op.kind)})}/><span><strong>{op.title}</strong><small title={op.evidence}>{op.evidence}</small></span></label>
-        <strong className="brief-pinned-uplift">+{currency(data.baselineTotal*plan.uplifts[op.kind]/100)}</strong>
-        <button type="button" className="brief-expand-opportunity" aria-label={`Details for ${op.title}`} aria-expanded={isExpanded} aria-controls={`brief-opportunity-${op.kind}`} onClick={()=>setExpanded(isExpanded?null:op.kind)}><ChevronDown size={17} aria-hidden="true"/></button>
+        <span className="brief-pinned-checkbox"><input type="checkbox" aria-label={`Include ${op.title} in projection`} checked={included} onChange={e=>update({...plan,selected:e.target.checked?[...plan.selected,op.kind]:plan.selected.filter(kind=>kind!==op.kind)})}/></span>
+        <button type="button" className="brief-opportunity-toggle" aria-label={`Details for ${op.title}`} aria-expanded={isExpanded} aria-controls={`brief-opportunity-${op.kind}`} onClick={()=>setExpanded(isExpanded?null:op.kind)}><span className="brief-pinned-include"><span><strong>{op.title}</strong><small title={op.evidence}>{op.evidence}</small></span></span><strong className="brief-pinned-uplift">+{currency(data.baselineTotal*plan.uplifts[op.kind]/100)}</strong><ChevronDown size={17} aria-hidden="true"/></button>
        </div>
        {isExpanded&&<div id={`brief-opportunity-${op.kind}`} className="brief-pinned-opportunity-detail">
         <p>{op.text}</p><div className="brief-opportunity-evidence">{op.evidence}</div>
-        <details className="brief-assumptions"><summary><SlidersHorizontal size={14}/>Projection assumption · {plan.uplifts[op.kind]}%</summary><label>Expected sales uplift<span><input aria-label={`${op.title} expected uplift`} type="number" min={0} max={30} step={1} value={plan.uplifts[op.kind]} onChange={e=>{const value=Number(e.target.value);if(Number.isFinite(value))update({...plan,uplifts:{...plan.uplifts,[op.kind]:Math.min(30,Math.max(0,value))}});}}/>%</span></label><small>{op.assumption} Adjust this example assumption to compare scenarios.</small></details>
         <button className="v2-link brief-review-opportunity" onClick={()=>onOpen(op.kind,saved,!!saved)}>{saved?'Manage trial':'Review & set up'}<ArrowRight size={16}/></button>
        </div>}
       </article>;
