@@ -39,7 +39,7 @@ export default function BriefSalesDashboard({state,tab,onTab,onNavigate,onOpen,o
  function update(next:ProjectionPlan){setPlan(next);try{workspaceStorage.setItem(projectionKey,JSON.stringify(next));setError('');}catch{setError('Your scenario is available for this visit but could not be saved.');}}
  const report=sampleMode?onReport:()=>onInfo('No connected sales data is available to export. Activate Samples to explore the example report.');
  return <div className="brief-pinned-layout">
-  <DailyHeader title="Brief"><span className="brief-sales-badge">{sampleMode?'Sample data':'Sales overview'}</span></DailyHeader>
+  <DailyHeader title="Sales & growth"><span className="brief-sales-badge">{sampleMode?'Sample data':'Sales overview'}</span></DailyHeader>
   <main className="brief-sales-content brief-pinned-content">
    <FarmSalesSection compact brief sample={sampleMode} onPeriod={()=>onInfo('This view compares the last 30 days with a four-week scenario. Sales are sample data; projections use the assumptions selected below.')} onReport={report} onDetails={()=>setSalesDetailsOpen(true)} chart={<>
     <ProjectionChart compact plan={plan} sample={sampleMode}/>
@@ -49,9 +49,9 @@ export default function BriefSalesDashboard({state,tab,onTab,onNavigate,onOpen,o
      <p aria-live="polite"><strong>+{currency(data.improvement)}</strong><span>+{Math.round(data.lift*100)}% projected</span></p>
     </section>
    </>}/>
-   <section className="brief-pinned-opportunities" aria-label="Sales opportunities">
-    <div className="brief-opportunities-heading brief-pinned-heading"><h2><Sprout size="tiny"/>Sales opportunities</h2><button type="button" className="brief-methodology-icon" aria-label="How this projection works" onClick={()=>setMethodologyOpen(true)}><CircleHelp size={19} aria-hidden="true"/></button></div>
-    {sampleMode&&<DailySegments label="Brief sections" active={tab} items={[{id:'ideas',label:'Opportunities',count:availableOpportunities.length},{id:'trying',label:'In progress',count:state.trials.length}]} onChange={onTab}/>}
+   <section className="brief-pinned-opportunities" aria-label="Growth opportunities">
+    <div className="brief-opportunities-heading brief-pinned-heading"><h2><Sprout size="tiny"/>Growth opportunities</h2><button type="button" className="brief-methodology-icon" aria-label="How this projection works" onClick={()=>setMethodologyOpen(true)}><CircleHelp size={19} aria-hidden="true"/></button></div>
+    {sampleMode&&<DailySegments label="Growth sections" active={tab} items={[{id:'ideas',label:'Opportunities',count:availableOpportunities.length},{id:'trying',label:'In progress',count:state.trials.length}]} onChange={onTab}/>}
     <div className="brief-opportunity-scroll" role="region" aria-label={tab==='trying'?'Trials in progress':'Suggested sales opportunities'} tabIndex={0}>
      {!sampleMode?<div className="brief-sales-empty"><p>Your sales and opportunities will appear here once connected data is available.</p><button className="v2-secondary" onClick={()=>void setSampleMode(true)}>Explore sample sales</button></div>:tab==='trying'?state.trials.length?state.trials.map(trial=>{
       const op=opportunities.find(item=>item.kind===trial.kind)!,isExpanded=expanded===trial.kind;
