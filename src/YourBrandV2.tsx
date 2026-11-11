@@ -15,7 +15,7 @@ import Sprout from './Sprout';
 import {workspaceStorage} from './accountStorage';
 import {catalogueKey,type CatalogueItem} from '../shared/dailyV2';
 import {designPapers,hasDesignTweaks,labelTemplateNames,validDesignTweaks,validLabelTemplate,type LabelTemplate} from '../shared/labelTemplates';
-import {presetDesignPhotos,presetImagesFor} from '../shared/presetProduct';
+import {presetDesignPhotos,presetImagesFor,presetPackaging} from '../shared/presetProduct';
 import type {V2BrandKit} from '../shared/brandV2';
 import {applyDirection,directionsFor,type DirectionKit} from '../shared/brandDirections';
 import '@fontsource/bree-serif/400.css';
@@ -88,9 +88,11 @@ function DesignScreen({profile,brand,catalogue,page,productId,extraId,isNew=fals
  const saved=item?templateOf(item):extra?.template||'botanical';
  const [value,setValue]=useState<DesignChoice>(()=>{const tweaks=isNew?undefined:item?item.product.designTweaks:extra?.tweaks;return {template:isNew?'botanical':saved,tweaks:validDesignTweaks(tweaks)?tweaks:{}};});
  const [name,setName]=useState(extra?.name||'');const [mode,setMode]=useState<'3d'|'photo'>('3d');
- const {template,tweaks}=value;const own=hasDesignTweaks(tweaks);const kit=item?.product.brandIdentity||brand;
+ const {template,tweaks}=value;const own=hasDesignTweaks(tweaks)&&!(item&&presetImagesFor(item.product)===presetPackaging);const kit=item?.product.brandIdentity||brand;
  const title=isNew?'New design':item?.product.name||extra?.name||'Design';
- const images=item?presetImagesFor(item.product):null;const view=mode==='3d'?'studio':'photo';
+ const images=item?presetImagesFor(item.product):null;
+ // Mango Jam only has finished photos for the three themes, so it picks a theme and nothing else.
+ const jamOnly=!!images&&images===presetPackaging;const view=mode==='3d'?'studio':'photo';
  const sampleImage=!isNew&&template===saved?item?.product.samplePackaging?.image:undefined;
  const product=item?{...(item.product as ProductDraft),labelTemplate:template,designTweaks:own?tweaks:undefined}:null;
  const photos=own?presetDesignPhotos(product):null;
@@ -113,7 +115,7 @@ function DesignScreen({profile,brand,catalogue,page,productId,extraId,isNew=fals
   <div className="yb-preview">{preview}</div>
   {product&&<div className="daily-segments yb-segments" role="group" aria-label="Preview">{(['3d','photo'] as const).map(option=><button type="button" key={option} aria-pressed={mode===option} className={mode===option?'active':''} onClick={()=>setMode(option)}>{option==='3d'?'3D box':'On photo'}</button>)}</div>}
   {!product&&<section className="de-section"><h2>Name</h2><input className="yb-name" value={name} maxLength={60} placeholder="Holiday gift box" onChange={e=>setName(e.target.value)}/><small>Shape, name and weight come from the product you use it on.</small></section>}
-  <DesignEditor brand={kit} profile={profile} value={value} onChange={setValue} tileImage={images?(option=>images[option].studio):undefined} suggestions={suggestions}/>
+  <DesignEditor brand={kit} profile={profile} value={jamOnly?{template,tweaks:{}}:value} onChange={setValue} tileImage={images?(option=>images[option].studio):undefined} suggestions={suggestions} themesOnly={jamOnly}/>
  </main>{footer(<div className="yb-button-row">{product&&(src?<a className="v2-secondary yb-download" href={src} download={`${product.name.toLowerCase().replace(/[^a-z0-9]+/g,'-')}-packaging.jpg`}>Download</a>:<button type="button" className="v2-secondary yb-download" onClick={()=>{void downloadPackaging('png',product,profile,kit).catch(()=>{});}}>Download</button>)}<button type="button" className="v2-primary" onClick={()=>onSave(target,{template,tweaks:own?tweaks:{}},name.trim())}>Save design</button></div>)}</div>;
 }
 

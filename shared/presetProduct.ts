@@ -104,6 +104,8 @@ function swapUploads(value:unknown,key=''):unknown{
  if(Array.isArray(value))return value.map(item=>swapUploads(item,key));
  if(!value||typeof value!=='object')return value;
  const o=value as Record<string,unknown>;
+ // Mango Jam only has photos for the three themes, so label colour, picture and layout changes are dropped.
+ if(typeof o.photo==='string'&&o.photo.startsWith('/preset/jam-')&&o.designTweaks!==undefined){const {designTweaks:_dropped,...rest}=o;void _dropped;return swapUploads(rest,key);}
  if(typeof o.dataUrl==='string'&&o.dataUrl.length>1000)return {...presetCertificateFile};
  if(typeof o.url==='string'&&o.url.startsWith('data:image/')){
   if(key==='portrait')return {...o,url:presetPortrait.url};
@@ -112,6 +114,6 @@ function swapUploads(value:unknown,key=''):unknown{
  return Object.fromEntries(Object.entries(o).map(([k,v])=>[k,swapUploads(v,k)]));
 }
 export function migrateLegacySamplePhotos(storage:Pick<Storage,'length'|'key'|'getItem'|'setItem'>){
- for(let i=0;i<storage.length;i++){const key=storage.key(i);if(!key?.startsWith('farmily'))continue;const value=storage.getItem(key);if(!value||!value.includes('data:image/'))continue;try{const next=JSON.stringify(swapUploads(JSON.parse(value)));if(next!==value)storage.setItem(key,next);}catch{}}
+ for(let i=0;i<storage.length;i++){const key=storage.key(i);if(!key?.startsWith('farmily'))continue;const value=storage.getItem(key);if(!value||!value.includes('data:image/')&&!(value.includes('/preset/jam-')&&value.includes('designTweaks')))continue;try{const next=JSON.stringify(swapUploads(JSON.parse(value)));if(next!==value)storage.setItem(key,next);}catch{}}
  for(let i=0;i<storage.length;i++){const key=storage.key(i);if(!key?.startsWith('farmily'))continue;const value=storage.getItem(key);if(!value||!value.includes('/publish-v2/'))continue;let next=value;for(const [from,to] of Object.entries(legacySamplePhotos))next=next.split(from).join(to);if(next!==value)storage.setItem(key,next);}
 }

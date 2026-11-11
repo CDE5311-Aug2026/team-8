@@ -17,3 +17,12 @@ test('old uploaded photos are swapped for presets so storage has room again',()=
   assert.equal(profile.portrait.url,'/sample-profile/farmer.png');
   assert.equal(data.other,big);
 });
+
+test('Mango Jam drops label colour, picture and layout changes',()=>{
+ const data:Record<string,string>={'farmily-product-work':JSON.stringify({product:{name:'Mango Jam',photo:'/preset/jam-photo.jpg',labelTemplate:'botanical',designTweaks:{paper:'#8a5a3e',art:'sprig'}}}),'farmily-honey':JSON.stringify({photo:'/preset/honey.jpg',designTweaks:{art:'sprig'}})};
+ migrateLegacySamplePhotos(memory(data));
+ const {product}=JSON.parse(data['farmily-product-work']);
+ assert.equal(product.designTweaks,undefined);
+ assert.equal(product.labelTemplate,'botanical');
+ assert.deepEqual(JSON.parse(data['farmily-honey']).designTweaks,{art:'sprig'});
+});
