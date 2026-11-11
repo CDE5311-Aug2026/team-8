@@ -35,7 +35,7 @@ export default function YourSalesV2({sample,onBack,onGrowth}:{sample:boolean;onB
   <section><h2 className="ys-heading">By product</h2><div className="ys-list">{s.products.map(item=>{const src=thumb(item.id);return <div className="ys-row" key={item.id}><span className="ys-thumb">{src?<img src={src} alt=""/>:<ImageIcon size={20}/>}</span><span className="ys-row-copy"><strong>{item.name}</strong><small>{item.sold} sold</small></span><b>{money(item.amount)}</b></div>;})}</div></section>
   <section><h2 className="ys-heading">Your shoppers</h2><div className="ys-stats">{[[s.customers,'Customers'],[s.repeat,'Repeat buyers'],[s.followers,'Followers']].map(([value,label])=><div className="ys-card" key={label}><strong>{value}</strong><small>{label}</small></div>)}</div></section>
   <section><h2 className="ys-heading">Where orders come from</h2><div className="ys-card ys-regions">{s.regions.map(region=><div key={region.name}><span>{region.name}</span><i><b style={{width:`${region.share}%`}}/></i><span>{region.share}%</span></div>)}</div></section>
-  <button type="button" className="ys-growth" onClick={onGrowth}><SproutLoader onDark still size={40}/><span><strong>Sprout found 2 ways to grow</strong><small>Open Sales and growth</small></span><ChevronRight size={20} aria-hidden="true"/></button>
+  <button type="button" className="ys-growth" onClick={onGrowth}><SproutLoader onDark still size={40}/><span><strong>Sprout AI found 2 ways to grow</strong><small>Open Sales and growth</small></span><ChevronRight size={20} aria-hidden="true"/></button>
   <button type="button" className="v2-secondary ys-download" onClick={download}><Download size={18} aria-hidden="true"/>Download report</button>
  </main></div>;
 }

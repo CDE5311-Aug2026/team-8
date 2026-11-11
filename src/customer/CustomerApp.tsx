@@ -14,7 +14,7 @@ function SproutLoading({done}:{done:boolean}){
    <path d="M34.5601 15.84C34.5601 5.76 41.7601 0 53.2801 0C53.2801 10.08 46.0801 15.84 34.5601 15.84Z" fill="#074226"/>
    <g className="cx-loading-eyes"><circle cx="27.72" cy="29.016" r="3.24" fill="white"/><circle cx="45" cy="29.016" r="3.24" fill="white"/></g>
   </svg>
-  <div className="cx-loading-words"><strong>Setting up your market</strong><span>Sprout is gathering farms near you</span></div>
+  <div className="cx-loading-words"><strong>Setting up your market</strong><span>Sprout AI is gathering farms near you</span></div>
  </div>;
 }
 
