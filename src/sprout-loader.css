@@ -1,0 +1,9 @@
+/* Sprout looks Center, Left, Right, Center, then blinks. 2 s loop, same as the customer loading screen. */
+.sprout-loader{flex:none;display:block}
+.sprout-loader-eyes{animation:sprout-loader-look 2s ease-in-out infinite}
+.sprout-loader-eyes>circle{transform-box:fill-box;transform-origin:center;animation:sprout-loader-blink 2s ease-in-out infinite}
+@keyframes sprout-loader-look{0%,10%{transform:translateX(0)}25%,35%{transform:translateX(-5.76px)}50%,60%{transform:translateX(5.76px)}75%,100%{transform:translateX(0)}}
+@keyframes sprout-loader-blink{0%,85%,95%,100%{transform:scaleY(1)}90%{transform:scaleY(.2)}}
+
+.sprout-loader.is-still .sprout-loader-eyes,.sprout-loader.is-still .sprout-loader-eyes>circle{animation:none}
+@media(prefers-reduced-motion:reduce){.sprout-loader-eyes,.sprout-loader-eyes>circle{animation:none}}

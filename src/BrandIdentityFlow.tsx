@@ -86,7 +86,7 @@ export default function BrandIdentityFlow({preferSaved=false,startNew=false,prof
   timer.current=setTimeout(()=>{setWork(value=>({...value,concepts:demoConcepts,selected:0,palette:0,style:0,handwritten:false,image:null,origin:'sample',basis:signature(value.profile),stage:'preview'}));timer.current=null;},1000);
  }
  function fallbackToSamples(source:BrandWork){
-  setError('');setStatus(localDemo?'Local demo designs based on your farm profile.':'Brand generation is unavailable. Showing sample designs instead.');
+  setError('');setStatus(localDemo?'Designs based on your farm profile.':'Brand generation is unavailable. Showing sample designs instead.');
   setWork({...source,concepts:demoConcepts,selected:0,palette:0,style:0,handwritten:false,image:null,origin:'sample',basis:signature(source.profile),refinement:'',stage:'preview'});
  }
  async function generate(action:'concepts'|'image'='concepts',refinement=''){

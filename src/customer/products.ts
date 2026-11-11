@@ -1,3 +1,4 @@
+import {demoProducts,demoProfile} from '../../shared/demoDashboard';
 export type PhotoLabel='none'|'enhanced'|'generated';
 
 export type Product={
@@ -15,14 +16,29 @@ export type Product={
  allergens:string[];
  image:string;
  photoLabel:PhotoLabel;
+ processPhotos?:[string,string];
+ storyPhoto?:string;
 };
 
 const img=(file:string)=>`/images/customer/${file}`;
 
+// Green Valley Farm is the demo farmer's farm, so its listings come straight from the farmer's
+// published products (same photos, price, size, ingredients and description).
+const blurbs:Record<string,string>={'demo-honey':'Raw and floral.','demo-tea':'Light and citrusy.','demo-kaya':'Creamy pandan spread.','demo-jam':'Small-batch mango preserve.'};
+const greenValleyProducts:Product[]=demoProducts.filter(item=>item.live).map(item=>{
+ const allergenInfo=String(item.allergens||'Not listed');const extra=item as typeof item&{listingPhotos?:{url:string;name?:string}[];processPhotos?:{url:string;name?:string}[]};const listing=extra.listingPhotos||[];const process=extra.processPhotos||[];
+ return {id:`green-valley-${String(item.id).replace('demo-','')}`,blurb:blurbs[String(item.id)]||'',quantity:item.quantity,ingredients:String(item.ingredients||''),allergenInfo,
+  story:String(item.description||''),processCaptions:[process[0]?.name||'On the farm',process[1]?.name||'Packing'],name:item.name,farm:'Green Valley Farm',price:Number(item.price),unit:item.quantity,
+  allergens:/^contains /i.test(allergenInfo)?allergenInfo.replace(/^contains /i,'').split(/,\s*|\s+and\s+/).map(x=>x.toLowerCase()):[],
+  image:listing[0]?.url||item.photo,photoLabel:'enhanced',
+  processPhotos:process.length>=2?[process[0].url,process[1].url]:undefined,storyPhoto:demoProfile.photos?.[0]?.url};
+});
+
 export const products:Product[]=[
  {id:'goat-milk',blurb:'Fresh from the morning milking.',quantity:'1 L',ingredients:'Goat milk',allergenInfo:'Contains milk',story:'Goat milk from Happy Hill Farm, bottled fresh by the farm team. It is mild and creamy, and easy to pour over cereal or into a coffee.',processCaptions:['Picking on the farm','Packing your order'],name:'Goat milk',farm:'Happy Hill Farm',price:6.5,unit:'1L',allergens:['milk'],image:img('goat-milk.png'),photoLabel:'enhanced'},
  {id:'wildflower-honey',blurb:'Raw and unfiltered.',quantity:'250 g',ingredients:'Raw wildflower honey',allergenInfo:'Not listed',story:'Raw wildflower honey from Bee Good Apiary, collected from hives near the farm. Spoon it onto toast or stir it into tea.',processCaptions:['Picking on the farm','Packing your order'],name:'Raw wildflower honey',farm:'Bee Good Apiary',price:12,unit:'250g',allergens:[],image:img('honey.png'),photoLabel:'none'},
- {id:'heirloom-tomatoes',blurb:'Freshly picked. Great for salads.',quantity:'1 lb',ingredients:'Heirloom tomatoes',allergenInfo:'May contain traces of peanuts and tree nuts',story:'Heirloom tomatoes from Green Valley Farm. Freshly picked and great for salads.',processCaptions:['Picking tomatoes','Packing tomatoes'],name:'Heirloom Tomatoes',farm:'Green Valley Farm',price:4.5,unit:'1 lb',allergens:['peanuts','tree nuts'],image:img('tomatoes.png'),photoLabel:'generated'},
+ {id:'heirloom-tomatoes',blurb:'Freshly picked. Great for salads.',quantity:'1 lb',ingredients:'Heirloom tomatoes',allergenInfo:'May contain traces of peanuts and tree nuts',story:'Heirloom tomatoes from Riverbend Farm. Freshly picked and great for salads.',processCaptions:['Picking tomatoes','Packing tomatoes'],name:'Heirloom Tomatoes',farm:'Riverbend Farm',price:4.5,unit:'1 lb',allergens:['peanuts','tree nuts'],image:img('tomatoes.png'),photoLabel:'generated'},
+ ...greenValleyProducts,
  {id:'goat-cheese',blurb:'Soft and mild.',quantity:'150 g',ingredients:'Goat milk, salt',allergenInfo:'Contains milk',story:'Goat cheese from Happy Hill Farm, wrapped by hand in paper. It spreads well on bread and crumbles easily over salads.',processCaptions:['Picking on the farm','Packing your order'],name:'Goat cheese',farm:'Happy Hill Farm',price:9.8,unit:'150g',allergens:['milk'],image:img('goat-cheese.png'),photoLabel:'none'},
  {id:'sourdough-loaf',blurb:'Baked fresh this morning.',quantity:'1 loaf',ingredients:'Wheat flour, water, salt, sourdough starter',allergenInfo:'Contains wheat',story:'Sourdough loaf from Field and Flour, baked in small batches. It has a crisp crust and a soft inside, and is good with soup or butter.',processCaptions:['Picking on the farm','Packing your order'],name:'Sourdough loaf',farm:'Field and Flour',price:8,unit:'loaf',allergens:['wheat'],image:img('sourdough.png'),photoLabel:'none'},
  {id:'fresh-spinach',blurb:'Picked this morning.',quantity:'250 g',ingredients:'Fresh spinach',allergenInfo:'Not listed',story:'Fresh spinach from Riverbend Farm, picked in bunches. Toss it into a salad or wilt it into a hot dish.',processCaptions:['Picking on the farm','Packing your order'],name:'Fresh spinach',farm:'Riverbend Farm',price:3.2,unit:'250g',allergens:[],image:img('spinach.png'),photoLabel:'enhanced'},
@@ -54,7 +70,7 @@ export const categories:Category[]=[
 
 export const bannerImage=img('banner.png');
 export const aiPickIds=['fresh-spinach','sourdough-loaf','apricot-jam'];
-export const seasonalIds=['goat-milk','wildflower-honey','heirloom-tomatoes','goat-cheese'];
+export const seasonalIds=['goat-milk','green-valley-tea','heirloom-tomatoes','goat-cheese'];
 export const aiPromptChips=['Breakfast ideas','Dinner vegetables','Compare products'];
 
 export const interestOptions=['Honey','Preserves','Drinks','Baked','Snacks','Sauces & spices','Dried goods','Produce'];

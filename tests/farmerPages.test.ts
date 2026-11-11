@@ -15,7 +15,7 @@ test('product lifecycle distinguishes unfinished packaging, unpublished and publ
 test('only published products supply analytics, customer reviews and AI performance recommendations',()=>{
  const unpublished={...demoProducts[0],live:false};for(const packagingComplete of [false,true]){const products=[{...unpublished,packagingComplete}],d=dashboardStats(products);assert.equal(d.sales,0);assert.equal(d.views,0);assert.equal(d.customers,0);assert.equal(d.reviews,0);assert.equal(d.populated,false);assert.equal(nextActions(products,true,true,true).some(a=>a.source==='insight'),false);}
  const published=dashboardStats([{...unpublished,live:true}]);assert.ok(published.sales>0);assert.ok(published.reviews>0);
- const detailed=dashboardStats([demoProducts[0]],30,[],true);assert.equal(detailed.orders,38);assert.equal(detailed.sales,532);assert.equal(detailed.lifetime,3640);assert.equal(detailed.rating,4.8);assert.equal(detailed.positive,96);
+ const detailed=dashboardStats([demoProducts[0]],30,[],true);assert.equal(detailed.orders,38);assert.equal(detailed.sales,616);assert.equal(detailed.lifetime,5880);assert.equal(detailed.rating,4.8);assert.equal(detailed.positive,96);
  const feedback=simulatedReviews([demoProducts[0]],detailed.reviews,true);assert.equal(Math.round(feedback.reduce((n,r)=>n+r.rating,0)/feedback.length*10)/10,detailed.rating);
 });
 test('orders accept, decline and progress through fulfilment without reopening terminal states',()=>{

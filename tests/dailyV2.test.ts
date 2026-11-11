@@ -1,6 +1,6 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {currentCatalogueItem,catalogueStatus,restoreCatalogue,upsertCatalogue,sampleOrders,changeSampleOrder,catalogueKey,dailyOrdersKey,type CatalogueItem} from '../shared/dailyV2.ts';
+import {currentCatalogueItem,catalogueStatus,restoreCatalogue,upsertCatalogue,migrateCatalogue,findDraftTwin,sampleOrders,changeSampleOrder,catalogueKey,dailyOrdersKey,type CatalogueItem} from '../shared/dailyV2.ts';
 import {workspaceKeys} from '../shared/access.ts';
 const item={id:'one',draft:false,product:{name:'Honey',photo:'',live:true}} as CatalogueItem;
 
@@ -16,7 +16,9 @@ test('opening a saved unpublished product preserves its information, packaging a
 test('catalogue restores valid entries and replaces by identity without overwriting other products',()=>{
  assert.deepEqual(restoreCatalogue([null,{},item]),[item]);
  const second={...item,id:'two'};const changed={...item,product:{...item.product,live:false}};
- assert.deepEqual(upsertCatalogue([item,second],changed),[second,changed]);
+ // An edited product keeps its place (opening or saving it must not reorder Home and Products); a new one goes last.
+ assert.deepEqual(upsertCatalogue([item,second],changed),[changed,second]);
+ const third={...item,id:'three'};assert.deepEqual(upsertCatalogue([item,second],third),[item,second,third]);
  assert.equal(catalogueStatus(item),'Published');assert.equal(catalogueStatus(changed),'Unpublished');assert.equal(catalogueStatus({...item,draft:true}),'Draft');
  assert.ok(workspaceKeys.includes(catalogueKey));assert.ok(!(workspaceKeys as readonly string[]).includes(dailyOrdersKey));
 });
@@ -25,4 +27,16 @@ test('sample order actions enforce lifecycle transitions and preserve fixtures',
  assert.deepEqual(changeSampleOrder(sampleOrders,'#1042','Delivered'),sampleOrders);
  const delivered=changeSampleOrder(changeSampleOrder(accepted,'#1042','Ready'),'#1042','Delivered');assert.equal(delivered[0].status,'Delivered');assert.deepEqual(changeSampleOrder(delivered,'#1042','New'),delivered);
  assert.equal(changeSampleOrder(sampleOrders,'#1041','Cancelled')[1].status,'Cancelled');
+});
+test('the first read of the catalogue brings over every saved product, not only the one being edited',()=>{
+ const legacy=[{id:'demo-honey',name:'Honey',photo:'',live:true},{id:'demo-jam',name:'Jam',photo:'',live:false,packagingComplete:false}] as unknown as Parameters<typeof migrateCatalogue>[1];
+ const first=migrateCatalogue(null,legacy);
+ assert.deepEqual(first.items.map(i=>[i.id,i.draft]),[['demo-honey',false],['demo-jam',true]]);assert.equal(first.migrated,true);
+ const later=migrateCatalogue([item],legacy);
+ assert.deepEqual(later.items,[item]);assert.equal(later.migrated,false);
+});
+test('adding a product named like a draft finishes that draft',()=>{
+ const draft={id:'demo-jam',draft:true,product:{name:'Mango Jam',photo:'',live:false}} as CatalogueItem;
+ assert.equal(findDraftTwin([item,draft],' mango jam ')?.id,'demo-jam');
+ assert.equal(findDraftTwin([item,draft],'Honey'),undefined);assert.equal(findDraftTwin([draft],''),undefined);
 });

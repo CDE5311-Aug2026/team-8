@@ -43,3 +43,10 @@
 .sample-package-label .pf-product-label.label-template.label-botanical>strong{font-size:24px;line-height:24px}
 .sample-package-label .pf-product-label.label-template.label-botanical>.label-quantity{font-size:12px;line-height:14px}
 .label-template:not(.label-botanical)>.label-rule>*{display:none}
+
+/* Product's own design (Your brand, product design): band layout and picture choices */
+.pf-product-label.label-template.label-band{justify-content:flex-start;padding-top:0;overflow:hidden}
+.label-template.label-band>.label-farm{background:var(--label-ink);color:var(--label-paper);margin:0 -20px 4px;width:calc(100% + 40px);padding:8px 12px;box-sizing:border-box}
+.label-template.label-art-leaves>.label-botanical{display:block;color:inherit}
+.label-template>.label-sprig{position:relative;z-index:1;width:30px;height:36px;flex:none;color:inherit;opacity:.85}
+.label-template.label-art-none>.label-rule>svg{display:none}

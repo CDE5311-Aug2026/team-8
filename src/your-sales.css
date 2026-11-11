@@ -1,0 +1,42 @@
+/* Your sales (Figma: Farmer Side · v1 → 10 Your sales) */
+.ys .ys-content{display:flex;flex-direction:column;gap:16px;padding:8px 16px 40px}
+.ys-card{background:white;border-radius:16px;padding:16px}
+.ys-periods{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none}
+.ys-periods button{flex:none;height:36px;padding:0 16px;border-radius:999px;border:1px solid #e3e2dc;background:white;font:600 14px/20px 'Figtree',sans-serif;color:#1a1a18;cursor:pointer}
+.ys-periods button.active{background:#074226;border-color:#074226;color:white}
+.ys-total{display:flex;flex-direction:column}
+.ys-total>small{font:400 12px/16px 'Figtree',sans-serif;color:#6e6e69}
+.ys-total>strong{font:700 28px/36px 'Bricolage Grotesque',sans-serif;color:#1a1a18;margin-top:4px}
+.ys-total>p{margin:4px 0 0;font:400 12px/16px 'Figtree',sans-serif;color:#6e6e69}
+.ys-total>p b{color:#0e6b3b;font-weight:600}
+.ys-chart{width:100%;height:120px;margin-top:20px;display:block;overflow:visible}
+.ys-axis{display:flex;justify-content:space-between;margin-top:8px;font:400 11px/14px 'Figtree',sans-serif;color:#6e6e69}
+.ys-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.ys-stats .ys-card{padding:12px;display:flex;flex-direction:column;gap:2px}
+.ys-stats strong{font:700 16px/22px 'Bricolage Grotesque',sans-serif;color:#1a1a18}
+.ys-stats small{font:400 12px/16px 'Figtree',sans-serif;color:#6e6e69}
+.ys .ys-content .ys-heading{font:700 20px/28px 'Bricolage Grotesque',sans-serif;margin:8px 0 12px;color:#1a1a18;letter-spacing:0}
+.ys-list{background:white;border-radius:16px;overflow:hidden}
+.ys-row{display:flex;align-items:center;gap:12px;padding:8px 16px 8px 8px;border-bottom:1px solid #f0efea}
+.ys-row:last-child{border-bottom:0}
+.ys-thumb{width:48px;height:48px;border-radius:10px;background:#f5f5f2;display:flex;align-items:center;justify-content:center;overflow:hidden;flex:none;color:#6e6e69}
+.ys-thumb img{width:100%;height:100%;object-fit:cover}
+.ys-row-copy{flex:1;min-width:0;display:flex;flex-direction:column}
+.ys-row-copy strong{font:600 16px/22px 'Figtree',sans-serif;color:#1a1a18}
+.ys-row-copy small{font:400 13px/18px 'Figtree',sans-serif;color:#6e6e69}
+.ys-row>b{font:700 16px/22px 'Bricolage Grotesque',sans-serif;color:#1a1a18}
+.ys-regions{display:flex;flex-direction:column;gap:14px}
+.ys-regions>div{display:grid;grid-template-columns:56px 1fr 40px;align-items:center;gap:12px;font:400 12px/16px 'Figtree',sans-serif;color:#1a1a18}
+.ys-regions>div>span:last-child{text-align:right;font-weight:600}
+.ys-regions i{height:6px;border-radius:3px;background:#f0efea;overflow:hidden;display:block}
+.ys-regions i b{display:block;height:100%;border-radius:3px;background:#19a35a}
+.ys-growth{display:flex;align-items:center;gap:12px;padding:14px 16px;border:0;border-radius:16px;background:#074226;color:white;text-align:left;cursor:pointer}
+.ys-growth .sprout-loader{width:40px;height:auto}
+.ys-growth span{flex:1;display:flex;flex-direction:column}
+.ys-growth strong{font:600 15px/20px 'Figtree',sans-serif}
+.ys-growth small{font:400 12px/16px 'Figtree',sans-serif;color:rgba(255,255,255,.86)}
+.ys .ys-download{width:100%;max-width:none;min-height:48px;height:48px;margin:16px 0 0;display:flex;align-items:center;justify-content:center;gap:8px}
+.ys-empty strong{font:600 16px/22px 'Figtree',sans-serif}
+.ys-empty p{margin:4px 0 0;font:400 14px/20px 'Figtree',sans-serif;color:#6e6e69}
+.ys .ys-content .ys-growth small{color:rgba(255,255,255,.86)}
+.ys .ys-content .ys-growth strong{color:white}

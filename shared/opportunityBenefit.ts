@@ -1,7 +1,6 @@
 import type {BriefTrial} from './briefV2.ts';
 
 export const briefProductFacts={
- tomatoes:{name:'Heirloom tomatoes',quantity:'1 kg',price:4.5},
  honey:{name:'Wildflower Honey',quantity:'250 g',price:14},
  kaya:{name:'Pandan Kaya',quantity:'200 g',price:9.5},
  tea:{name:'Lemongrass Tea',quantity:'20 bags',price:6},
@@ -12,7 +11,7 @@ export function offerSalesScenario(trial:BriefTrial){
  const jars=Number.isInteger(trial.jars)&&trial.jars>0?trial.jars:null;
  const weeks=trial.kind==='delivery'?(Number.isInteger(trial.weeks)&&trial.weeks>0&&trial.weeks<=52?trial.weeks:null):4;
  const separate=[...new Set(trial.products)].reduce((sum,id)=>sum+(briefProductFacts[id as keyof typeof briefProductFacts]?.price||0),0);
- const comparison=trial.kind==='bundle'?separate:briefProductFacts.kaya.price;
+ const comparison=trial.kind==='bundle'?separate:briefProductFacts.honey.price;
  const gap=price===null?null:Math.round((comparison-price)*100)/100;
  const orders=jars===null?null:trial.kind==='delivery'?(weeks===null?null:jars*weeks):jars;
  const totalSales=price!==null&&orders!==null?Math.round(price*orders*100)/100:null;

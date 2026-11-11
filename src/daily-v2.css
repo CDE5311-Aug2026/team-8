@@ -12,3 +12,7 @@
 
 
 .daily-nav .growth-tab-icon{display:block;width:22px;height:22px;flex:none}.daily-nav button:not(.active)>.growth-tab-icon{filter:brightness(0) saturate(100%) invert(86%) sepia(12%) saturate(746%) hue-rotate(92deg) brightness(94%) contrast(89%)}
+.daily-footer-row{display:flex;gap:12px}.daily-footer-row>.v2-secondary{flex:none;display:inline-flex;align-items:center;gap:8px;padding:0 20px}.daily-footer-row>.v2-primary{flex:1;width:auto}
+
+/* Product detail title stays on one line at phone widths (Figma: Product details header). */
+.daily-detail .daily-header h1,.daily-header:has(>.daily-status) h1{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:clamp(20px,6.2vw,28px);overflow-wrap:normal}

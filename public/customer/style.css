@@ -2811,3 +2811,12 @@ body[data-fpchat="other"] [data-name="Chat / Green Valley Farm"] [data-name="Con
 .fp-hist{display:contents}
 .fp-hist *{pointer-events:none}
 .fp-hist-dup{display:none!important}
+
+/* Interests grid: Figma tiles are a fixed 177px on a 402px frame. Split the row in two so
+   narrower phones (393, 390, 375) still get two columns. */
+[data-node-id="1493:4608"]>[data-name="Interest tile"]{width:calc((100% - 16px)/2)!important}
+[data-node-id="1493:4608"] [data-name="Scrim"]{width:auto!important;left:0!important;right:0}
+/* Selected tiles have a 3px border; the photo's own 16px radius left gaps in the corners. The tile already clips it. */
+[data-node-id="1493:4608"] [data-name="Interest tile"]>img{border-radius:0!important}
+/* Fresh picks (Explore): no Sprout in the header corner (Figma: Sprout hidden in the Backdrop on Explore screens). */
+[data-name^="Explore"] [data-name="Backdrop"] [data-name="Sprout"]{display:none!important}

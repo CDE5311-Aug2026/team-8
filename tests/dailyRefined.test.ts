@@ -14,8 +14,9 @@ test('new order lifecycle migrates older statuses and retains every saved transi
 });
 test('order details reconcile line items, welcome discount and farmer proceeds',()=>{
  const order=sampleOrders[0],detail=orderDetails(order);assert.equal(detail.items.length,2);assert.equal(detail.address,'Toa Payoh');assert.equal(detail.shopping,'First order');
- const total=detail.items.reduce((sum,item)=>sum+Math.round(Number(item.price)*100),0);assert.equal(total,2150);assert.equal(total-Math.round(Number(detail.discount)*100),Math.round(Number(order.total)*100));
- const other=orderDetails(sampleOrders[1]);assert.equal(other.address,'Jurong');assert.equal(other.shopping,'Not provided');assert.equal(other.subtotal,sampleOrders[1].total);
+ const total=detail.items.reduce((sum,item)=>sum+Math.round(Number(item.price)*100),0);assert.equal(total,2000);assert.equal(total-Math.round(Number(detail.discount)*100),Math.round(Number(order.total)*100));
+ for(const o of sampleOrders){const d=orderDetails(o);assert.notEqual(d.shopping,'Not provided');assert.notEqual(d.window,'Not provided');assert.equal((Number(d.subtotal)-Number(d.discount)).toFixed(2),o.total);}
+ const other=orderDetails(sampleOrders[1]);assert.equal(other.address,'Jurong');assert.equal(other.subtotal,sampleOrders[1].total);
 });
 test('certificate migration keeps onboarding uploads and multiple local entries without claiming real verification',()=>{
  const legacy={...sampleProfile,certificate};assert.equal(profileCertificates(legacy)[0].certificate,certificate);

@@ -1,3 +1,4 @@
+import type {ProductAnalytics} from '../shared/productAnalytics';
 import {printableLabelSvg} from './labelArtwork';
 import {samplePackagingFor} from '../shared/samplePackaging';
 import {jsPDF} from 'jspdf';
@@ -12,4 +13,4 @@ export async function packagingFiles(product:ProductDraft,profile:FarmerProfile,
  }finally{URL.revokeObjectURL(url);}
 }
 export async function downloadPackaging(kind:'pdf'|'svg'|'png'|'all',product:ProductDraft,profile:FarmerProfile,brand:BrandKit,mockup?:string){const files=await packagingFiles(product,profile,brand,mockup);const slug=product.name.toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'')||'product';if(kind==='all'){const zip=zipSync({[`${slug}-print.pdf`]:files.pdf,[`${slug}-label.svg`]:files.svg,[`${slug}-preview.png`]:files.png});saveBlob(new Blob([zip as BlobPart],{type:'application/zip'}),`${slug}-packaging.zip`);}else saveBlob(new Blob([files[kind] as BlobPart],{type:kind==='pdf'?'application/pdf':kind==='svg'?'image/svg+xml':'image/png'}),`${slug}-${kind==='png'?'preview':'label'}.${kind}`);}
-export function downloadSalesReport(name:string){saveBlob(new Blob([`Sample data only\nProduct,Orders,Lifetime earnings,Product views\n"${name.replaceAll('"','""')}",38,3640.00,2350\n`],{type:'text/csv;charset=utf-8'}),'sample-sales-report.csv');}
+export function downloadSalesReport(name:string,data:ProductAnalytics){saveBlob(new Blob([`Product,Sold (30 days),Sales (30 days),Orders (30 days),Lifetime earnings,Product views\n"${name.replaceAll('"','""')}",${data.sold},${data.amount.toFixed(2)},${data.orders},${data.lifetime.toFixed(2)},${data.views}\n`],{type:'text/csv;charset=utf-8'}),'sales-report.csv');}

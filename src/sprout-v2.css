@@ -5,3 +5,4 @@
 .completed-home .home-v2-setup h2,.completed-home .home-v2-task h3{font:700 20px/26px "Bricolage Grotesque",sans-serif;letter-spacing:-.2px;margin:0;color:inherit;font-variation-settings:"opsz" 14,"wdth" 100}.completed-header .home-v2-account{flex:none;font-size:11px;padding:0 8px}.completed-products-empty{border-radius:16px;background:white}.completed-home .home-v2-task p{margin:0}.completed-home .home-v2-deck{overflow:clip;border-radius:16px}
 
 .completed-brand>span{flex:none}.completed-brand .completed-portrait{display:block;width:48px;height:48px;object-fit:cover;border-radius:50%}
+.completed-setup-first{display:flex;align-items:flex-start;gap:12px;margin-bottom:16px}.completed-setup-first .sprout-icon{width:40px;height:auto;object-fit:contain;flex:none}.completed-setup-first p{margin:0;font:400 15px/22px "Figtree",sans-serif;color:#3b3b38}

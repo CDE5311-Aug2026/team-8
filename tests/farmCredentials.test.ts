@@ -13,10 +13,10 @@ test('growing practice suggestions use explicit wording and respect a negative o
  for(const value of [['Organic','Organic'],['Certified organic'],null,'Organic'])assert.ok(!validGrowingPractices(value));
 });
 test('onboarding has five stages and photo back navigation follows the path actually taken',()=>{
- assert.deepEqual(['basics','story','practices','certificate','photos'].map(step=>farmOnboardingStep(step as 'basics')),[0,1,2,3,4]);
- assert.equal(farmOnboardingStep('certificate-upload'),3);
- assert.equal(previousFarmOnboardingScreen('practices'),'story');assert.equal(previousFarmOnboardingScreen('certificate'),'practices');
- assert.equal(previousFarmOnboardingScreen('photos','certificate-upload'),'certificate-upload');assert.equal(previousFarmOnboardingScreen('photos','certificate'),'certificate');
+ assert.deepEqual(['basics','story','photos','practices','certificate'].map(step=>farmOnboardingStep(step as 'basics')),[0,1,2,3,4]);
+ assert.equal(farmOnboardingStep('certificate-upload'),4);
+ assert.equal(previousFarmOnboardingScreen('practices'),'photos');assert.equal(previousFarmOnboardingScreen('photos'),'story');assert.equal(previousFarmOnboardingScreen('certificate'),'practices');
+ assert.equal(previousFarmOnboardingScreen('certificate-upload'),'certificate');
 });
 test('old onboarding drafts keep progress while new drafts retain deselections and local certificate details',()=>{
  const old={profile:sampleProfile,life:'Small batches.',step:'photos'};

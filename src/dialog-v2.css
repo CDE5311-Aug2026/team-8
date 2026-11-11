@@ -32,3 +32,4 @@
 .v2-dialog :focus-visible{outline:2px solid #19a35a;outline-offset:3px}
 @media(prefers-reduced-motion:no-preference){.v2-dialog[open]>.v2-dialog-panel{animation:v2-dialog-enter .18s ease-out}@keyframes v2-dialog-enter{from{transform:translateY(24px);opacity:0}to{transform:translateY(0);opacity:1}}}
 .pf-mobile-dialog.v2-dialog:not([open]){display:none}.v2-dialog .v2-dialog-header{height:auto;width:100%}
+dialog.pf-mobile-dialog.v2-dialog{inset:0;width:100%;max-width:none;height:100%;max-height:none}dialog.pf-mobile-dialog.v2-dialog>.v2-dialog-panel{max-width:480px;margin:0 auto}

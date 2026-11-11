@@ -16,7 +16,7 @@ export default function AccountGate({onBack,initialMode='signin'}:{onBack?:()=>v
  useEffect(()=>{window.scrollTo({top:0,behavior:'instant'});heading.current?.focus({preventScroll:true});},[mode]);
  const {prepareGuestTransfer,signInDemo,startDemoSignup}=useAccount();const hasDrafts=hasProgress(snapshot(null));
  async function submit(){
-  setError('');setMessage('');if(!authClient){if(busy)return;setBusy(true);try{if(mode==='signin'){if(!await signInDemo(email,password))setError('Email or password does not match a local demo account.');}else{if(password!==confirmation){setError('The passwords do not match.');return;}await startDemoSignup(email,password);}}catch(err){setError(err instanceof Error?err.message:'Local demo sign-in is unavailable.');}finally{setBusy(false);}return;}
+  setError('');setMessage('');if(!authClient){if(busy)return;setBusy(true);try{if(mode==='signin'){if(!await signInDemo(email,password))setError('Email or password does not match a local demo account.');}else{if(password!==confirmation){setError('The passwords do not match.');return;}await startDemoSignup(email,password);}}catch(err){setError(err instanceof Error?err.message:'Sign-in is unavailable right now.');}finally{setBusy(false);}return;}
   if(mode==='signup'&&password!==confirmation){setError('The passwords do not match.');return;}
   setBusy(true);
   prepareGuestTransfer(email.trim());

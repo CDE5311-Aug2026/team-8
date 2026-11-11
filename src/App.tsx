@@ -21,6 +21,6 @@ export default function App(){
  const entry=entryStep(!!account.identity,guest,role);
  if(!v2Complete&&entry!=='customer')return <OnboardingV2 onBuy={()=>choose('customer')} onComplete={()=>{setV2Complete(true);startSelling();}}/>;
  if(entry==='farmer')return <><div hidden={!!accountPrompt}><FarmerApp onChangeRole={()=>choose(null)} onCreateAccount={()=>setAccountPrompt('signup')} onSignIn={()=>setAccountPrompt('signin')} onSignOut={signOut}/></div>{accountPage}</>;
- if(entry==='customer')return <><div hidden={!!accountPrompt}><CustomerApp/></div>{accountPage}</>;
+ if(entry==='customer')return <><div hidden={!!accountPrompt}><CustomerApp onExit={()=>choose(null)}/></div>{accountPage}</>;
  return <><div hidden={!!accountPrompt}><Welcome onExplore={()=>choose('customer')} onSell={startSelling} onSignIn={()=>setAccountPrompt('signin')}/></div>{accountPage}</>;
 }

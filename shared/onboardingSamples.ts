@@ -12,5 +12,7 @@ export function onboardingSampleWorkspace(current:Workspace):Workspace{
  const products=new Map([...demoProducts,...saved,...userProducts].map(product=>[product.id,product]));
  const catalogue=new Map<string,CatalogueItem>([...products.values()].map(product=>[product.id,{id:product.id,product,draft:product.packagingComplete===false}]));
  for(const item of daily)catalogue.set(item.id,item);
- return {...demoWorkspace(),...current,'farmily-products':JSON.stringify([...products.values()]),'farmily-catalogue-v2':JSON.stringify([...catalogue.values()]),'farmily-setup-complete':'true',[onboardingSampleReturnKey]:'true'};
+ // After sign-up the demo always shows the preset farm: what was typed during sign-up (often test text) is replaced.
+ const preset=demoWorkspace();
+ return {...preset,...current,'farmily-profile':preset['farmily-profile'],'farmily-brand':preset['farmily-brand'],'farmily-products':JSON.stringify([...products.values()]),'farmily-catalogue-v2':JSON.stringify([...catalogue.values()]),'farmily-setup-complete':'true',[onboardingSampleReturnKey]:'true'};
 }
