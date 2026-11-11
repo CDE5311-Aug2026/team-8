@@ -18,7 +18,9 @@
   bg:{name:'Bee Good Apiary',km:'5 km away',who:'Nadia',certs:['Food safety certified','Halal certified']},
   hh:{name:'Happy Hill Farm',km:'3 km away',who:'Raj',certs:['Certified organic','SFA licence']},
   rb:{name:'Riverbend Farm',km:'6 km away',who:'Wei Ling',certs:['Good Agricultural Practice','Food safety certified']},
-  ff:{name:'Field and Flour',km:'7 km away',who:'Farah',certs:['Food safety certified','Halal certified']}
+  ff:{name:'Field and Flour',km:'7 km away',who:'Farah',certs:['Food safety certified','Halal certified']},
+  kp:{name:'Kampung Pantry',km:'5.5 km away',who:'Rosnah',certs:['Food safety certified','Halal certified']},
+  sg:{name:'Sunrise Greens',km:'4.8 km away',who:'Jun Hao',certs:['Good Agricultural Practice','Certified organic']}
  };
  // photos: [touched-up photo, farmer's own photo]. ai: the card shows the AI mark.
  var products={
@@ -78,8 +80,37 @@
    process:[['/preset/jam-cooking.jpg','Cooking in small pots'],['/preset/jam-filling.jpg','Filling the jars']],
    r1:['G','grace_h','2 days ago','Not too sweet, real fruit pieces.','Fresh','Helpful (3)'],
    r2:['V','vik_r','5 days ago','Lovely jam. The jar is small for the price.','Good packaging','Helpful (2)','Thanks, Vik. A bigger jar is on the way.']}
+,
+  kaya:{match:'Pandan kaya',farm:'kp',name:'Pandan kaya',rating:'4.8',reviews:'52',price:'SGD 6.50',unit:'/ 250 g',
+   taste:[['Fragrant',5],['Sweet',4],['Creamy',4]],qty:'250 g',ingredients:'Coconut milk, eggs, sugar, pandan',allergens:'Egg',chips:['Toast','Kueh','Breakfast'],
+   story:'Stirred by hand for two hours over a low flame, the way Rosnah’s grandmother made it.',voice:'0:24',
+   photos:['/preset/shop-kaya-studio.jpg','/preset/shop-kaya-photo.jpg'],ai:true,
+   process:[['/preset/kaya-cooking.jpg','Stirring for two hours'],['/preset/kaya-jarring.jpg','Filling the jars']],
+   r1:['S','sharon_l','2 days ago','Tastes just like my grandmother’s. Not too sweet.','Fresh','Helpful (5)'],
+   r2:['W','wen.c','6 days ago','Smooth and fragrant. I wish the jar were bigger.','Good packaging','Helpful (2)','Thanks, Wen. A bigger jar is coming soon.']},
+  sambal:{match:'Sambal belacan',farm:'kp',name:'Sambal belacan',rating:'4.7',reviews:'31',price:'SGD 7.00',unit:'/ 200 g',
+   taste:[['Spicy',5],['Savoury',4],['Smoky',3]],qty:'200 g',ingredients:'Chillies, shallots, belacan, oil',allergens:'Shellfish (shrimp paste)',chips:['Rice','Noodles','Grilled fish'],
+   story:'Pounded by hand in a stone mortar, then fried slowly until dark and fragrant.',voice:'0:19',
+   photos:['/preset/shop-sambal-studio.jpg','/preset/shop-sambal-photo.jpg'],ai:true,
+   process:[['/preset/sambal-pounding.jpg','Pounding by hand'],['/preset/sambal-frying.jpg','Frying slowly']],
+   r1:['F','faiz_m','3 days ago','Properly spicy and full of flavour. Great with eggs.','Fresh','Helpful (6)'],
+   r2:['C','clara_n','1 week ago','Delicious but too hot for my kids.','Good value','Helpful (2)','Thanks, Clara. A milder batch is on the way.']},
+  microgreens:{match:'Microgreens',farm:'sg',name:'Microgreens',rating:'4.7',reviews:'28',price:'SGD 5.50',unit:'/ 50 g',
+   taste:[['Crunchy',5],['Fresh',5],['Peppery',3]],qty:'50 g',ingredients:'Pea, radish and sunflower shoots',allergens:'None',chips:['Salads','Sandwiches','Garnish'],
+   story:'Grown on shelves under soft lights and cut the morning they ship.',voice:'0:17',
+   photos:['/preset/shop-microgreens-studio.jpg','/preset/shop-microgreens-photo.jpg'],ai:true,
+   process:[['/preset/microgreens-trays.jpg','On the grow shelves'],['/preset/microgreens-cutting.jpg','Cut to order']],
+   r1:['A','amir.r','1 week ago','Crunchy and so fresh. My salads finally taste of something.','Fresh','Helpful (4)'],
+   r2:['J','joyce_t','4 days ago','Lovely, but they only last three days.','Small batch','Helpful (1)','Thanks, Joyce. Keep them dry in the fridge and they last longer.']},
+  lettuce:{match:'Butterhead lettuce',farm:'sg',name:'Butterhead lettuce',rating:'4.6',reviews:'22',price:'SGD 3.80',unit:'/ 1 head',
+   taste:[['Buttery',4],['Mild',4],['Crisp',3]],qty:'1 head',ingredients:'Butterhead lettuce',allergens:'None',chips:['Salads','Wraps','Burgers'],
+   story:'Grown in water channels in our greenhouse and sold with the roots on so it stays fresh.',voice:'0:15',
+   photos:['/preset/shop-lettuce-studio.jpg','/preset/shop-lettuce-photo.jpg'],ai:true,
+   process:[['/preset/lettuce-picking.jpg','Lifting from the channel'],['/preset/lettuce-packing.jpg','Wrapped by hand']],
+   r1:['N','nadia_k','2 days ago','Soft leaves, and it stays fresh with the roots on.','Fresh','Helpful (3)'],
+   r2:['P','peter_w','5 days ago','Good lettuce, a little small this week.','Good value','Helpful (1)','Thanks, Peter. The next harvest is bigger.']}
  };
- var order=['Raw wildflower honey','Wildflower Honey','Lemongrass Tea','Fresh spinach','Goat milk','Sourdough loaf','Goat cheese','Apricot jam'];
+ var order=['Raw wildflower honey','Wildflower Honey','Lemongrass Tea','Fresh spinach','Goat milk','Sourdough loaf','Goat cheese','Apricot jam','Pandan kaya','Sambal belacan','Microgreens','Butterhead lettuce'];
  var byMatch={};for(var id in products)byMatch[products[id].match]=id;
  var tea=products.tea;
  function current(){try{return products[sessionStorage.getItem(key)]||tea;}catch(e){return tea;}}
@@ -104,7 +135,7 @@
  // The first farm group holds that product, with the welcome deal (10% off a first order from
  // that farm) and free delivery from SGD 10.20. Happy Hill's goat milk and goat cheese are
  // already in the basket, so adding one of them raises its count instead.
- var shortName={gv:'Green Valley',bg:'Bee Good',hh:'Happy Hill',rb:'Riverbend',ff:'Field and Flour'};
+ var shortName={gv:'Green Valley',bg:'Bee Good',hh:'Happy Hill',rb:'Riverbend',ff:'Field and Flour',kp:'Kampung Pantry',sg:'Sunrise Greens'};
  var hhItems={milk:'I1447:3631;1091:388',cheese:'I1447:3634;1091:388'};
  function money(n){return 'SGD '+n.toFixed(2);}
  function num(p){return parseFloat(p.price.replace('SGD ',''));}
@@ -186,11 +217,15 @@
  // Farm page "Our story": the photos each farm added to its profile.
  var farmPhotos={gv:[['/preset/farm-products.jpg','Our products'],['/preset/farm-process.jpg','Harvesting lemongrass']],
   bg:[['/preset/bg-farm.jpg','Our honey and jam'],['/preset/bg-apiary.jpg','Our hives']],
-  hh:[['/preset/hh-farm.jpg','Our milk and cheese'],['/preset/hh-goats.jpg','Our goats']]};
+  hh:[['/preset/hh-farm.jpg','Our milk and cheese'],['/preset/hh-goats.jpg','Our goats']],
+  rb:[['/preset/rb-farm.jpg','Our fields'],['/preset/spinach-picking.jpg','Picking at dawn']],
+  ff:[['/preset/ff-bakery.jpg','Our bakery'],['/preset/sourdough-shaping.jpg','Shaping the dough']],
+  kp:[['a/94ef5fbd-842f-4c39-af81-8f6f719cbaf8.jpg','Our kitchen'],['/preset/kaya-cooking.jpg','Stirring the kaya']],
+  sg:[['a/76ec87a3-6302-4fb9-9f17-f6868198ff03.jpg','Our greenhouse'],['/preset/microgreens-trays.jpg','Our grow room']]};
  function farmStory(){
-  [['1447:3495',farmPhotos.gv],['1468:7115',farmPhotos.gv],['1447:3521',farmPhotos.bg],['1447:3547',farmPhotos.hh]].forEach(function(f){
+  [['1447:3495',farmPhotos.gv],['1468:7115',farmPhotos.gv],['1447:3521',farmPhotos[(/^#farm-(\w+)/.exec(location.hash)||[])[1]]||farmPhotos.bg],['1447:3547',farmPhotos.hh]].forEach(function(f){
    var sec=document.querySelector('[data-node-id="'+f[0]+'"]');if(!sec)return;
-   var row=sec.querySelector(':scope > [data-name="Photos"]');if(row)return;
+   var row=sec.querySelector(':scope > [data-name="Photos"]');if(row){photoRow(row,f[1]);return;}
    var title=sec.querySelector(':scope > [data-name="Section title"]');var r=photoRow(null,f[1]);
    if(title)title.after(r);else sec.prepend(r);});
  }
