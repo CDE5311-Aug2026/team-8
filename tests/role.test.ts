@@ -18,5 +18,8 @@ test('returning farmers resume their existing profile; new visitors must choose 
  assert.equal(initialRole(null,false),null);
  assert.equal(initialRole(null,true),'farmer');
  assert.equal(initialRole('farmer',false),'farmer');
- assert.equal(initialRole('customer',true),'customer');
+ assert.equal(initialRole('customer',true),'farmer');
+});
+test('customers start from the buy or sell choice on every visit',()=>{
+ assert.equal(initialRole('customer',false),null);
 });

@@ -2898,3 +2898,6 @@ body[data-fpchat="other"] [data-name="Chat / Green Valley Farm"] [data-name="Con
 .br-tip{position:relative}.br-tipx{position:absolute;top:10px;right:10px;width:24px;height:24px;display:flex!important;align-items:center;justify-content:center;color:#fff!important}.br-tipx svg{width:16px;height:16px}
 .br-tag{position:absolute;left:8px;bottom:8px;background:#fff;color:#1a1a18;font:500 11px/16px 'Figtree',sans-serif;padding:2px 8px;border-radius:999px}
 .br-price s{white-space:nowrap;display:inline-block}
+
+/* Search bar: the placeholder stays on one line on narrow phones. */
+[data-node-id="1447:3337"] p{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
