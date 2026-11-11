@@ -27,7 +27,7 @@ import CurrencyField from './CurrencyField';
 import {formatSgd} from '../shared/currency';
 
 import AllergenPicker from './AllergenPicker';
-import {initialAllergens,allergenStatement,addIngredients} from '../shared/productFields';
+import {initialAllergens,setAllergenFree,allergenStatement,addIngredients} from '../shared/productFields';
 import './product-flow.css';
 
 type Screen='add'|'details'|'packaging'|'saved'|'listing';
@@ -59,7 +59,7 @@ export default function ProductFlowV2({editOnOpen=false,packagingOnOpen=false,pu
  useEffect(()=>{window.scrollTo({top:0,behavior:'instant'});heading.current?.focus({preventScroll:true});},[screen]);
  const update=(key:keyof ProductDraft,value:string)=>{setProduct(p=>({...p,[key]:value}));setReviewed(false);setTouched(keys=>[...keys,key]);};
  const photoChanged=useCallback((photo:string,sample:boolean)=>{setProduct(value=>value.photo===photo&&!!value.sample===sample?value:{...value,photo,sample});setReviewed(false);},[]);
- const scan=(info:ProductInfo,photo:string,result:Analysis|null,sample:boolean,notice='')=>{setScanNotice(notice);setProduct(p=>({...p,...info,allergenDetails:initialAllergens(info.allergens),ingredientsNotApplicable:false,ingredientInput:'',photo,sample,price:(info as {price?:string}).price||(sample?presetProductPrice:p.price)}));setAnalysis(result);setTouched([]);setReviewed(false);go('details');};
+ const scan=(info:ProductInfo,photo:string,result:Analysis|null,sample:boolean,notice='')=>{setScanNotice(notice);const allergenDetails=sample&&!info.allergens.trim()?setAllergenFree(initialAllergens(''),true):initialAllergens(info.allergens);setProduct(p=>({...p,...info,allergenDetails,allergens:sample&&!info.allergens.trim()?allergenStatement(allergenDetails):info.allergens,ingredientsNotApplicable:false,ingredientInput:'',photo,sample,price:(info as {price?:string}).price||(sample?presetProductPrice:p.price)}));setAnalysis(result);setTouched([]);setReviewed(false);go('details');};
  function save(current=product){
   const product=current;
   if(!selectedBrand||!productCanSave(product,farmProfile,selectedBrand,reviewed)){setError('Check the product information and choose a saved brand before confirming.');return;}
