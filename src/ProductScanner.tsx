@@ -33,7 +33,7 @@ export default function ProductScanner({onUse,onPhotoChange,initialPhoto='',init
   if(!photo||busy)return;setError('');setBusy(true);
   // A photo of one of the farm's products fills in that product's details.
   if(variant==='v2'){const id=await matchProductPhoto(photo);if(id){const info=knownProductInfo(id);const live=readDailyCatalogue().some(item=>(item.product.id||item.id)===id&&item.product.live);onUse(info,photo,null,id==='demo-jam',live?`${info.name} is already in your products. Saving adds another listing.`:'');return;}}
-  if(localDemo||!import.meta.env.VITE_DEV_TESTING&&!authClient&&!token){if(variant==='v2')timer.current=setTimeout(()=>onUse(emptyInfo(),photo,null,false,'Sprout could not recognise this product. Enter the details below.'),900);else onUse(emptyInfo(),photo,null,false,'Enter the product details to continue.');return;}
+  if(localDemo||!import.meta.env.VITE_DEV_TESTING&&!authClient&&!token){if(variant==='v2')timer.current=setTimeout(()=>onUse(emptyInfo(),photo,null,false,'Sprout AI could not recognise this product. Enter the details below.'),900);else onUse(emptyInfo(),photo,null,false,'Enter the product details to continue.');return;}
   const controller=new AbortController();active.current=controller;const timeout=setTimeout(()=>controller.abort(),55000);
   try{
    const response=await fetch('/api/analyze',{method:'POST',headers:{'Content-Type':'application/json',...(token?{'X-Scan-Token':token}:{})},body:JSON.stringify({image:photo}),signal:controller.signal});
