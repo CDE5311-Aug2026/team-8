@@ -1,0 +1,16 @@
+{
+  "name": "Farmily",
+  "short_name": "Farmily",
+  "description": "Fresh food from farms near you, and a shop for the farms that grow it.",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#074226",
+  "theme_color": "#074226",
+  "icons": [
+    {"src": "/icons/icon-192.png", "sizes": "192x192", "type": "image/png"},
+    {"src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png"},
+    {"src": "/icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable"}
+  ]
+}
