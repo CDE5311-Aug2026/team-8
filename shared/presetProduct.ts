@@ -85,6 +85,9 @@ export function themedListingPhotos<P extends {url:string;name?:string}>(product
 }
 // The cover shoppers and the farmer see on cards: the theme's cover for preset products, else the product photo.
 export function coverPhoto(product:{id?:string;photo?:string;labelTemplate?:string;listingPhotos?:{url:string}[];designTweaks?:{paper?:string;art?:string;layout?:string}}){return themedListingPhotos(product)[0]?.url||product.photo||'';}
+// Every certificate upload saves this small sample file instead of the farmer's own file.
+export const presetCertificateFile={name:'organic-certificate.png',type:'image/png',size:68,dataUrl:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII='};
+export const presetCertificateDetails={issuedBy:'SFA Organic',number:'SG-ORG-2041',validUntil:'2027-06-30'};
 export const presetBehindPhotos=[{url:'/preset/jam-harvest.jpg',name:'Harvest'},{url:'/preset/jam-packing.jpg',name:'Packing'}];
 // The old tomato sample photos, swapped for Mango Jam ones in saved data (see migrateLegacySamplePhotos).
 export const legacySamplePhotos:Record<string,string>={
@@ -94,6 +97,21 @@ export const legacySamplePhotos:Record<string,string>={
  '/publish-v2/4658824a-eb38-4460-8938-a2eba5fb2eed.png':'/preset/jam-harvest.jpg',
  '/publish-v2/1df5c969-0fa2-4777-8715-89a8ff44ec09.png':'/preset/jam-packing.jpg',
 };
+// Photos the farmer uploaded before everything was preset, saved as large data URLs, filled the
+// browser's storage so nothing could be saved. Swap each one for the matching preset photo.
+function swapUploads(value:unknown,key=''):unknown{
+ if(typeof value==='string')return value.startsWith('data:image/')&&value.length>1000?(key==='photo'?presetProductPhoto:presetBehindPhotos[0].url):value;
+ if(Array.isArray(value))return value.map(item=>swapUploads(item,key));
+ if(!value||typeof value!=='object')return value;
+ const o=value as Record<string,unknown>;
+ if(typeof o.dataUrl==='string'&&o.dataUrl.length>1000)return {...presetCertificateFile};
+ if(typeof o.url==='string'&&o.url.startsWith('data:image/')){
+  if(key==='portrait')return {...o,url:presetPortrait.url};
+  if(o.kind==='farm'||o.kind==='products'||o.kind==='process')return {...o,url:presetFarmPhoto(o.kind).url};
+ }
+ return Object.fromEntries(Object.entries(o).map(([k,v])=>[k,swapUploads(v,k)]));
+}
 export function migrateLegacySamplePhotos(storage:Pick<Storage,'length'|'key'|'getItem'|'setItem'>){
+ for(let i=0;i<storage.length;i++){const key=storage.key(i);if(!key?.startsWith('farmily'))continue;const value=storage.getItem(key);if(!value||!value.includes('data:image/'))continue;try{const next=JSON.stringify(swapUploads(JSON.parse(value)));if(next!==value)storage.setItem(key,next);}catch{}}
  for(let i=0;i<storage.length;i++){const key=storage.key(i);if(!key?.startsWith('farmily'))continue;const value=storage.getItem(key);if(!value||!value.includes('/publish-v2/'))continue;let next=value;for(const [from,to] of Object.entries(legacySamplePhotos))next=next.split(from).join(to);if(next!==value)storage.setItem(key,next);}
 }

@@ -1,6 +1,6 @@
 import FarmDetailsEditor from './FarmDetailsEditor';
 import useDrawerDismiss from './useDrawerDismiss';
-import {presetFarmPhoto,presetPortrait} from '../shared/presetProduct';
+import {presetCertificateDetails,presetCertificateFile,presetFarmPhoto,presetPortrait} from '../shared/presetProduct';
 import WelcomeScreenV2 from './WelcomeScreenV2';
 import {onboardingAddedAssets as added} from './onboardingAddedAssets';
 import {CertificateDetails,CertificateKindPicker,GrowingPracticesPicker,certificateLabels} from './FarmCredentials';
@@ -14,12 +14,16 @@ import {onboardingAssets as assets} from './onboardingAssets';
 import {workspaceStorage} from './accountStorage';
 import {useAccount} from './AuthContext';
 import {authClient} from './authClient';
-import {blankProfile,type FarmerProfile,type FarmPhoto,validProfile} from '../shared/branding';
+import {sampleProfile,type FarmerProfile,type FarmPhoto,validProfile} from '../shared/branding';
 
 type Screen=OnboardingScreen;
 type Draft=FarmOnboardingDraft;
 const draftKey='farmily-v2-onboarding';
-function readDraft():Draft {try{const restored=restoreFarmOnboardingDraft(JSON.parse(workspaceStorage.getItem(draftKey)||'null'));if(restored)return restored;}catch{}return {profile:{...blankProfile},life:'',step:'welcome',certificateKind:'organic',photoReturn:'certificate'};}
+// Everything starts preset: the sample farm's details fill any field the farmer has not filled.
+const presetLife='We pick by hand in the early morning and cook every batch in our farm kitchen.';
+const presetProfile:FarmerProfile={...sampleProfile,products:'Mangoes, Raw honey',photos:[]};
+function withPreset(profile:FarmerProfile):FarmerProfile{const next={...profile};for(const key of ['farmerName','farmName','location','story','products','philosophy'] as const)if(!next[key]?.trim())next[key]=presetProfile[key];return next;}
+function readDraft():Draft {try{const restored=restoreFarmOnboardingDraft(JSON.parse(workspaceStorage.getItem(draftKey)||'null'));if(restored)return {...restored,profile:withPreset(restored.profile),life:restored.life?.trim()?restored.life:presetLife};}catch{}return {profile:{...presetProfile},life:presetLife,step:'welcome',certificateKind:'organic',photoReturn:'certificate'};}
 function Icon({id}:{id:keyof typeof assets}){return <img className="v2-icon" src={assets[id]} alt=""/>;}
 const prompts=[['Started by my family','Took over in 2018'],['Harvested by hand','Small batches'],['Grown without chemicals','Less waste']];
 const placeholders=['A family farm started in 2018, growing food for our neighbours.','We grow seasonal vegetables in small batches and harvest by hand.','Healthy soil, less waste, and fresh food for our community.'];
@@ -50,7 +54,7 @@ export default function OnboardingV2({onBuy,onComplete,accountMode,onAccountBack
  function saveProfile(change:Partial<FarmerProfile>={}){try{const profile=validProfile({...p,...change,story:[p.story,draft.life].filter(Boolean).join('\n\n')});workspaceStorage.setItem('farmily-profile',JSON.stringify(profile));go('ready');}catch(e){setError(e instanceof Error?e.message:'Your profile could not be saved.');}}
 
  function enterPractices(){if(!draft.practicesReviewed)setDraft(current=>({...current,practicesReviewed:true,profile:{...current.profile,growingPractices:current.profile.growingPractices??suggestedGrowingPractices([current.profile.story,current.life,current.profile.philosophy].join(' '))}}));go('practices');}
- async function uploadCertificate(file:File|undefined){if(!file)return;const problem=certificateFileError(file);if(problem){setError(problem);return;}setBusy(true);const version=++uploadVersion.current;try{const dataUrl=await new Promise<string>((resolve,reject)=>{const reader=new FileReader();reader.onload=()=>resolve(String(reader.result));reader.onerror=reject;reader.readAsDataURL(file);});if(version!==uploadVersion.current)return;const certificate=newFarmCertificate(draft.certificateKind||'organic',{name:file.name,type:file.type,size:file.size,dataUrl});update({certificate});go('certificate-upload');}catch{setError('We could not read that certificate. Please try another.');}finally{setBusy(false);}}
+ async function uploadCertificate(file:File|undefined){if(!file)return;const problem=certificateFileError(file);if(problem){setError(problem);return;}setBusy(true);++uploadVersion.current;try{const certificate={...newFarmCertificate(draft.certificateKind||'organic',{...presetCertificateFile}),...presetCertificateDetails};update({certificate});go('certificate-upload');}catch{setError('We could not read that certificate. Please try another.');}finally{setBusy(false);}}
  async function uploadPortrait(file:File|undefined){if(!file)return;if(!file.type.startsWith('image/')){setError('Choose a photo.');return;}update({portrait:{...presetPortrait}});setError('');}
  function sendCertificate(){try{if(!p.certificate)throw new Error('Upload a certificate first.');saveProfile({certificate:localCertificateReview(p.certificate)});}catch(error){setError(error instanceof Error?error.message:'Check your certificate details.');}}
  function chooseCertificate(kind:CertificateKind){if(busy)return;setDraft(current=>({...current,certificateKind:kind,profile:{...current.profile,certificate:current.profile.certificate?.kind===kind?current.profile.certificate:undefined}}));setError('');}
