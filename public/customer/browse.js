@@ -40,10 +40,12 @@
  function svg(k,cls){return '<svg class="'+(cls||'')+'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+ICON[k]+'</svg>';}
  function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
 
+ // Farm photo on the Local favourite bar, the same one the farm page uses.
+ var LOGO={gv:'a/18b50773-654f-40c8-a7d9-c73143231805.jpg',bg:'a/505fa549-b09d-4189-acfd-8b14e29c0ea4.jpg',hh:'a/38f4e780-cb48-45b3-83fa-71a2c057f3e2.jpg',rb:'/preset/shop-spinach-studio.jpg',ff:'/preset/shop-sourdough-studio.jpg',kp:'/preset/shop-kaya-studio.jpg',sg:'/preset/shop-microgreens-studio.jpg'};
  function card(id){var p=P[id];return '<div class="br-card" data-name="Product card" data-br-product="'+id+'">'+
   '<div class="br-img"><img src="'+p.img+'" alt="">'+(p.deal?'<span class="br-deal">'+p.deal+'</span>':'')+
   (p.tag?'<span class="br-tag">'+p.tag+'</span>':'')+'<span class="br-fav">'+svg('heart')+'</span>'+(p.ai?'<span class="br-ai">AI</span>':'')+'</div>'+
-  (p.fav?'<div class="br-local">Local favourite</div>':'')+
+  (p.fav?'<div class="br-local">'+(LOGO[p.farm]?'<img src="'+LOGO[p.farm]+'" alt="">':'')+'Local favourite</div>':'')+
   '<div class="br-body"><div class="br-name">'+esc(p.name)+'</div><div class="br-meta">'+esc(FARMS[p.farm].name)+'</div>'+
   '<div class="br-foot"><span class="br-price">'+p.price+(p.old?' <s>'+p.old+'</s>':'')+'</span><span class="br-add">'+svg('cart')+'</span></div></div></div>';}
  function grid(ids){var h='<div class="br-grid">';ids.forEach(function(i){h+=card(i);});return h+'</div>';}

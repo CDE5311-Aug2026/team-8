@@ -2866,7 +2866,7 @@ body[data-fpchat="other"] [data-name="Chat / Green Valley Farm"] [data-name="Con
 .br-deal{position:absolute;left:8px;top:8px;background:#ff7a1a;color:#fff;font:600 12px/16px 'Figtree',sans-serif;padding:2px 6px;border-radius:6px}
 .br-fav{position:absolute;right:8px;top:8px;width:32px;height:32px;border-radius:999px;background:#fff;display:flex;align-items:center;justify-content:center}.br-fav svg{width:18px;height:18px}
 .br-ai{position:absolute;right:8px;bottom:8px;width:20px;height:20px;border-radius:999px;background:#1a1a18;color:#fff;font:600 9px/20px 'Figtree',sans-serif;text-align:center}
-.br-local{background:var(--color-primary-900,#1f4a2c);color:#fff;font:500 12px/16px 'Figtree',sans-serif;padding:4px 10px}
+.br-local{background:var(--color-primary-900,#1f4a2c);color:#fff;font:500 12px/16px 'Figtree',sans-serif;padding:4px 10px;display:flex;align-items:center;gap:6px}.br-local img{width:16px;height:16px;border-radius:999px;object-fit:cover}
 .br-body{padding:10px 12px 12px;display:flex;flex-direction:column;gap:2px}
 .br-name{font:600 15px/20px 'Figtree',sans-serif;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .br-meta{font:400 12px/16px 'Figtree',sans-serif;color:#6e6e69}
