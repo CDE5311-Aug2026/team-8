@@ -8,3 +8,14 @@
 .brief-pinned-opportunity.brief-pinned-trial{padding:0;gap:0}.brief-pinned-trial-copy{display:flex;flex-direction:column;gap:2px;flex:1;min-width:0}.brief-pinned-trial-copy>strong{font:600 13px/18px 'Figtree',sans-serif;overflow-wrap:anywhere}.brief-pinned-trial-copy>small{font-size:10px;line-height:15px;color:#6e6e69}.brief-pinned-trial-detail{padding-left:12px}.brief-pinned-trial-detail>small{font-size:10px;line-height:16px;color:#6e6e69}@media(max-width:360px){.brief-pinned-trial-copy>strong{font-size:12px;line-height:17px}}
 .brief-pinned-checkbox{display:flex;align-items:center;flex:none}.brief-pinned-content .brief-pinned-checkbox input[type=checkbox]{width:18px;height:18px;min-width:18px;min-height:18px;max-width:18px;max-height:18px;margin:0;padding:0;accent-color:#0e6b3b;appearance:auto;cursor:pointer}.brief-opportunity-toggle{display:flex;align-items:center;gap:8px;flex:1;min-width:0;align-self:stretch;padding:0;border:0;background:transparent;color:inherit;text-align:left;cursor:pointer}.brief-opportunity-toggle>svg{flex:none;color:#6e6e69;margin:0 5px}.brief-opportunity-toggle[aria-expanded=true]>svg{transform:rotate(180deg)}.brief-opportunity-toggle:focus-visible{outline:2px solid #19a35a;outline-offset:3px;border-radius:4px}
 .brief-trial-toggle{width:100%;border:0;background:transparent;color:inherit;text-align:left;cursor:pointer}.brief-trial-toggle>svg{flex:none;color:#6e6e69;margin:0 5px}.brief-trial-toggle[aria-expanded=true]>svg{transform:rotate(180deg)}.brief-trial-toggle:focus-visible{outline:2px solid #19a35a;outline-offset:-3px;border-radius:12px}
+/* Opportunity action is a real button (design guide: main actions are filled buttons, 40px in cards). */
+.brief-pinned-opportunity-detail>.brief-review-button{width:100%;height:40px;min-height:40px;margin-top:12px;font-size:14px}
+/* Opportunity card: checkbox, title, amount and chevron share the first line; details start under the title. */
+.brief-pinned-opportunity .brief-pinned-opportunity-row,.brief-pinned-opportunity .brief-opportunity-toggle{align-items:flex-start}
+.brief-pinned-opportunity .brief-pinned-checkbox{height:18px}
+.brief-pinned-opportunity .brief-pinned-uplift{line-height:18px}
+.brief-pinned-opportunity .brief-opportunity-toggle>svg{height:18px}
+.brief-pinned-opportunity .brief-pinned-opportunity-detail{padding:0 13px 12px 31px}
+.brief-pinned-opportunity .brief-pinned-opportunity-detail>.brief-review-button{margin-top:4px}
+.brief-forecast-compact{background:#f5f5f2}.brief-forecast-compact>div>small{color:#6e6e69}.brief-forecast-compact>div>strong{color:#1a1a18}
+.brief-pinned-opportunity .brief-pinned-opportunity-detail>.brief-review-button{align-self:stretch;width:auto;max-width:none;margin:4px -1px 0 -19px}

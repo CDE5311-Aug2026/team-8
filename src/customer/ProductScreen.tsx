@@ -51,14 +51,14 @@ export default function ProductScreen({productId,go,back,requestAction,notice}:{
     <hr className="cx-divider"/>
     <h2 className="cx-heading">The story behind this product</h2>
     <p className="cx-product-farm">{product.story}</p>
-    <div className="cx-story-photo" style={{backgroundImage:`url(${farmStory})`}} role="img" aria-label={`The people behind ${product.farm}`}>
+    <div className="cx-story-photo" style={{backgroundImage:`url(${product.storyPhoto||farmStory})`}} role="img" aria-label={`The people behind ${product.farm}`}>
      <PhotoChip text={photoLabelText.enhanced} size="story"/>
     </div>
     <p className="cx-caption">The people behind {product.farm}</p>
     <hr className="cx-divider"/>
     <h2 className="cx-heading">From picking to packing</h2>
     <div className="cx-gallery">
-     {processPhotos.map((photo,index)=><figure key={photo} className="cx-gallery-item">
+     {(product.processPhotos||processPhotos).map((photo,index)=><figure key={photo} className="cx-gallery-item">
       <div className="cx-gallery-photo" style={{backgroundImage:`url(${photo})`}} role="img" aria-label={product.processCaptions[index]}>
        <PhotoChip text={photoLabelText.enhanced} size="gallery"/>
       </div>

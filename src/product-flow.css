@@ -18,3 +18,7 @@
 .pf-product-status{margin-bottom:16px}.pf-summary-details{margin:20px 0 28px}.pf-summary-details>div{padding:12px 0;border-bottom:1px solid #e2e6db}.pf-summary-details dt{font-size:12px;color:#788076;margin-bottom:5px}.pf-summary-details dd{margin:0;font-size:15px;line-height:1.6;white-space:pre-wrap;overflow-wrap:anywhere}.pf-summary-actions{display:grid;gap:12px;margin-top:16px}.pf-summary-actions .text-button{min-height:44px}
 
 .pf-combobox-options{touch-action:pan-y;overscroll-behavior:contain}
+/* Picked items read as the field value while the list is open (the tags below sit under the list). */
+.pf-combobox>input[data-picked]::placeholder{color:#1a1a18;opacity:1}
+.pf-combobox>input[data-picked]{text-overflow:ellipsis}
+.pf-field-tags{gap:8px}.pf-field-tags li{gap:0;min-height:36px;padding-left:12px;background:#fff;border:1px solid #e0e0dc;color:#1a1a18;font:500 13px/18px "Figtree",sans-serif}.pf-field-tags button{min-width:36px;min-height:36px;padding:6px;margin:-1px 0;color:#6e6e69}

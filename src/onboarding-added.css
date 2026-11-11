@@ -52,3 +52,6 @@
 .farm-certificate-upload-label input{position:absolute;inset:0;width:100%;height:100%;opacity:0;cursor:pointer}
 .farm-certificate-upload-label:focus-within{outline:3px solid #19a35a;outline-offset:3px}
 @media(max-width:360px){.farm-practice-chips>button{font-size:13px;padding:0 12px}.farm-onboarding-portrait{gap:8px}.farm-onboarding-portrait>.v2-secondary{padding:0 8px}.farm-onboarding-portrait small{font-size:11px;line-height:15px}}
+
+/* Certificate file row is a rounded card, as in Figma (F11). */
+.farm-certificate-file{border:1px solid #e0e0dc;border-radius:12px}

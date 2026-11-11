@@ -8,5 +8,5 @@ test('SGD entry supports decimal keyboards and pasted currency without storing s
  assert.equal(parsePriceInput(''),'');
  for(const value of ['-4.50','4.567','1e3','abc'])assert.equal(parsePriceInput(value),null);
  assert.equal(normalisePrice('.5'),'0.50');assert.equal(normalisePrice('4'),'4.00');assert.equal(normalisePrice(''),'');
- assert.equal(formatSgd('4.5'),'S$4.50');
+ assert.equal(formatSgd('4.5'),'SGD 4.50');
 });

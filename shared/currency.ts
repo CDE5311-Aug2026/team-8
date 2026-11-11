@@ -4,4 +4,4 @@ export function parsePriceInput(value:string):string|null{
  return /^\d*(\.\d{0,2})?$/.test(amount)?amount:null;
 }
 export function normalisePrice(value:string){const amount=Number(value);return value.trim()&&Number.isFinite(amount)?amount.toFixed(2):value;}
-export function formatSgd(value:string){const amount=Number(value);return `S$${new Intl.NumberFormat('en-SG',{minimumFractionDigits:2,maximumFractionDigits:2}).format(Number.isFinite(amount)?amount:0)}`;}
+export function formatSgd(value:string){const amount=Number(value);return `SGD ${new Intl.NumberFormat('en-SG',{minimumFractionDigits:2,maximumFractionDigits:2}).format(Number.isFinite(amount)?amount:0)}`;}

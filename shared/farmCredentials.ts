@@ -12,7 +12,7 @@ export function suggestedGrowingPractices(story:string):GrowingPractice[]{
  return growingPractices.filter((_,index)=>patterns[index].test(text)&&!(index===0&&/\bnot organic\b|\bnon[- ]organic\b/.test(text)));
 }
 export function validGrowingPractices(value:unknown):value is GrowingPractice[]{return Array.isArray(value)&&value.length<=growingPractices.length&&value.every(item=>growingPractices.includes(item))&&new Set(value).size===value.length;}
-export function validFarmerPortrait(value:unknown):value is FarmerPortrait{const p=value as FarmerPortrait;return !!p&&typeof p.id==='string'&&p.id.length<=100&&typeof p.name==='string'&&p.name.length<=500&&typeof p.url==='string'&&p.url.length<maxFarmUploadBytes*1.4&&/^data:image\/(jpeg|png|webp);base64,[a-z\d+/]+=*$/i.test(p.url);}
+export function validFarmerPortrait(value:unknown):value is FarmerPortrait{const p=value as FarmerPortrait;return !!p&&typeof p.id==='string'&&p.id.length<=100&&typeof p.name==='string'&&p.name.length<=500&&typeof p.url==='string'&&p.url.length<maxFarmUploadBytes*1.4&&(/^data:image\/(jpeg|png|webp);base64,[a-z\d+/]+=*$/i.test(p.url)||/^\/(sample-profile|preset)\/[\w.-]+\.(png|jpe?g|webp)$/.test(p.url));}
 export function validFarmCertificate(value:unknown):value is FarmCertificate{
  const c=value as FarmCertificate;if(!c||!certificateKinds.includes(c.kind)||!['draft','local-pending'].includes(c.status)||!c.file)return false;
  const f=c.file;if(typeof f.name!=='string'||!f.name.trim()||f.name.length>500||!['application/pdf','image/jpeg','image/png','image/webp'].includes(f.type)||!Number.isInteger(f.size)||f.size<1||f.size>maxFarmUploadBytes||typeof f.dataUrl!=='string'||f.dataUrl.length>maxFarmUploadBytes*1.4||!f.dataUrl.startsWith(`data:${f.type};base64,`)||!/^data:(application\/pdf|image\/(jpeg|png|webp));base64,[a-z\d+/]+=*$/i.test(f.dataUrl))return false;
@@ -24,4 +24,4 @@ export function localCertificateReview(certificate:FarmCertificate):FarmCertific
  return {...certificate,status:'local-pending',localReviewAt:new Date().toISOString()};
 }
 export function newFarmCertificate(kind:CertificateKind,file:LocalCertificateFile):FarmCertificate{return {kind,file,issuedBy:'',number:'',validUntil:'',status:'draft'};}
-export function certificateFileError(file:{type:string;size:number}){if(!['application/pdf','image/jpeg','image/png','image/webp'].includes(file.type))return 'Choose a PDF, JPG, PNG or WebP certificate.';if(file.size<1||file.size>maxFarmUploadBytes)return 'Choose a certificate up to 512 KB for this local demo.';return '';}
+export function certificateFileError(file:{type:string;size:number}){if(!['application/pdf','image/jpeg','image/png','image/webp'].includes(file.type))return 'Choose a PDF, JPG, PNG or WebP certificate.';if(file.size<1||file.size>maxFarmUploadBytes)return 'Choose a certificate up to 512 KB.';return '';}

@@ -1,5 +1,5 @@
 import {renderLabelSvg} from './renderLabelSvg.ts';
-import {botanicalMotif,labelTheme,validLabelTemplate,type LabelTemplate} from './labelTemplates.ts';
+import {botanicalMotif,labelTheme,validDesignTweaks,validLabelTemplate,type DesignTweaks,type LabelTemplate} from './labelTemplates.ts';
 import {samplePackagingFor} from './samplePackaging.ts';
 import type {SamplePackaging} from './samplePackaging.ts';
 import type {ListingContent} from './publishing.ts';
@@ -7,12 +7,12 @@ import {allergenStatement,validAllergenSelection,type AllergenSelection} from '.
 import {canAddProduct,signature,validConcept,type BrandKit,type FarmerProfile} from './branding.ts';
 import {fieldNames,validateAnalysis,type Analysis,type FieldName} from './analysis.ts';
 type ProductInfo=Record<FieldName,string>;
-export type ProductDraft=ProductInfo&{labelTemplate?:LabelTemplate;samplePackaging?:SamplePackaging;id?:string;createdAt?:string;packagingComplete?:boolean;photos?:string[];listing?:ListingContent;photo:string;price:string;currency?:'SGD';story:string;live:boolean;sample?:boolean;ingredientInput?:string;ingredientsNotApplicable?:boolean;allergenDetails?:AllergenSelection;brandIdentity?:BrandKit;v2PackagingTheme?:number;packagingMode?:'photo'|'3d'};
+export type ProductDraft=ProductInfo&{labelTemplate?:LabelTemplate;designTweaks?:DesignTweaks;samplePackaging?:SamplePackaging;id?:string;createdAt?:string;packagingComplete?:boolean;photos?:string[];listing?:ListingContent;photo:string;price:string;currency?:'SGD';story:string;live:boolean;sample?:boolean;ingredientInput?:string;ingredientsNotApplicable?:boolean;allergenDetails?:AllergenSelection;brandIdentity?:BrandKit;v2PackagingTheme?:number;packagingMode?:'photo'|'3d'};
 export const productWorkKey='farmily-product-work';
 export function restoreProductWork(value:unknown,profile:FarmerProfile){
  if(!value||typeof value!=='object')return null;
  const saved=value as {product:ProductDraft;profileSignature:string;screen:string;reviewed:boolean;analysis:Analysis|null};
- const product={...saved.product};if(product.labelTemplate!==undefined&&!validLabelTemplate(product.labelTemplate))delete product.labelTemplate;
+ const product={...saved.product};if(product.labelTemplate!==undefined&&!validLabelTemplate(product.labelTemplate))delete product.labelTemplate;if(product.designTweaks!==undefined&&!validDesignTweaks(product.designTweaks))delete product.designTweaks;
  if(product.v2PackagingTheme!==undefined&&(!Number.isInteger(product.v2PackagingTheme)||product.v2PackagingTheme<0||product.v2PackagingTheme>2))delete product.v2PackagingTheme;
  if(product.allergenDetails&&!validAllergenSelection(product.allergenDetails))delete product.allergenDetails;
  if(typeof product.ingredientInput!=='string')product.ingredientInput='';

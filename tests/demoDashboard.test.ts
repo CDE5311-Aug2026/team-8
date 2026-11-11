@@ -12,7 +12,7 @@ test('empty guests have no products, sales, customers, reviews or fabricated ins
 test('explicit demo fixture supplies four valid products and the Figma dashboard totals',()=>{
  const workspace=demoWorkspace(),products=restoreCatalogue(JSON.parse(workspace['farmily-products']));
  assert.equal(products.length,4);assert.ok(products.every(p=>canAddProduct(demoProfile,p.brandIdentity||null)));
- const d=dashboardStats(products);assert.equal(d.sales,1860);assert.equal(d.orders,72);assert.equal(d.lifetime,12480);assert.equal(d.customers,64);assert.equal(d.reviews,48);
+ const d=dashboardStats(products);assert.equal(d.sales,1240);assert.equal(d.orders,72);assert.equal(d.lifetime,12480);assert.equal(d.customers,64);assert.equal(d.reviews,48);
  assert.notEqual(workspaceKey('farmily-products','demo-farmer'),workspaceKey('farmily-products',null));
  assert.ok(workspaceKeys.includes('farmily-products'));assert.ok(workspaceKeys.includes('farmily-demo-promotions'));
 });

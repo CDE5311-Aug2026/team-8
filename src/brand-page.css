@@ -1,0 +1,78 @@
+/* Your brand (Figma: Farmer Side · v1 → 9 Your brand) */
+.yb .yb-content{display:flex;flex-direction:column;gap:24px;padding:8px 16px 132px}
+.yb h2{margin:0}
+.yb-card{background:white;border-radius:16px;padding:16px;display:flex;flex-direction:column;gap:12px}
+.yb-card-top{display:flex;align-items:center;justify-content:space-between}
+.yb-card-top small{font:400 12px/16px 'Figtree',sans-serif;color:#6e6e69}
+.yb-tag{background:#f5f5f2;border-radius:6px;padding:2px 8px;font:600 12px/16px 'Figtree',sans-serif;color:#1a1a18}
+.yb-wordmark-stage{background:#f5f5f2;border-radius:12px;height:112px;display:flex;align-items:center;justify-content:center}
+.yb-wordmark{color:#fdfbf5;display:flex;align-items:center;gap:8px;border-radius:8px;padding:18px 24px;font:400 22px/1 'Courgette',cursive;box-shadow:0 2px 6px rgba(26,26,24,.12)}
+.yb-brand-meta{display:flex;align-items:center;gap:10px;font:400 13px/18px 'Figtree',sans-serif;color:#1a1a18}
+.yb-swatches{display:flex;gap:4px}
+.yb-swatches i{width:18px;height:18px;border-radius:50%;box-shadow:inset 0 0 0 1px rgba(26,26,24,.08)}
+.yb-pattern{font:400 12px/16px 'Figtree',sans-serif;color:#6e6e69;margin-top:-4px}
+.yb .yb-change{width:100%;min-height:44px;height:44px;margin:4px 0 0}
+.yb .yb-change:disabled{opacity:.5}
+.yb-section-heading{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:12px}
+.yb-section-heading h2{font:700 20px/28px 'Bricolage Grotesque',sans-serif}
+.yb-section-heading span{font:400 14px/20px 'Figtree',sans-serif;color:#6e6e69}
+.yb-list{background:white;border-radius:16px;overflow:hidden}
+.yb-row{width:100%;display:flex;align-items:center;gap:12px;padding:8px 12px 8px 8px;background:none;border:0;border-bottom:1px solid #f0efea;text-align:left;color:#1a1a18;cursor:pointer}
+.yb-row:last-child{border-bottom:0}
+.yb-row>svg{color:#6e6e69;flex:none}
+.yb-thumb{width:48px;height:48px;border-radius:10px;background:#f5f5f2;display:flex;align-items:center;justify-content:center;overflow:hidden;flex:none;color:#6e6e69}
+.yb-thumb img{width:100%;height:100%;object-fit:cover}
+.yb-row-copy{flex:1;min-width:0;display:flex;flex-direction:column}
+.yb-row-copy strong{font:600 16px/22px 'Figtree',sans-serif}
+.yb-row-copy small{font:400 13px/18px 'Figtree',sans-serif;color:#6e6e69}
+.yb-empty{margin:0;font:400 14px/20px 'Figtree',sans-serif;color:#6e6e69}
+.yb-footer{display:flex;flex-direction:column;align-items:center;gap:8px}
+.yb-footer .v2-primary{max-width:none;margin-top:0}
+.yb-button-row{display:flex;gap:12px;width:100%}
+.yb-button-row .v2-primary{flex:1;width:auto}
+.yb .yb-download{flex:none;width:112px;min-height:52px;height:52px;margin:0;display:flex;align-items:center;justify-content:center;text-decoration:none}
+.yb .yb-download:disabled{opacity:.5}
+.yb-preview{background:white;border-radius:16px;aspect-ratio:1/0.82;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.yb-preview>*{width:100%;height:100%}
+.yb-preview-art{object-fit:cover;display:block}
+.yb .yb-segments{margin:-8px 0 0}
+.yb-theme{display:flex;flex-direction:column;gap:12px}
+.yb-theme h2,.yb-label{font:600 15px/20px 'Figtree',sans-serif;color:#1a1a18;margin:0 0 12px}
+.yb-theme h2{margin:0}
+.yb-theme small,.yb-note{display:block;font:400 13px/18px 'Figtree',sans-serif;color:#6e6e69}
+.yb-note{margin-top:12px}
+.yb-chips{display:flex;gap:8px;flex-wrap:wrap}
+.yb-chips button{height:36px;padding:0 16px;border-radius:999px;border:1px solid #e3e2dc;background:white;font:600 14px/20px 'Figtree',sans-serif;color:#1a1a18;cursor:pointer}
+.yb-chips button.active{background:#074226;border-color:#074226;color:white}
+.yb-option{width:100%;display:flex;align-items:center;gap:12px;padding:12px 16px;background:none;border:0;border-bottom:1px solid #f0efea;font:400 15px/20px 'Figtree',sans-serif;color:#1a1a18;text-align:left;cursor:pointer}
+.yb-option:last-child{border-bottom:0}
+.yb-tick{width:20px;height:20px;border-radius:5px;border:1.5px solid #b9b8b1;display:flex;align-items:center;justify-content:center;flex:none;color:white}
+.yb-tick.on{background:#074226;border-color:#074226}
+.yb-tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.yb-tiles button{display:flex;flex-direction:column;gap:6px;padding:4px 4px 8px;background:white;border:1.5px solid #ecebe6;border-radius:12px;cursor:pointer;text-align:left}
+.yb-tiles button.active{border-color:#074226}
+.yb-tiles img{width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:8px;display:block}
+.yb-tiles span{display:flex;align-items:center;justify-content:space-between;padding:0 4px;font:600 13px/18px 'Figtree',sans-serif;color:#1a1a18}
+.yb-tip{display:flex;align-items:flex-start;gap:10px;background:#074226;color:white;border-radius:16px;padding:14px 12px 14px 14px}
+.yb-tip .sprout-icon{width:40px;height:auto;object-fit:contain;flex:none}
+.yb-tip div{flex:1}
+.yb-tip strong{display:block;font:600 15px/20px 'Figtree',sans-serif}
+.yb-tip p{margin:2px 0 0;font:400 13px/18px 'Figtree',sans-serif;color:rgba(255,255,255,.86)}
+.yb-tip button{background:none;border:0;color:white;padding:2px;cursor:pointer;flex:none}
+.yb-subheading{font:700 18px/24px 'Bricolage Grotesque',sans-serif;margin:0 0 12px}
+.yb .yb-content .yb-label,.yb .yb-content .yb-theme h2{font:600 15px/20px 'Figtree',sans-serif;letter-spacing:0;color:#1a1a18}
+.yb .yb-content .yb-label{margin:0 0 12px}
+.yb .yb-content .yb-subheading{margin:0 0 12px}
+.yb-directions{display:flex;flex-direction:column;gap:12px}
+.yb-direction{display:flex;flex-direction:column;align-items:stretch;gap:10px;padding:12px;background:white;border:1.5px solid #ecebe6;border-radius:16px;text-align:left;color:#1a1a18;cursor:pointer}
+.yb-direction.active{border:2px solid #074226;padding:11.5px}
+.yb-direction .yb-wordmark-stage{height:96px}
+.yb-direction>strong{font:600 15px/20px 'Figtree',sans-serif}
+.yb-direction .yb-pattern{margin-top:-2px}
+/* Product design: own-design controls */
+.yb-swatches{display:flex;gap:12px;flex-wrap:wrap}
+.yb-swatches button{width:36px;height:36px;border-radius:50%;border:3px solid white;box-shadow:0 0 0 1px #e3e2dc;cursor:pointer;padding:0}
+.yb-swatches button.active{box-shadow:0 0 0 2px #074226}
+.yb .yb-content .yb-suggest h2{display:flex;align-items:center;gap:8px;font:600 13px/18px 'Figtree',sans-serif;color:#1a1a18}
+.yb-suggest .sprout-icon{width:20px;height:auto}
+.yb-name{height:44px;border:1px solid #e0e0dc;border-radius:12px;padding:0 14px;font:400 16px/24px Figtree,sans-serif;background:white;width:100%}

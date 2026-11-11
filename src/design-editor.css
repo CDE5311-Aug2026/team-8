@@ -1,0 +1,30 @@
+/* DesignEditor: shared by Your brand and Add product packaging */
+.de-section{display:flex;flex-direction:column;gap:10px}
+.de-section>h2{display:flex;align-items:center;gap:8px;font-size:16px;line-height:22px}
+.de-section>small{font-size:12px;line-height:16px;color:#6e6e69}
+.de-chips{display:flex;gap:8px;flex-wrap:wrap}
+.de-chips button{height:36px;padding:0 16px;border-radius:999px;border:1px solid #e3e2dc;background:white;font:600 14px/20px 'Figtree',sans-serif;color:#1a1a18;cursor:pointer}
+.de-chips button.active{background:#074226;border-color:#074226;color:white}
+.de-swatches{display:flex;gap:12px;flex-wrap:wrap}
+.de-swatches button{width:36px;height:36px;border-radius:50%;border:1px solid #e0e0dc;cursor:pointer;padding:0}
+.de-swatches button.active{outline:2px solid #074226;outline-offset:3px}
+.de-tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.de-tiles button{display:flex;flex-direction:column;gap:6px;padding:4px 4px 8px;background:white;border:1.5px solid #ecebe6;border-radius:12px;cursor:pointer;text-align:left;min-width:0}
+.de-tiles button.active{border-color:#074226}
+.de-tiles img,.de-tile-label{width:100%;aspect-ratio:3/4;object-fit:cover;border-radius:8px;display:block;background:#f0efea;overflow:hidden;position:relative}
+.de-tiles button>span:last-child{display:flex;align-items:center;justify-content:space-between;padding:0 4px;font:600 13px/18px 'Figtree',sans-serif;color:#1a1a18}
+.de-tile-label>.de-label-thumb{position:absolute;inset:0}
+.de-designs{display:flex;gap:8px;overflow-x:auto;padding-bottom:2px}
+.de-designs button{flex:0 0 112px;display:flex;flex-direction:column;align-items:flex-start;gap:2px;padding:6px 6px 8px;background:white;border:1.5px solid #ecebe6;border-radius:12px;cursor:pointer;text-align:left}
+.de-designs button.active{border-color:#074226}
+.de-designs .de-label-thumb{width:100%;height:76px;border-radius:8px;background:#f0efea;margin-bottom:4px}
+.de-designs strong{font:600 13px/18px 'Figtree',sans-serif;color:#1a1a18;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
+.de-designs small{font-size:12px;line-height:16px;color:#6e6e69}
+.de-label-thumb{position:relative;display:block;overflow:hidden;pointer-events:none}
+.de-label-thumb>span{position:absolute;left:50%;top:50%;width:220px;height:150px;transform:translate(-50%,-50%) scale(var(--thumb-scale,.5))}
+.de-flat{position:relative;width:100%;height:100%;background:#f0efea;display:flex;align-items:center;justify-content:center}
+.de-flat>.de-label-thumb{width:240px;height:170px}
+.de-flat>small{position:absolute;bottom:10px;font-size:12px;color:#6e6e69}
+.yb-thumb>.de-label-thumb{width:100%;height:100%}
+.ap-design{display:flex;flex-direction:column;gap:20px}.ap-design-note{font-size:12px;line-height:16px;color:#6e6e69}
+.de-tiles .de-tile-label{aspect-ratio:1/1}

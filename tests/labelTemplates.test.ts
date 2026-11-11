@@ -10,3 +10,18 @@ test('every label template keeps brand contrast and escapes product declarations
 test('label selection restores independently of product facts and rejects unknown templates',()=>{
  const draft={product:{...demoProducts[0],labelTemplate:'minimal'},profileSignature:demoBrand.profileSignature,screen:'packaging',reviewed:true,analysis:null};const restored=restoreProductWork(draft,demoProfile)!;assert.equal(restored.product.labelTemplate,'minimal');assert.equal(restored.product.ingredients,draft.product.ingredients);assert.equal(restoreProductWork({...draft,product:{...draft.product,labelTemplate:'invented'}},demoProfile)!.product.labelTemplate,undefined);
 });
+test('print files and shop covers use the product’s own design, not only the theme',()=>{
+ const base={...demoProducts[1],labelTemplate:'minimal' as const};
+ const plain=labelSvg(base,demoProfile,demoBrand);
+ const own=labelSvg({...base,designTweaks:{paper:'#415b51',layout:'band',art:'sprig'}},demoProfile,demoBrand);
+ assert.ok(!plain.includes('height="112"'));
+ assert.match(own,/<rect width="960" height="\d+" fill="#415b51"\/>/);
+ assert.match(own,/<rect width="960" height="112" fill=/);
+ assert.match(own,/M20 46V4/);
+ assert.equal(labelSvg({...base,designTweaks:{art:'none'}},demoProfile,demoBrand).includes('M444 125H516'),false);
+});
+test('saved designs made ahead keep their label colour, picture and layout',async()=>{
+ const {restoreBrandPage}=await import('../shared/brandPage.ts');
+ const page=restoreBrandPage({version:1,changesLeft:3,extras:[{id:'a',name:'Holiday tin',template:'botanical',tweaks:{paper:'#415b51',art:'sprig'}},{id:'b',name:'Bad',template:'botanical',tweaks:{paper:'red'}}]});
+ assert.deepEqual(page.extras.map(e=>e.name),['Holiday tin']);assert.deepEqual(page.extras[0].tweaks,{paper:'#415b51',art:'sprig'});
+});

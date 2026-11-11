@@ -15,9 +15,11 @@ type Conflict={id:string;email:string;guest:Workspace;account:Workspace;version:
 const previousSessionKey='farmily-before-sample-session';
 const pendingKey='farmily-pending-account-transfer';
 function seedDemoWorkspace(){
- const current=snapshot(demoAccount.id);if(current['farmily-demo-seed-version']==='5')return;
+ const current=snapshot(demoAccount.id);if(current['farmily-demo-seed-version']==='10')return;
  if(!current['farmily-products']&&!current['farmily-draft']){restore(demoAccount.id,{...current,...demoWorkspace()});return;}
- const next:Record<string,string>={...current,'farmily-demo-seed-version':'5'};
+ // Version 6: the demo farm always uses the preset profile and brand (sign-up text is often test text).
+ const preset=demoWorkspace();
+ const next:Record<string,string>={...current,'farmily-profile':preset['farmily-profile'],'farmily-brand':preset['farmily-brand'],'farmily-demo-seed-version':'10'};if(!current['farmily-brand-page-v1'])next['farmily-brand-page-v1']=preset['farmily-brand-page-v1'];
  for(const key of ['farmily-products','farmily-catalogue-v2','farmily-draft']){try{const value=JSON.parse(current[key]||'null');if(key==='farmily-catalogue-v2'&&Array.isArray(value))next[key]=JSON.stringify(value.map(item=>({...item,product:upgradeSampleProduct(item.product)})));else if(Array.isArray(value))next[key]=JSON.stringify(value.map(upgradeSampleProduct));else if(value&&key==='farmily-draft')next[key]=JSON.stringify(upgradeSampleProduct(value));}catch{/* Preserve malformed records for their own restore guards. */}}
  restore(demoAccount.id,next);
 }
@@ -97,8 +99,8 @@ export function AccountProvider({children}:{children:ReactNode}){
   if(signed.id===demoAccount.id){if(identity?.id!==demoAccount.id)localStorage.setItem(previousSessionKey,localStorage.getItem(demoSessionKey)||'');prepareSampleWorkspace();}sequence.current++;
   localStorage.setItem(demoSessionKey,JSON.stringify(signed));setStorageOwner(signed.id);active.current=signed.id;setIdentity(signed);setLoading(false);setSync('local');setSyncError('');return true;
  }
- async function updateDemoAccount(email:string,password?:string){if(!identity?.demo)throw new Error('DEV: Account editing is available for local demo accounts.');await saveLocalCredentials(identity.id,email,password);const next={...identity,email:email.trim().toLowerCase()};localStorage.setItem(demoSessionKey,JSON.stringify(next));setIdentity(next);}
- async function deleteDemoAccount(){if(!identity?.demo)throw new Error('DEV: Only a local demo account can be deleted here.');for(const key of workspaceKeys)localStorage.removeItem(workspaceKey(key,identity.id));removeLocalAccount(identity.id);localStorage.removeItem('farmily-guest-mode');await signOut();}
+ async function updateDemoAccount(email:string,password?:string){if(!identity?.demo)throw new Error('Account editing is not available right now.');await saveLocalCredentials(identity.id,email,password);const next={...identity,email:email.trim().toLowerCase()};localStorage.setItem(demoSessionKey,JSON.stringify(next));setIdentity(next);}
+ async function deleteDemoAccount(){if(!identity?.demo)throw new Error('This account cannot be deleted here.');for(const key of workspaceKeys)localStorage.removeItem(workspaceKey(key,identity.id));removeLocalAccount(identity.id);localStorage.removeItem('farmily-guest-mode');await signOut();}
  async function activateOnboardingSamples(){
   if(identity?.id===demoAccount.id)return;
   const source=snapshot(identity?.id||null);

@@ -12,3 +12,26 @@
 @media(prefers-reduced-motion:reduce){.v2-wave i{animation:none}}@media(max-width:360px){.v2 h1{font-size:25px}.v2-chips button{padding:0 12px}.v2-photo-slots{gap:8px}}
 .app-shell.v2{--input-corner-radius:12px;background:var(--v2-bg)}.app-shell.v2.v2-ready{background:var(--v2-green)}
 .v2 h1,.v2-wordmark{font-variation-settings:"opsz" 14,"wdth" 100}
+
+/* What do you sell? (Figma: Farmer Side · v1 → Onboarding / Farm basics, uses the Chip component) */
+.v2-sell{display:flex;flex-direction:column;gap:8px}
+.v2-sell-label{font-size:14px;line-height:20px;font-weight:600;color:#1a1a18}
+.v2-type-chips{display:flex;flex-wrap:wrap;gap:8px}
+.v2-type-chips button{height:36px;padding:0 16px;display:inline-flex;align-items:center;gap:6px;border-radius:999px;border:1px solid #e0e0dc;background:#fff;font:600 14px/20px 'Figtree',sans-serif;color:#3b3b38;cursor:pointer}
+.v2-type-chips button img{width:16px;height:16px}
+.v2-type-chips button.on{background:#074226;border-color:#074226;color:#fff}
+.v2-type-chips button b{min-width:18px;height:18px;padding:0 6px;border-radius:999px;background:#f1f1ee;color:#55554f;font:600 12px/18px 'Figtree',sans-serif;text-align:center}
+.v2-type-chips button.on b{background:#19a35a;color:#fff}
+.v2-type-panel{display:flex;flex-direction:column;gap:10px;padding:12px;border-radius:12px;background:#fff;border:1px solid #e0e0dc}
+.v2-type-panel small{color:#6e6e69}
+.v2-type-panel .v2-add-product input{flex:1;min-width:0}
+.v2 select:focus-visible{outline:3px solid #19a35a;outline-offset:3px}
+/* Text fields: no green focus ring. The field border turns dark instead (still shows where you are typing). */
+.v2 input:not([type=checkbox]):not([type=radio]):not([type=file]):focus,.v2 input:not([type=checkbox]):not([type=radio]):not([type=file]):focus-visible,.v2 textarea:focus,.v2 textarea:focus-visible{outline:none!important;box-shadow:none!important;border-color:#3b3b38!important}
+
+/* Sign-in and sign-up errors sit above the button so they are seen (F13). */
+.v2-auth-error{margin:0;color:#b42318;font:500 13px/18px 'Figtree',sans-serif}
+
+/* Edit farm profile from the ready screen: one page with sections (C7). */
+.v2-edit-profile{flex:1;padding:8px 16px 32px;display:flex;flex-direction:column;gap:16px}
+.v2-edit-profile>h1{margin:0}

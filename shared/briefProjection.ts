@@ -8,7 +8,8 @@ export function restoreProjectionPlan(value:unknown):ProjectionPlan{
  return {selected:[...new Set(plan.selected)],uplifts:{...plan.uplifts}};
 }
 export function salesProjection(plan:ProjectionPlan,sample:boolean){
- const history=sample?[390,440,490,540]:[0,0,0,0];
+ // Weekly sales for the last 4 weeks; they add up to Your sales' 30-day total (SGD 1,240).
+ const history=sample?[260,295,325,360]:[0,0,0,0];
  const weekly=history.at(-1)!;
  const lift=sample?[...new Set(plan.selected)].reduce((sum,kind)=>sum+plan.uplifts[kind],0)/100:0;
  const baseline=Array.from({length:4},()=>weekly);
