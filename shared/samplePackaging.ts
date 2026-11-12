@@ -1,3 +1,4 @@
+import {isShowcaseProduct,showcasePackaging} from './showcaseProduct.ts';
 import {presetBehindPhotos,presetProductPhoto,presetThemeSet} from './presetProduct.ts';
 import type {LabelTemplate} from './labelTemplates.ts';
 export type SamplePackaging={kind:'jar'|'carton';name:string;material:string;closure:string;image:string;fill:string;labelWidthMm:number;labelHeightMm:number};
@@ -13,7 +14,7 @@ export const sampleProductDetails:Record<string,Record<string,string>>={
  'demo-kaya':{description:'A creamy pandan coconut spread for toast and breakfast treats. Packed in a wide-mouth glass jar with a screw lid and tamper seal.',ingredients:'Coconut milk, eggs, sugar, pandan leaves',allergens:'Contains eggs',storage:'Refrigerate after opening and use a clean, dry spoon.',expiry:'See use-by date on the jar lid.',producer:'Green Valley Farm',origin:'Lim Chu Kang, Singapore'},
  'demo-jam':{description:'A golden mango preserve with a soft, spreadable texture. Packed in a reusable glass jam jar with a screw lid and tamper seal.',ingredients:'Mango, sugar, lemon juice, fruit pectin',allergens:'No allergens declared',storage:'Refrigerate after opening and use a clean, dry spoon.',expiry:'See best-before date on the jar lid.',producer:'Green Valley Farm',origin:'Lim Chu Kang, Singapore'},
 };
-export function samplePackagingFor(product:{id?:string;samplePackaging?:SamplePackaging}){return product.id&&samplePackaging[product.id]?product.samplePackaging||samplePackaging[product.id]:undefined;}
+export function samplePackagingFor(product:{id?:string;samplePackaging?:SamplePackaging;showcase?:string}){if(isShowcaseProduct(product))return showcasePackaging;return product.id&&samplePackaging[product.id]?product.samplePackaging||samplePackaging[product.id]:undefined;}
 // Upgrade only the known demo products; keep edited fields, product status and custom photos.
 export function upgradeSampleProduct<T extends {id?:string;[key:string]:unknown}>(product:T):T{
  const id=product.id||'',details=sampleProductDetails[id],pack=samplePackaging[id];if(!details)return product;const next={...product,samplePackaging:pack};

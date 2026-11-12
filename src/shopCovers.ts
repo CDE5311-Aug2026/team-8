@@ -1,3 +1,4 @@
+import {isShowcaseProduct} from '../shared/showcaseProduct';
 // Shop covers: the picture shoppers see for each published product on the customer side.
 // A preset theme uses its finished photo. A product with its own design (changed in Your brand)
 // is drawn here from the brand, so the customer side shows the same design as the farmer side.
@@ -53,7 +54,7 @@ export async function syncShopCovers(products:ProductDraft[],profile:FarmerProfi
  for(const product of products){
   const key=String(product.id||'').replace(/^demo-/,'');if(!key||!product.live)continue;
   const kit=product.brandIdentity||brand;
-  if(kit&&ownDesign(product)&&!presetDesignPhotos(product)){
+  if(kit&&!isShowcaseProduct(product)&&ownDesign(product)&&!presetDesignPhotos(product)){
    const sig=JSON.stringify([product.name,product.quantity,product.labelTemplate,product.designTweaks,kit.concept.colors,profile.farmName]);
    if(before[key]?.sig===sig){next[key]=before[key];continue;}
    try{next[key]={sig,url:await renderCover(product,profile,kit)};}catch{/* keep the preset photo */}
