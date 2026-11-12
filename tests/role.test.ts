@@ -23,3 +23,9 @@ test('returning farmers resume their existing profile; new visitors must choose 
 test('customers start from the buy or sell choice on every visit',()=>{
  assert.equal(initialRole('customer',false),null);
 });
+
+test('a new visit always starts on the buy or sell choice, even for farmers',()=>{
+ assert.equal(initialRole('farmer',true,false),null);
+ assert.equal(initialRole('farmer',false,false),null);
+ assert.equal(initialRole('farmer',true,true),'farmer');
+});
