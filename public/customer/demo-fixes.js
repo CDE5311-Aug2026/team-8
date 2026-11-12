@@ -166,7 +166,19 @@
  // play). Anywhere else, or if that fails, the browser's most natural voice reads the story.
  var STORY_IDS=['tea','gv-honey','honey','spinach','milk','sourdough','cheese','jam','kaya','sambal','microgreens','lettuce'];
  var speaking=null,audio=null;
- function stopVoice(){try{speechSynthesis.cancel();}catch(e){}if(audio){audio.pause();audio=null;}if(speaking)speaking.classList.remove('is-playing');speaking=null;}
+ var tick=null;
+ function timeLabel(v){var ps=v.querySelectorAll('p');for(var i=ps.length-1;i>=0;i--)if(/\d:\d\d/.test(ps[i].textContent))return ps[i];return null;}
+ function countdown(v){
+  var lab=timeLabel(v);if(!lab)return;if(!lab.dataset.fxOrig)lab.dataset.fxOrig=lab.textContent;
+  var m=/(\d+):(\d\d)/.exec(lab.dataset.fxOrig);var total=m?(+m[1])*60+(+m[2]):20;var t0=Date.now();
+  clearInterval(tick);tick=setInterval(function(){
+   var len=audio&&isFinite(audio.duration)&&audio.duration>0?audio.duration:total;
+   var left=audio&&audio.currentTime>0?len-audio.currentTime:total-(Date.now()-t0)/1000;left=Math.max(0,Math.ceil(left));
+   var txt=lab.dataset.fxOrig.replace(/\d+:\d\d/,Math.floor(left/60)+':'+('0'+left%60).slice(-2));if(lab.textContent!==txt)lab.textContent=txt;
+  },250);
+ }
+ function stopVoice(){clearInterval(tick);tick=null;try{speechSynthesis.cancel();}catch(e){}if(audio){audio.pause();audio=null;}
+  if(speaking){speaking.classList.remove('is-playing');var lab=timeLabel(speaking);if(lab&&lab.dataset.fxOrig){lab.textContent=lab.dataset.fxOrig;delete lab.dataset.fxOrig;}}speaking=null;}
  function bestVoice(){
   var vs=[];try{vs=speechSynthesis.getVoices()||[];}catch(e){}
   var en=vs.filter(function(v){return /^en/i.test(v.lang);});
@@ -184,7 +196,7 @@
   var card=v.closest('[data-name="Farm story card"]')||v.parentElement;for(var up=0;up<4&&card.querySelectorAll('p').length<3&&card.parentElement;up++)card=card.parentElement;var best='';
   card.querySelectorAll('p').forEach(function(p){var t=p.textContent.trim();if(t.length>best.length&&!/^Hear /.test(t))best=t;});
   var who=(v.textContent.match(/Hear ([^,]+)/)||[])[1];best=best.replace(/[“”]/g,'');var text=(who?'Hi, I’m '+who+'. ':'')+best;
-  stopVoice();speaking=v;v.classList.add('is-playing');
+  stopVoice();speaking=v;v.classList.add('is-playing');countdown(v);
   var id=null;try{id=sessionStorage.getItem('farmily-customer-product');}catch(e){}
   var fm=/^farm-(\w+)/.exec(scr());if(fm)id='farm-'+fm[1];else if(scr()!=='product'||STORY_IDS.indexOf(id)<0)id=null;
   if(id&&window.Audio){
@@ -282,7 +294,10 @@
   '.fx-restart{display:flex;align-items:center;gap:12px;width:100%;background:#fff;border:1px solid #e0e0dc;border-radius:16px;padding:14px 16px;text-align:left;cursor:pointer;font-family:Figtree,sans-serif;margin-top:12px}',
   '.fx-restart b{display:block;font-size:15px;color:#1a1a18}.fx-restart i{display:block;font-style:normal;font-size:13px;color:#6e6e69}',
   '.fx-ri{width:36px;height:36px;border-radius:999px;background:#e2f5e9 url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%230e6b3b\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'%3E%3Cpath d=\'M3 12a9 9 0 1 0 3-6.7L3 8\'/%3E%3Cpath d=\'M3 3v5h5\'/%3E%3C/svg%3E") center/18px no-repeat;flex-shrink:0}',
-  '.screen[data-screen="home"] [data-node-id="1447:3319"]{cursor:pointer}'
+  '.screen[data-screen="home"] [data-node-id="1447:3319"]{cursor:pointer}',
+  // Sprout\'s bubble sits above the card heart; card hearts always hug the top-right corner.
+  '[data-name="Sprout says"]{z-index:20!important}',
+  '[data-name="Product card"] [data-name="Favourite"]{left:auto!important;right:10px!important}'
  ].join('\n');
 
  // ---------- Elastic end of scroll ----------
@@ -301,13 +316,14 @@
   if((dir>0&&next>0)||(dir<0&&next<0))next=0;
   bandSet(sc,next,false);clearTimeout(band.timer);band.timer=setTimeout(bandRelease,120);
  },{passive:true});
- if(!nativeBounce){var ty=null;
-  window.addEventListener('touchstart',function(e){var sc=e.target.closest&&e.target.closest('.screen');ty=sc?{y:e.touches[0].clientY,sc:sc}:null;},{passive:true});
+ (function(){var ty=null;
+  window.addEventListener('touchstart',function(e){var sc=e.target.closest&&e.target.closest('.screen');if(sc&&nativeBounce&&sc.scrollHeight>sc.clientHeight+1)sc=null;ty=sc?{y:e.touches[0].clientY,sc:sc}:null;},{passive:true});
   window.addEventListener('touchmove',function(e){if(!ty)return;var dy=e.touches[0].clientY-ty.y;var dir=dy<0?1:-1;if(!edge(ty.sc,dir)){ty.y=e.touches[0].clientY;return;}
    var off=dy*0.35;off=Math.max(-80,Math.min(80,off));bandSet(ty.sc,off,false);},{passive:true});
-  window.addEventListener('touchend',function(){ty=null;bandRelease();},{passive:true});
- }
- style.textContent+='\n.screen[data-screen="me"]>div>[data-name="Settings"]~.fx-restart{margin-bottom:24px}';
+  window.addEventListener('touchend',function(){if(!ty)return;ty=null;bandRelease();},{passive:true});
+ })();
+ // Profile: the last row clears the floating tab bar, so it can be scrolled into full view.
+ style.textContent+='\n.fx-restart{margin-bottom:116px!important}';
 
  // ---------- Clicks ----------
  window.addEventListener('click',function(e){
@@ -356,7 +372,7 @@
  var busy=false,queued=false;
  function apply(){
   var r=root();if(!r)return;busy=true;
-  try{nameFix(r);picksInit(r);heartsPaint();basketPaint();addPaint();exPaint();mePaint();chatListPaint();likeFromToast();}catch(err){}
+  try{nameFix(r);picksInit(r);heartsPaint();basketPaint();addPaint();likeFromToast();exPaint();mePaint();chatListPaint();}catch(err){}
   busy=false;
  }
  new MutationObserver(function(){if(busy||queued)return;queued=true;setTimeout(function(){queued=false;apply();},0);}).observe(document.documentElement,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:['data-screen']});
