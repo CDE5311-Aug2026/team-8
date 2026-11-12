@@ -1,3 +1,4 @@
+import {isShowcaseProduct,showcaseListingPhotos} from './showcaseProduct.ts';
 // Demo preset for "Add product": whatever photo the farmer takes or uploads, the app shows
 // Mango Jam and "AI" fills in its details for the farmer to check. Images: public/preset/
 // (made with Figma AI, kept in Figma Drafts → "Preset images – Mango Jam").
@@ -72,7 +73,8 @@ export function presetDesignPhotos(product:{id?:string;labelTemplate?:string;des
 export function presetListingPhotos(template:LabelTemplate|undefined){const set=presetPackaging[template||'botanical'];return [{url:set.studio,name:'Cover'},{url:presetProductPhoto,name:'Close-up'},{url:set.photo,name:'Packed'}];}
 // Listing photos as shoppers see them. Cover and Packed always follow the product's current theme,
 // so changing the theme changes them too. The farmer's own photos (not packaging renders) stay in between.
-export function themedListingPhotos<P extends {url:string;name?:string}>(product:{id?:string;photo?:string;labelTemplate?:string;listingPhotos?:P[];designTweaks?:{paper?:string;art?:string;layout?:string}}):{url:string;name?:string}[]{
+export function themedListingPhotos<P extends {url:string;name?:string}>(product:{showcase?:string;id?:string;photo?:string;labelTemplate?:string;listingPhotos?:P[];designTweaks?:{paper?:string;art?:string;layout?:string}}):{url:string;name?:string}[]{
+ if(isShowcaseProduct(product))return [...showcaseListingPhotos(),...(product.listingPhotos?.length?product.listingPhotos:showcaseListingPhotos(product.photo)).filter(p=>p.url!==showcaseListingPhotos()[0].url)];
  const own=product.listingPhotos||[];const set=presetImagesFor(product);if(!set)return own;
  const ownDesign=!!product.designTweaks&&!!(product.designTweaks.paper||product.designTweaks.art||product.designTweaks.layout);
  const matched=presetDesignPhotos(product);
@@ -84,7 +86,7 @@ export function themedListingPhotos<P extends {url:string;name?:string}>(product
  return [{name:'Cover',url:theme.studio},...rest,{name:'Packed',url:theme.photo}];
 }
 // The cover shoppers and the farmer see on cards: the theme's cover for preset products, else the product photo.
-export function coverPhoto(product:{id?:string;photo?:string;labelTemplate?:string;listingPhotos?:{url:string}[];designTweaks?:{paper?:string;art?:string;layout?:string}}){return themedListingPhotos(product)[0]?.url||product.photo||'';}
+export function coverPhoto(product:{showcase?:string;id?:string;photo?:string;labelTemplate?:string;listingPhotos?:{url:string}[];designTweaks?:{paper?:string;art?:string;layout?:string}}){return themedListingPhotos(product)[0]?.url||product.photo||'';}
 // Every certificate upload saves this small sample file instead of the farmer's own file.
 export const presetCertificateFile={name:'organic-certificate.png',type:'image/png',size:68,dataUrl:'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNkYAAAAAYAAjCB0C8AAAAASUVORK5CYII='};
 export const presetCertificateDetails={issuedBy:'SFA Organic',number:'SG-ORG-2041',validUntil:'2027-06-30'};
@@ -104,6 +106,8 @@ function swapUploads(value:unknown,key=''):unknown{
  if(Array.isArray(value))return value.map(item=>swapUploads(item,key));
  if(!value||typeof value!=='object')return value;
  const o=value as Record<string,unknown>;
+ // Showcase photos are resized on input and must survive reloads.
+ if(o.showcase==='pomegranate'||(o.product as {showcase?:string}|undefined)?.showcase==='pomegranate')return value;
  // Mango Jam only has photos for the three themes, so label colour, picture and layout changes are dropped.
  if(typeof o.photo==='string'&&o.photo.startsWith('/preset/jam-')&&o.designTweaks!==undefined){const {designTweaks:_dropped,...rest}=o;void _dropped;return swapUploads(rest,key);}
  if(typeof o.dataUrl==='string'&&o.dataUrl.length>1000)return {...presetCertificateFile};
