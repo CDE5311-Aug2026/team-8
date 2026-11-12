@@ -181,12 +181,13 @@
   try{speechSynthesis.speak(u);}catch(e){stopVoice();}
  }
  function playVoice(v){
-  var card=v.closest('[data-name="Farm story card"]')||v.parentElement;var best='';
+  var card=v.closest('[data-name="Farm story card"]')||v.parentElement;for(var up=0;up<4&&card.querySelectorAll('p').length<3&&card.parentElement;up++)card=card.parentElement;var best='';
   card.querySelectorAll('p').forEach(function(p){var t=p.textContent.trim();if(t.length>best.length&&!/^Hear /.test(t))best=t;});
-  var who=(v.textContent.match(/Hear ([^,]+)/)||[])[1];var text=(who?'Hi, I’m '+who+'. ':'')+best;
+  var who=(v.textContent.match(/Hear ([^,]+)/)||[])[1];best=best.replace(/[“”]/g,'');var text=(who?'Hi, I’m '+who+'. ':'')+best;
   stopVoice();speaking=v;v.classList.add('is-playing');
   var id=null;try{id=sessionStorage.getItem('farmily-customer-product');}catch(e){}
-  if(scr()==='product'&&STORY_IDS.indexOf(id)>=0&&window.Audio){
+  var fm=/^farm-(\w+)/.exec(scr());if(fm)id='farm-'+fm[1];else if(scr()!=='product'||STORY_IDS.indexOf(id)<0)id=null;
+  if(id&&window.Audio){
    var a=new Audio('/api/voice?id='+encodeURIComponent(id));audio=a;var started=false;
    a.onplaying=function(){started=true;};
    a.onended=function(){if(speaking===v)stopVoice();};
@@ -225,8 +226,8 @@
   var n=mode==='products'?get(LIKES,[]).length:get(FARM_LIKES,[]).length;
   r.querySelectorAll('[data-name="Tabs"] [data-name="Segment 2"] [data-name="Count"]').forEach(function(c){var p=c.querySelector('p')||c;setText(p,String(n));});
   if(s!=='ex-likedtab'&&s!=='ex-likedempty')return;
-  var host=r.querySelector('.fx-liked');
-  if(!host){host=document.createElement('div');host.className='fx-liked';var anchor=r.querySelector('.fp-liked,[data-name="List"],[data-name="Empty state"]');if(!anchor)return;anchor.parentElement.insertBefore(host,anchor);}
+  var host=r.querySelector('.fx-likedlist');
+  if(!host){host=document.createElement('div');host.className='fx-likedlist';var anchor=r.querySelector('.fp-liked,[data-name="List"],[data-name="Empty state"]');if(!anchor)return;anchor.parentElement.insertBefore(host,anchor);}
   var html='';
   if(mode==='products'){var ids=get(LIKES,[]).map(function(nm){return PID[nm];}).filter(Boolean);
    html=ids.length?ids.map(function(id){var i=PINFO[id];var nm=Object.keys(PID).filter(function(k){return PID[k]===id;})[0];return '<div class="fx-lrow" data-fx-product="'+id+'"><img src="'+i[2]+'" alt=""><div><b>'+nm+'</b><span>'+i[0]+'</span><em>'+i[1]+'</em></div><span class="fx-lheart" data-fx-unlike="'+nm+'"></span></div>';}).join(''):
@@ -270,7 +271,7 @@
   '.screen[data-fx-mode="products"] [data-name="Swipe card"][data-swipe="right"]::after{content:"ADD TO CART"}',
   // Our Liked lists replace the fixed ones.
   '.screen[data-screen="ex-likedtab"] .fp-liked,.screen[data-screen="ex-likedtab"] [data-name="List"],.screen[data-screen="ex-likedempty"] [data-name="Empty state"]{display:none!important}',
-  '.fx-liked{display:flex;flex-direction:column;gap:10px;width:100%;font-family:Figtree,sans-serif}',
+  '.fx-likedlist{display:flex;flex-direction:column;gap:10px;width:100%;font-family:Figtree,sans-serif}',
   '.fx-lrow{display:flex;align-items:center;gap:12px;background:#fff;border-radius:16px;padding:10px 12px;cursor:pointer}',
   '.fx-lrow img{width:56px;height:56px;border-radius:10px;object-fit:cover}.fx-lrow img.round{border-radius:999px}',
   '.fx-lrow div{flex:1;min-width:0}.fx-lrow b{display:block;font-size:15px;font-weight:600;color:#1a1a18}.fx-lrow span{display:block;font-size:13px;color:#6e6e69}.fx-lrow em{display:block;font-style:normal;font-size:13px;font-weight:600;color:#1a1a18}',
@@ -283,6 +284,30 @@
   '.fx-ri{width:36px;height:36px;border-radius:999px;background:#e2f5e9 url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' viewBox=\'0 0 24 24\' fill=\'none\' stroke=\'%230e6b3b\' stroke-width=\'2\' stroke-linecap=\'round\' stroke-linejoin=\'round\'%3E%3Cpath d=\'M3 12a9 9 0 1 0 3-6.7L3 8\'/%3E%3Cpath d=\'M3 3v5h5\'/%3E%3C/svg%3E") center/18px no-repeat;flex-shrink:0}',
   '.screen[data-screen="home"] [data-node-id="1447:3319"]{cursor:pointer}'
  ].join('\n');
+
+ // ---------- Elastic end of scroll ----------
+ // Scrolling past the end of a screen stretches a little, then springs back, so the shopper
+ // feels where the content ends (iPhone already does this natively).
+ var nativeBounce=/iPhone|iPad|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+ var band={off:0,timer:null,sc:null};
+ function bandParts(sc){var c=sc&&sc.firstElementChild;return c?[].filter.call(c.children,function(k){return !k.dataset.pinned;}):[];}
+ function bandSet(sc,off,anim){band.off=off;band.sc=sc;bandParts(sc).forEach(function(k){k.style.transition=anim?'transform .5s cubic-bezier(.2,1.5,.4,1)':'none';k.style.transform=off?'translateY('+off+'px)':'';});}
+ function bandRelease(){if(band.sc)bandSet(band.sc,0,true);}
+ function edge(sc,dir){return dir>0?sc.scrollTop+sc.clientHeight>=sc.scrollHeight-1:sc.scrollTop<=0;}
+ window.addEventListener('wheel',function(e){
+  var sc=e.target.closest&&e.target.closest('.screen');if(!sc||!e.deltaY)return;var dir=e.deltaY>0?1:-1;
+  if(!edge(sc,dir)&&!band.off)return;
+  var next=band.off-e.deltaY*0.35*(1-Math.min(1,Math.abs(band.off)/90));next=Math.max(-72,Math.min(72,next));
+  if((dir>0&&next>0)||(dir<0&&next<0))next=0;
+  bandSet(sc,next,false);clearTimeout(band.timer);band.timer=setTimeout(bandRelease,120);
+ },{passive:true});
+ if(!nativeBounce){var ty=null;
+  window.addEventListener('touchstart',function(e){var sc=e.target.closest&&e.target.closest('.screen');ty=sc?{y:e.touches[0].clientY,sc:sc}:null;},{passive:true});
+  window.addEventListener('touchmove',function(e){if(!ty)return;var dy=e.touches[0].clientY-ty.y;var dir=dy<0?1:-1;if(!edge(ty.sc,dir)){ty.y=e.touches[0].clientY;return;}
+   var off=dy*0.35;off=Math.max(-80,Math.min(80,off));bandSet(ty.sc,off,false);},{passive:true});
+  window.addEventListener('touchend',function(){ty=null;bandRelease();},{passive:true});
+ }
+ style.textContent+='\n.screen[data-screen="me"]>div>[data-name="Settings"]~.fx-restart{margin-bottom:24px}';
 
  // ---------- Clicks ----------
  window.addEventListener('click',function(e){
@@ -319,8 +344,8 @@
    var btn=t.closest('[data-name="Checkout bar"] [data-name="Button"]');if(btn&&btn.classList.contains('fx-blocked')){e.stopPropagation();e.preventDefault();return;}
   }
   // Story voice.
-  var play=t.closest('[data-name="Voice"] [data-name="Play"]');
-  if(play){e.stopPropagation();e.preventDefault();var v=play.closest('[data-name="Voice"]');if(speaking===v)stopVoice();else playVoice(v);return;}
+  var play=t.closest('[data-name="Voice"] [data-name="Play"],[data-name="Player"] [data-name="Play"]');
+  if(play){e.stopPropagation();e.preventDefault();var v=play.closest('[data-name="Voice"],[data-name="Player"]');if(speaking===v)stopVoice();else playVoice(v);return;}
   // Onboarding picks: save after the app toggles the choice.
   if((s==='gs-interests'&&t.closest('[data-name="Interest tile"]'))||(s==='gs-values'&&t.closest('[data-name="Chip"]'))){
    var el=t.closest('[data-name="Interest tile"],[data-name="Chip"]');var label=el.textContent.trim();setTimeout(function(){picksSave(label);},0);

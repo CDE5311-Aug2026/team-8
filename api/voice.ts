@@ -26,7 +26,19 @@ const stories: Record<string, { farm: string; story: string }> = {
   microgreens: { farm: 'sg', story: 'Grown on shelves under soft lights and cut the morning they ship.' },
   lettuce: { farm: 'sg', story: 'Grown in water channels in our greenhouse and sold with the roots on so it stays fresh.' },
 };
+// Farm pages: the farmer's own quote in "Our story".
+const farmQuotes: Record<string, { who: string; quote: string; voice: string }> = {
+  gv: { who: 'Alex', quote: 'My dad started with two rows of kangkong. Now we keep bees and grow lemongrass.', voice: 'ash' },
+  bg: { who: 'Siti', quote: 'My grandmother kept three hives behind the house.', voice: 'coral' },
+  hh: { who: 'Raj', quote: 'We started with two goats and a lot of questions.', voice: 'verse' },
+  rb: { who: 'Wei Ling', quote: 'My father planted the first spinach here in 1998.', voice: 'shimmer' },
+  ff: { who: 'Farah', quote: 'I still feed the starter my mother gave me.', voice: 'sage' },
+  kp: { who: 'Rosnah', quote: 'This is my grandmother’s kaya. Two hours of stirring.', voice: 'coral' },
+  sg: { who: 'Jun Hao', quote: 'We grow up, not out. Ten shelves in one small room.', voice: 'ash' },
+};
 export function scriptFor(id: string): { text: string; voice: string } | null {
+  const fm = /^farm-(\w+)$/.exec(id);
+  if (fm) { const q = farmQuotes[fm[1]]; return q ? { text: `Hi, I'm ${q.who}. ${q.quote}`, voice: q.voice } : null; }
   const s = stories[id]; const f = s && farms[s.farm];
   if (!s || !f) return null;
   return { text: `Hi, I'm ${f.who} from ${f.name}. ${s.story}`, voice: f.voice };
