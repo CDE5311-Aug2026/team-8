@@ -28,7 +28,18 @@ if(new URLSearchParams(location.search).has('restart')){
  try{Object.keys(localStorage).filter(key=>key.startsWith('farmily')).forEach(key=>localStorage.removeItem(key));sessionStorage.clear();}catch{/* storage blocked: nothing saved to clear */}
  history.replaceState(null,'',location.pathname);
 }
-createRoot(document.getElementById('root')!).render(<React.StrictMode><AccountProvider><App/></AccountProvider></React.StrictMode>);
+// noframe branch: on a desktop browser, show the app inside a fixed 402x874 screen (no phone border)
+// so farmer and shopper screens can be recorded at the same size. ?inner is the app itself.
+const recordingStage=window.top===window&&innerWidth>=600&&!new URLSearchParams(location.search).has('inner');
+if(recordingStage){
+ document.body.style.cssText='margin:0;background:#e8e8e3;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px 0;box-sizing:border-box';
+ const screen=document.createElement('iframe');
+ screen.src='/?inner=1'+location.hash;
+ screen.title='Farmily';
+ screen.allow='camera; microphone; autoplay; clipboard-write';
+ screen.style.cssText='width:402px;height:874px;border:0;display:block;background:#fffdf0;flex-shrink:0';
+ document.getElementById('root')!.replaceWith(screen);
+}else createRoot(document.getElementById('root')!).render(<React.StrictMode><AccountProvider><App/></AccountProvider></React.StrictMode>);
 import './shorts-v2.css';
 import './brief-v2.css';
 
