@@ -191,6 +191,9 @@
   if(s==='basket'){
    var bar=t.closest('[data-name="Checkout bar"]');
    var cb=t.closest('[data-name="Checkbox"]')||(bar&&!t.closest('[data-name="Button"],[data-name="Total"]')?allBox(bar):null);if(cb){e.stopPropagation();e.preventDefault();basketClick(cb);return;}
+   // Sold-out honey: Find similar and Show me open Recommended for you, with the similar honey first.
+   var sim=t.closest('[data-name="Find similar"],[data-name="AI sticker"] [data-name="Action"],[data-name="AI sticker"] a,[data-name="AI sticker"] button');
+   if(sim&&window.farmilyBrowse){e.stopPropagation();e.preventDefault();window.farmilyBrowse.recommended('gv-honey');return;}
    var btn=t.closest('[data-name="Checkout bar"] [data-name="Button"]');if(btn&&btn.classList.contains('fx-blocked')){e.stopPropagation();e.preventDefault();return;}
   }
   // Story voice.
