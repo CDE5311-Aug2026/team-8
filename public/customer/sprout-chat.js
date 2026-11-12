@@ -80,12 +80,16 @@
   '.sc-card .sc-photo{width:100%;height:150px;object-fit:cover;border-radius:12px}',
   '.sc-card .sc-big{border:0;border-radius:12px;background:#074226;color:#fff;padding:14px;font:700 16px Figtree,sans-serif;cursor:pointer}',
   '.sc-card .sc-two{display:grid;grid-template-columns:1fr 1fr;gap:8px}',
-  '.sc-card .sc-two button{border:1px solid #c9c9c4;background:#fff;border-radius:10px;padding:9px;font:600 14px Figtree,sans-serif;cursor:pointer;color:#1a1a18}',
+  '.sc-card .sc-two button{display:flex;align-items:center;justify-content:center;gap:6px;border:1px solid #c9c9c4;background:#fff;border-radius:10px;padding:9px;font:600 14px Figtree,sans-serif;cursor:pointer;color:#1a1a18}',
+  '.sc-attach{align-self:flex-end;display:flex;flex-direction:column;gap:6px;max-width:80%;animation:sc-in .25s ease-out}',
+  '.sc-attach>span{align-self:flex-end;font-size:12px;color:#6e6e69}',
+  '.sc-attach .sc-item{border:1.5px solid #074226;cursor:pointer}',
   '.sc-farmer{align-self:flex-start;max-width:85%;background:#fff;border-radius:4px 16px 16px 16px;padding:10px 14px;font-size:15px;line-height:21px;animation:sc-in .3s ease-out}',
   '.sc-farmer small{display:block;color:#6e6e69;font-size:12px;margin-top:4px}',
   '.sc-wait{display:flex;align-items:center;gap:10px;background:#fff;border-radius:12px;padding:10px 12px;font-size:13px;margin-left:36px}',
   '.sc-wait svg{width:18px;height:18px}.sc-wait b{display:block;font-weight:600}.sc-wait i{font-style:normal;color:#6e6e69}',
-  '.sc-green svg,.sc-card .sc-two svg{width:15px;height:15px;vertical-align:-3px;margin-right:6px}',
+  '.sc-green svg{width:15px;height:15px;display:inline-block;vertical-align:-3px;margin-right:6px}',
+  '.sc-card .sc-two svg{width:16px;height:16px;display:block;flex-shrink:0}',
   '.sc-green{align-self:flex-start;border:0;border-radius:10px;background:#19A35A;color:#fff;padding:9px 14px;font:700 13px Figtree,sans-serif;cursor:pointer}',
   '.sc-me{align-self:flex-end;max-width:80%;background:#074226;color:#fff;border-radius:18px 18px 4px 18px;padding:10px 14px;font-size:15px;line-height:20px;animation:sc-in .25s ease-out}',
   '.sc-bot{display:flex;gap:8px;align-items:flex-start;animation:sc-in .3s ease-out}',
@@ -230,11 +234,13 @@
    if(key==='today')return reply(function(){say(farm.today,verified()+chips(more('today')));});
    if(key==='fresh')return reply(function(){say('Packed this week at '+farm.name+':',farm.fresh.map(function(i){return item(i);}).join('')+verified()+chips(more('fresh')));});
    if(key==='farmer')return reply(function(){say('Sure. Type your question below and I’ll pass it to '+farm.who+'.');},700);
+   if(key==='stock')return reply(function(){var pr=self.product&&P[self.product];say(pr?'Yes, the '+pr.name+' is in stock and was packed this week.':'Everything on '+farm.name+'’s page is in stock right now.',verified()+chips(more('stock')));});
    if(key==='cheese')return handoff(text,'cheese');
    return handoff(text);
   }
   function farmIntent(text){var t=text.toLowerCase();
    if(/deliver|delivery|ship|send to/.test(t))return 'deliver';
+   if(self.product&&/stock|available|left|sold out/.test(t))return 'stock';
    if(/allerg|gluten|nut|dairy|vegan/.test(t))return 'allergens';
    if(farm.today&&/today|fresh today|baked|in stock/.test(t))return 'today';
    if(/fresh|this week|what do you (have|sell)/.test(t))return 'fresh';
@@ -259,6 +265,10 @@
    add(chips(CHIPS));
   }
 
+  // A product carried in from Fresh picks: show it as attached, then offer product questions.
+  this.attach=function(id){var pr=P[id];if(!pr||!farm)return;self.product=id;
+   setTimeout(function(){list.classList.remove('sc-empty');add('<div class="sc-attach"><span>Product attached</span>'+item(id)+'</div>');
+    reply(function(){say('Ask me anything about the '+pr.name+'. I answer from '+farm.name+'’s verified info.',chips([['stock','Is it in stock?'],['allergens','Any allergens?'],['deliver','Do you deliver to me?'],['farmer','Ask '+farm.who+' directly']]));},900);},busy?1300:200);};
   function act(key,label){
    if(busy)return;if(label)me(label);
    if(farm)return farmAct(key,label);return sproutAct(key);
@@ -303,7 +313,7 @@
 
  // Which conversation belongs to the current screen. The app changes screens without a
  // hashchange, so we watch the screen name.
- var chats={},current=null,pendingFarm=null,returnTo=null,prevScreen='',lastScreen='';
+ var chats={},current=null,pendingFarm=null,pendingProduct=null,returnTo=null,prevScreen='',lastScreen='';
  var SCREEN_FARM={'ch-gv':'gv','ch-hh':'hh','ch-ask':'hh','ch-wait':'hh','ch-replied':'hh','ch-sprout':'ff'};
  function scr(){var s=document.querySelector('.screen');return s?s.getAttribute('data-screen')||'':'';}
  function kindFor(s,prev){
@@ -322,7 +332,10 @@
   if(!kind){current=null;return;}
   if(!chats[kind])chats[kind]=new Chat(kind);
   var c=chats[kind];if(c.el.parentNode!==ph)ph.appendChild(c.el);c.el.style.display='';current=kind;
+  if(pendingProduct&&kind!=='sprout'){var pp=pendingProduct;pendingProduct=null;if(c.product!==pp)c.attach(pp);}
  }
+ // Other scripts: open a farm's chat, or get the next chat ready with a product attached.
+ window.farmilyChat={prepare:function(f,product){if(FARMS[f])pendingFarm=f;pendingProduct=product||null;},open:function(f){if(!FARMS[f])return;pendingFarm=f;location.hash=f==='hh'?'#ch-hh':f==='ff'?'#ch-sprout':'#ch-gv';}};
  function check(){
   var s=scr();if(!s)return;
   if(s!==lastScreen){
