@@ -87,6 +87,8 @@
   var inp=el.querySelector('[data-br-q]');if(inp&&v[2]){setTimeout(function(){inp.focus();},50);v[2]=false;}}
  function open(){var v=[].slice.call(arguments);if(!stack.length)origin=location.hash||'#home';stack.push(v);render();}
  function back(){stack.pop();render();}
+ // Other scripts can open Recommended for you (the basket's sold-out Find similar and Show me use it).
+ window.farmilyBrowse={recommended:function(first){var l=LISTS['Recommended for you'];var ids=l.ids.slice();if(first&&P[first]&&ids.indexOf(first)<0)ids.unshift(first);open('list','Recommended for you',ids,l.sub,l.sprout);}};
  function leave(hash){if(el)el.style.display='none';location.hash=hash;}
  window.addEventListener('hashchange',function(){if(!el)return;if(location.hash===origin)el.style.display='';else el.style.display='none';});
 

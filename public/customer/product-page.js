@@ -292,7 +292,7 @@
  // Swipe the photo.
  var sx=null,swiped=false;
  document.addEventListener('pointerdown',function(e){sx=e.target.closest&&e.target.closest('[data-name="Hero"]')?e.clientX:null;},true);
- document.addEventListener('pointerup',function(e){if(sx==null)return;var dx=e.clientX-sx;sx=null;if(Math.abs(dx)<40||!page())return;var p=current();if(p.photos.length<2)return;swiped=true;shown=dx<0?Math.min(p.photos.length-1,shown+1):Math.max(0,shown-1);apply();},true);
+ document.addEventListener('pointerup',function(e){if(sx==null)return;var dx=e.clientX-sx;sx=null;if(Math.abs(dx)<40||!page())return;var p=current();if(p.photos.length<2)return;swiped=true;shown=(shown+(dx<0?1:-1)+p.photos.length)%p.photos.length;apply();},true);
  var queued=false;
  new MutationObserver(function(){if(busy||queued)return;queued=true;setTimeout(function(){queued=false;apply();},0);}).observe(document.documentElement,{subtree:true,childList:true,characterData:true});
  document.addEventListener('DOMContentLoaded',apply);
