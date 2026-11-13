@@ -162,62 +162,121 @@
  }
 
  // ---------- Story voice ----------
- // Product pages play a natural recorded-style voice from /api/voice (cached after the first
- // play). Anywhere else, or if that fails, the browser's most natural voice reads the story.
+ // Product pages play a natural recorded-style voice from /api/voice when it is set up.
+ // Otherwise the browser's most natural voice reads the story.
+ // The button shows play (stopped or paused) or pause (playing). Pause keeps the place, and
+ // play carries on from there. Leaving the page stops the voice.
  var STORY_IDS=['tea','gv-honey','honey','spinach','milk','sourdough','cheese','jam','kaya','sambal','microgreens','lettuce'];
- var speaking=null,audio=null;
+ var PLAYERS='[data-name="Voice"],[data-name="Player"],.fpo-player';
+ var vs=null; // {v,text,id,screen,audio,utt,pos,base,elapsed,startedAt,total,paused}
  var tick=null;
- function timeLabel(v){var ps=v.querySelectorAll('p');for(var i=ps.length-1;i>=0;i--)if(/\d:\d\d/.test(ps[i].textContent))return ps[i];return null;}
- function countdown(v){
-  var lab=timeLabel(v);if(!lab)return;if(!lab.dataset.fxOrig)lab.dataset.fxOrig=lab.textContent;
-  var m=/(\d+):(\d\d)/.exec(lab.dataset.fxOrig);var total=m?(+m[1])*60+(+m[2]):20;var t0=Date.now();
-  clearInterval(tick);tick=setInterval(function(){
-   var len=audio&&isFinite(audio.duration)&&audio.duration>0?audio.duration:total;
-   var left=audio&&audio.currentTime>0?len-audio.currentTime:total-(Date.now()-t0)/1000;left=Math.max(0,Math.ceil(left));
-   var txt=lab.dataset.fxOrig.replace(/\d+:\d\d/,Math.floor(left/60)+':'+('0'+left%60).slice(-2));if(lab.textContent!==txt)lab.textContent=txt;
-  },250);
+ function timeLabel(v){if(v.matches('.fpo-player'))return v.querySelector('em');var ps=v.querySelectorAll('p');for(var i=ps.length-1;i>=0;i--)if(/\d:\d\d/.test(ps[i].textContent))return ps[i];return null;}
+ function playBtn(v){return v.matches('.fpo-player')?v.querySelector('i'):v.querySelector('[data-name="Play"]');}
+ function secsLeft(){
+  if(!vs)return 0;
+  if(vs.audio&&isFinite(vs.audio.duration)&&vs.audio.duration>0&&vs.audio.currentTime>0)return vs.audio.duration-vs.audio.currentTime;
+  return vs.total-(vs.elapsed+(vs.paused||!vs.startedAt?0:(Date.now()-vs.startedAt)/1000));
  }
- function stopVoice(){clearInterval(tick);tick=null;try{speechSynthesis.cancel();}catch(e){}if(audio){audio.pause();audio=null;}
-  if(speaking){speaking.classList.remove('is-playing');var lab=timeLabel(speaking);if(lab&&lab.dataset.fxOrig){lab.textContent=lab.dataset.fxOrig;delete lab.dataset.fxOrig;}}speaking=null;}
+ function paintTime(){if(!vs)return;var lab=timeLabel(vs.v);if(!lab||!lab.dataset.fxOrig)return;var left=Math.max(0,Math.ceil(secsLeft()));
+  var txt=lab.dataset.fxOrig.replace(/\d+:\d\d/,Math.floor(left/60)+':'+('0'+left%60).slice(-2));if(lab.textContent!==txt)lab.textContent=txt;}
+ function paintState(){
+  document.querySelectorAll('.fx-vbtn').forEach(function(b){var v=b.closest(PLAYERS);var playing=!!(vs&&vs.v===v&&!vs.paused);b.classList.toggle('fx-pausebtn',playing);if(v)v.classList.toggle('is-playing',playing);});
+ }
+ function stopVoice(){
+  clearInterval(tick);tick=null;if(!vs)return;var old=vs;vs=null;
+  try{speechSynthesis.cancel();}catch(e){}if(old.audio){try{old.audio.pause();}catch(e){}}
+  var lab=timeLabel(old.v);if(lab&&lab.dataset.fxOrig){lab.textContent=lab.dataset.fxOrig;delete lab.dataset.fxOrig;}
+  paintState();
+ }
  function bestVoice(){
-  var vs=[];try{vs=speechSynthesis.getVoices()||[];}catch(e){}
-  var en=vs.filter(function(v){return /^en/i.test(v.lang);});
+  var list=[];try{list=speechSynthesis.getVoices()||[];}catch(e){}
+  var en=list.filter(function(v){return /^en/i.test(v.lang);});
   var prefs=[/natural/i,/neural/i,/premium|enhanced/i,/Samantha/,/Google UK English Female/,/Google US English/,/Daniel/,/Karen|Moira|Tessa/];
   for(var i=0;i<prefs.length;i++){var m=en.filter(function(v){return prefs[i].test(v.name);})[0];if(m)return m;}
   return en[0]||null;
  }
- function speak(v,text){
-  if(!('speechSynthesis' in window)){stopVoice();return;}
-  var u=new SpeechSynthesisUtterance(text);var b=bestVoice();if(b){u.voice=b;u.lang=b.lang;}else u.lang='en-GB';u.rate=0.98;u.pitch=1.02;
-  u.onend=u.onerror=function(){if(speaking===v)stopVoice();};
-  try{speechSynthesis.speak(u);}catch(e){stopVoice();}
+ // Speak from character `from`; word boundaries remember where we are, so a pause can resume.
+ function speakFrom(from){
+  if(!vs)return;if(!('speechSynthesis' in window)){stopVoice();return;}
+  var rest=vs.text.slice(from);if(!rest.trim()){stopVoice();return;}
+  var u=new SpeechSynthesisUtterance(rest);var b=bestVoice();if(b){u.voice=b;u.lang=b.lang;}else u.lang='en-GB';u.rate=0.98;u.pitch=1.02;u.volume=1;
+  vs.utt=u;vs.base=from;vs.pos=from;
+  u.onboundary=function(ev){if(vs&&vs.utt===u&&typeof ev.charIndex==='number')vs.pos=vs.base+ev.charIndex;};
+  u.onend=u.onerror=function(){if(vs&&vs.utt===u&&!vs.paused)stopVoice();};
+  try{speechSynthesis.cancel();speechSynthesis.resume();speechSynthesis.speak(u);}catch(e){stopVoice();}
+ }
+ function startClock(){vs.startedAt=Date.now();clearInterval(tick);tick=setInterval(paintTime,250);paintTime();}
+ function pauseVoice(){
+  if(!vs||vs.paused)return;vs.paused=true;vs.elapsed+=(Date.now()-vs.startedAt)/1000;clearInterval(tick);tick=null;
+  if(vs.audio){try{vs.audio.pause();}catch(e){}}else{vs.utt=null;try{speechSynthesis.cancel();}catch(e){}}
+  paintTime();paintState();
+ }
+ function resumeVoice(){
+  if(!vs||!vs.paused)return;vs.paused=false;startClock();paintState();
+  if(vs.audio){var p=vs.audio.play();if(p&&p.catch)p.catch(function(){if(vs){vs.audio=null;speakFrom(vs.pos||0);}});}
+  else{var at=vs.pos||0;at=at>0?vs.text.lastIndexOf(' ',at)+1:0;speakFrom(at);}
+ }
+ var serverVoice=null;
+ try{fetch('/api/voice?id=status').then(function(r){return r.ok?r.json():{ready:false};}).then(function(j){serverVoice=!!(j&&j.ready);}).catch(function(){serverVoice=false;});}catch(e){serverVoice=false;}
+ function storyText(v){
+  if(v.matches('.fpo-player')){var c=v.closest('.fpo-card');var q=c&&c.querySelector('.fpo-quote');var nm=c&&c.querySelector('.fpd-farmer b');
+   var who=nm?nm.textContent.trim().split(' ')[0]:'';return (who?'Hi, I’m '+who+'. ':'')+(q?q.textContent.replace(/[“”]/g,'').trim():'');}
+  var card=v.closest('[data-name="Farm story card"]')||v.parentElement;for(var up=0;up<4&&card.querySelectorAll('p').length<3&&card.parentElement;up++)card=card.parentElement;var best='';
+  card.querySelectorAll('p').forEach(function(p){var t=p.textContent.trim();if(t.length>best.length&&!/^Hear /.test(t)&&!/^\d+:\d\d$/.test(t))best=t;});
+  var who2=(v.textContent.match(/Hear ([^,]+)/)||[])[1];if(v.matches('[data-name="Voice"]')&&scr()==='product'&&window.farmilyProduct){var cp0=window.farmilyProduct.current(),fm0=cp0&&window.farmilyProduct.farm(cp0.farm);if(fm0)who2=fm0.who;}
+  if(!who2&&v.matches('[data-name="Player"]')){var r0=root();if(r0)[].some.call(r0.querySelectorAll('p'),function(p){var mm=/^Meet (.+)$/.exec(p.textContent.trim());if(mm)who2=mm[1];return !!mm;});}return (who2?'Hi, I’m '+who2+'. ':'')+best.replace(/[“”]/g,'');
  }
  function playVoice(v){
-  var card=v.closest('[data-name="Farm story card"]')||v.parentElement;for(var up=0;up<4&&card.querySelectorAll('p').length<3&&card.parentElement;up++)card=card.parentElement;var best='';
-  card.querySelectorAll('p').forEach(function(p){var t=p.textContent.trim();if(t.length>best.length&&!/^Hear /.test(t))best=t;});
-  var who=(v.textContent.match(/Hear ([^,]+)/)||[])[1];best=best.replace(/[“”]/g,'');var text=(who?'Hi, I’m '+who+'. ':'')+best;
-  stopVoice();speaking=v;v.classList.add('is-playing');countdown(v);
+  stopVoice();
+  var lab=timeLabel(v);if(lab&&!lab.dataset.fxOrig)lab.dataset.fxOrig=lab.textContent;
+  var m=lab&&/(\d+):(\d\d)/.exec(lab.dataset.fxOrig);
+  var txt0=storyText(v);vs={v:v,text:txt0,screen:scr(),audio:null,utt:null,pos:0,base:0,elapsed:0,startedAt:0,total:estSecs(txt0),paused:false};
   var id=null;try{id=sessionStorage.getItem('farmily-customer-product');}catch(e){}
-  var fm=/^farm-(\w+)/.exec(scr());if(fm)id='farm-'+fm[1];else if(scr()!=='product'||STORY_IDS.indexOf(id)<0)id=null;
-  if(id&&window.Audio){
-   var a=new Audio('/api/voice?id='+encodeURIComponent(id));audio=a;var started=false;
+  var fm=/^farm-(\w+)/.exec(scr());if(fm)id='farm-'+fm[1];else if(v.matches('.fpo-player')){var f=cardFarm();id=f?'farm-'+f:null;}else if(scr()!=='product'||STORY_IDS.indexOf(id)<0)id=null;
+  startClock();paintState();
+  if(id&&serverVoice===true&&window.Audio){
+   var a=new Audio('/api/voice?id='+encodeURIComponent(id));vs.audio=a;var me=vs,started=false;
+   try{var w=new SpeechSynthesisUtterance(' ');w.volume=0;speechSynthesis.speak(w);}catch(e){}
+   var fallback=function(){if(vs===me&&me.audio===a&&!started){me.audio=null;try{a.pause();}catch(e){}if(!me.paused)speakFrom(0);}};
    a.onplaying=function(){started=true;};
-   a.onended=function(){if(speaking===v)stopVoice();};
-   a.onerror=function(){if(audio===a&&!started){audio=null;speak(v,text);}};
-   var p=a.play();if(p&&p.catch)p.catch(function(){if(audio===a&&!started){audio=null;speak(v,text);}});
+   a.onended=function(){if(vs===me)stopVoice();};
+   a.onerror=fallback;setTimeout(fallback,4000);
+   var p=a.play();if(p&&p.catch)p.catch(fallback);
    return;
   }
-  speak(v,text);
+  speakFrom(0);
+ }
+ // How long the story takes to read aloud (about 2.5 words a second), so labels match the voice.
+ function estSecs(text){var w=(text.match(/\S+/g)||[]).length;return Math.max(3,Math.round(w/2.5+0.6));}
+ function fmt(sec){return Math.floor(sec/60)+':'+('0'+sec%60).slice(-2);}
+ function labelPaint(v){
+  if(vs&&vs.v===v)return;var lab=timeLabel(v);if(!lab)return;var text=storyText(v);if(!text)return;
+  var want=fmt(estSecs(text));
+  if(v.matches('[data-name="Voice"]')){var who=(text.match(/^Hi, I’m ([^.]+)\./)||[])[1];if(who){setText(lab,'Hear '+who+', '+want);return;}}
+  setText(lab,lab.textContent.replace(/\d+:\d\d/,want));
+ }
+ function voiceTap(v){if(vs&&vs.v===v){if(vs.paused)resumeVoice();else pauseVoice();}else playVoice(v);}
+ // Mark play buttons so they can show pause while playing; stop when the page is left.
+ function voicePaint(){
+  document.querySelectorAll(PLAYERS).forEach(function(v){var b=playBtn(v);if(b)b.classList.add('fx-vbtn');labelPaint(v);});
+  if(vs&&(!vs.v.isConnected||scr()!==vs.screen))stopVoice();
+  paintState();
  }
  try{speechSynthesis.getVoices();speechSynthesis.onvoiceschanged=function(){};}catch(e){}
  window.addEventListener('hashchange',stopVoice);
+ document.addEventListener('visibilitychange',function(){if(document.hidden)pauseVoice();});
+ style.textContent+=[
+  '.fx-vbtn{position:relative;cursor:pointer}',
+  '.fx-vbtn.fx-pausebtn>*{opacity:0}',
+  '.fx-vbtn.fx-pausebtn::after{content:"";position:absolute;inset:0;margin:auto;width:10px;height:12px;background:linear-gradient(90deg,#fff 0 3.5px,transparent 3.5px 6.5px,#fff 6.5px 10px);border-radius:1px}'
+ ].join('\n');
 
  // ---------- Product page: "Add to cart · SGD total" follows the quantity ----------
  function addPaint(){
   if(scr()!=='product')return;var r=root();
-  var price=r.querySelector('[data-node-id="1673:7026"]');var btn=r.querySelector('[data-node-id="1447:3411"] p');
-  if(!price||!btn||/Sold out/i.test(btn.textContent))return;
-  var unit=parseFloat((price.textContent.match(/(\d+(?:\.\d+)?)/)||[])[1]||'0');
+  var btn=r.querySelector('[data-node-id="1447:3411"] p');var cp=window.farmilyProduct&&window.farmilyProduct.current();if(!btn||!cp)return;
+  if(cp.soldOut){setText(btn,'Sold out');return;}
+  var unit=parseFloat(String(cp.price).replace(/[^\d.]/g,''))||0;
   var q=r.querySelector('[data-name="Action bar"] [data-name="Plus"]');q=q&&q.parentElement.querySelector('p');
   var n=q?parseInt(q.textContent,10)||1:1;
   if(unit)setText(btn,'Add to cart · '+money(unit*n));
@@ -325,6 +384,57 @@
  // Profile: the last row clears the floating tab bar, so it can be scrolled into full view.
  style.textContent+='\n.fx-restart{margin-bottom:116px!important}';
 
+ // ---------- Fresh picks: product details slide up like the farm details ----------
+ // The up arrow opens the full product page with the Fresh picks top bar (name and a down
+ // button), story-style dashes on the photo, and the Pass / Ask / Add buttons.
+ var fromEx=null; // {screen, product, seen, at}
+ var EX_TOP='<div class="fpd-top"><b></b><span class="fp-up fp-down" data-fx-exdown="1"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M6 13l6 6 6-6"/></svg></span></div>';
+ var EX_ACT='<div class="fpd-actions">'+
+  '<span class="fpd-btn fpd-pass" data-fx-exact="Pass"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></span>'+
+  '<span class="fpd-btn fpd-chat" data-fx-exact="Ask the farmer"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M4 5h16v11H9l-5 4z"/></svg></span>'+
+  '<span class="fpd-btn fpd-like" data-fx-exact="Like"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 4h2l2.4 11h11L21 7H6.2"/><circle cx="9" cy="19.5" r="1.5"/><circle cx="17" cy="19.5" r="1.5"/></svg></span></div>';
+ function exDetailPaint(){
+  var r=root();var on=false;
+  if(fromEx){
+   var cp=null;try{cp=sessionStorage.getItem('farmily-customer-product');}catch(e){}
+   if(scr()==='product'&&cp===fromEx.product){on=true;fromEx.seen=true;}
+   else if(fromEx.seen||Date.now()-fromEx.at>3000)fromEx=null;
+  }
+  if(r)r.classList.toggle('fx-ex',on);
+  var ui=document.querySelector('.fx-exui');
+  if(!on){if(ui)ui.remove();return;}
+  if(!ui||ui.parentElement!==r){if(ui)ui.remove();ui=document.createElement('div');ui.className='fx-exui';ui.innerHTML=EX_TOP+EX_ACT;r.appendChild(ui);}
+  var p=window.farmilyProduct&&window.farmilyProduct.current();setText(ui.querySelector('.fpd-top b'),p?p.name:'');
+ }
+ function exBack(action){
+  var to=fromEx?fromEx.screen:'ex-swipe';fromEx=null;exDetailPaint();location.hash='#'+to;
+  if(!action)return;var n=0;
+  (function wait(){var b=document.querySelector('.screen [data-name="Actions"] [data-name="'+action+'"]');if(b&&scr()===to){setTimeout(function(){b.click();},60);return;}if(++n<40)setTimeout(wait,50);})();
+ }
+ style.textContent+=[
+  '.fx-exui{position:fixed;inset:0;z-index:60;pointer-events:none;display:flex;flex-direction:column}',
+  '.fx-exui .fpd-top,.fx-exui .fpd-btn{pointer-events:auto}',
+  '.fx-exui .fpd-top{animation:fpdIn .3s cubic-bezier(.3,1,.4,1)}',
+  '.screen.fx-ex [data-node-id="1447:3373"]{animation:fpdIn .3s cubic-bezier(.3,1,.4,1)}',
+  '.screen.fx-ex [data-node-id="1447:3373"] [data-name="Hero"]{margin-top:62px}',
+  '.screen.fx-ex [data-node-id="1447:3376"],.screen.fx-ex [data-node-id="1447:3377"],.screen.fx-ex [data-node-id="1710:2416"],.screen.fx-ex [data-name="Action bar"]{display:none!important}',
+  '.screen.fx-ex .pp-bars{display:flex!important}',
+  '.screen.fx-ex [data-node-id="1447:3373"]::after{content:"";display:block;height:110px;flex-shrink:0}'
+ ].join('\n');
+
+ // ---------- Sprout's bubble: once seen, it stays tucked away for 5 minutes ----------
+ var SAY='farmily-customer-sprout',sayTap=0;
+ window.addEventListener('pointerdown',function(e){if(e.target.closest&&e.target.closest('[data-name="Sprout says"]'))sayTap=Date.now();},true);
+ new MutationObserver(function(list){
+  var done=[];list.forEach(function(m){var n=m.target;if(done.indexOf(n)>=0)return;done.push(n);
+   if(!n.classList||!n.classList.contains('fp-say-in')||n.classList.contains('fp-say-closed')||n.getAttribute('data-name')!=='Sprout says')return;
+   var key=(/^ex-/.test(scr())?exMode():'')+':'+(cardProduct()||cardFarm()||'');var seen=get(SAY,{});var now=Date.now();
+   if(now-sayTap<1500){seen[key]=now;put(SAY,seen);return;}
+   if(seen[key]&&now-seen[key]<5*60*1000){n.classList.remove('fp-say-in');n.classList.add('fp-say-closed');return;}
+   seen[key]=now;put(SAY,seen);
+  });
+ }).observe(document.documentElement,{subtree:true,attributes:true,attributeFilter:['class']});
+
  // ---------- Clicks ----------
  window.addEventListener('click',function(e){
   var t=e.target;if(!t.closest)return;var s=scr();
@@ -338,7 +448,10 @@
   var lp=t.closest('[data-fx-product]');if(lp){e.stopPropagation();e.preventDefault();var id=lp.getAttribute('data-fx-product');try{sessionStorage.setItem('farmily-customer-product',id);sessionStorage.setItem('farmily-customer-farm',PINFO[id][3]);}catch(err){}location.hash='#product';return;}
   var lf=t.closest('[data-fx-farm]');if(lf){e.stopPropagation();e.preventDefault();location.hash='#farm-'+lf.getAttribute('data-fx-farm');return;}
   // Fresh picks: the up arrow opens the full product page, so details always match.
-  if(/^ex-/.test(s)&&exMode()==='products'&&t.closest('[data-name="FP up"]')){var cp=cardProduct();if(cp&&PINFO[cp]){e.stopPropagation();e.preventDefault();try{sessionStorage.setItem('farmily-customer-product',cp);sessionStorage.setItem('farmily-customer-farm',PINFO[cp][3]);}catch(err){}location.hash='#product';return;}}
+  if(/^ex-/.test(s)&&exMode()==='products'&&t.closest('[data-name="FP up"]')){var cp=cardProduct();if(cp&&PINFO[cp]){e.stopPropagation();e.preventDefault();try{sessionStorage.setItem('farmily-customer-product',cp);sessionStorage.setItem('farmily-customer-farm',PINFO[cp][3]);}catch(err){}fromEx={screen:s,product:cp,seen:false,at:Date.now()};location.hash='#product';return;}}
+  // Product details from Fresh picks: down goes back; Pass / Ask / Add act on the card.
+  if(t.closest('[data-fx-exdown]')){e.stopPropagation();e.preventDefault();exBack(null);return;}
+  var xa=t.closest('[data-fx-exact]');if(xa){e.stopPropagation();e.preventDefault();exBack(xa.getAttribute('data-fx-exact'));return;}
   // Explore: Ask the farmer carries the product (or farm) into the chat.
   if(/^ex-/.test(s)&&t.closest('[data-name="Ask the farmer"]')&&window.farmilyChat){var mp=exMode()==='products'?cardProduct():null;var mf=mp&&PINFO[mp]?PINFO[mp][3]:cardFarm();if(mf)window.farmilyChat.prepare(mf,mp);}
   // Name: Continue needs a name.
@@ -360,8 +473,8 @@
    var btn=t.closest('[data-name="Checkout bar"] [data-name="Button"]');if(btn&&btn.classList.contains('fx-blocked')){e.stopPropagation();e.preventDefault();return;}
   }
   // Story voice.
-  var play=t.closest('[data-name="Voice"] [data-name="Play"],[data-name="Player"] [data-name="Play"]');
-  if(play){e.stopPropagation();e.preventDefault();var v=play.closest('[data-name="Voice"],[data-name="Player"]');if(speaking===v)stopVoice();else playVoice(v);return;}
+  var play=t.closest('.fx-vbtn');
+  if(play){e.stopPropagation();e.preventDefault();var v=play.closest(PLAYERS);if(v)voiceTap(v);return;}
   // Onboarding picks: save after the app toggles the choice.
   if((s==='gs-interests'&&t.closest('[data-name="Interest tile"]'))||(s==='gs-values'&&t.closest('[data-name="Chip"]'))){
    var el=t.closest('[data-name="Interest tile"],[data-name="Chip"]');var label=el.textContent.trim();setTimeout(function(){picksSave(label);},0);
@@ -372,7 +485,7 @@
  var busy=false,queued=false;
  function apply(){
   var r=root();if(!r)return;busy=true;
-  try{nameFix(r);picksInit(r);heartsPaint();basketPaint();addPaint();likeFromToast();exPaint();mePaint();chatListPaint();}catch(err){}
+  try{nameFix(r);picksInit(r);heartsPaint();basketPaint();addPaint();likeFromToast();exPaint();mePaint();chatListPaint();voicePaint();exDetailPaint();}catch(err){}
   busy=false;
  }
  new MutationObserver(function(){if(busy||queued)return;queued=true;setTimeout(function(){queued=false;apply();},0);}).observe(document.documentElement,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:['data-screen']});

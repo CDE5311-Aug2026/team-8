@@ -54,7 +54,7 @@
    setImg(hdr.querySelector(':scope > img')||hdr.querySelector('img'),d.cover);
    setImg(q('I1447:3515;1348:978')&&q('I1447:3515;1348:978').querySelector('img')||q('I1447:3515;1348:978'),d.logo);
    setText(q('I1447:3515;1358:1007'),d.name);setText(q('I1447:3515;1348:982'),d.loc);setText(q('I1447:3515;1539:4886;1447:7381'),d.certs[0]);setText(q('I1447:3515;1348:996'),d.rating);
-   setText(q('1447:3519'),'Meet '+d.who);setText(q('I1447:3520;1322:970'),d.full);setText(q('I1447:3520;1322:971'),d.role);setText(q('I1447:3520;1322:972'),d.quote);setText(q('I1447:3520;1322:1002'),d.dur);
+   setText(q('1447:3519'),'Meet '+d.who);setText(q('I1447:3520;1322:970'),d.full);setText(q('I1447:3520;1322:971'),d.role);setText(q('I1447:3520;1322:972'),d.quote);
    var ph=q('I1447:3520;1322:968');setImg(ph&&(ph.tagName==='IMG'?ph:ph.querySelector('img')),d.portrait);
    ['1556:10649','1556:10650','1556:10651','1556:10652'].forEach(function(c,i){setText(q('I'+c+';1088:285'),d.chips[i]);});
    // Certifications list: one row per certificate.
