@@ -48,6 +48,8 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
   const fail = (status: number, error: string) => { res.statusCode = status; res.setHeader('Content-Type', 'application/json'); res.setHeader('Cache-Control', 'no-store'); res.end(JSON.stringify({ error })); };
   if (req.method !== 'GET') { res.setHeader('Allow', 'GET'); return fail(405, 'Use GET.'); }
   const id = new URL(req.url || '', 'http://x').searchParams.get('id') || '';
+  // The app asks once whether the natural voice is available, so it can fall back instantly.
+  if (id === 'status') { res.statusCode = 200; res.setHeader('Content-Type', 'application/json'); res.setHeader('Cache-Control', 'no-store'); return res.end(JSON.stringify({ ready: Boolean(process.env.OPENAI_API_KEY) })); }
   const script = scriptFor(id);
   if (!script) return fail(404, 'No story for this product.');
   if (!process.env.OPENAI_API_KEY) return fail(503, 'Voice is not configured.');

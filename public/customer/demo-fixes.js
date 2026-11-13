@@ -188,23 +188,30 @@
  }
  function speak(v,text){
   if(!('speechSynthesis' in window)){stopVoice();return;}
-  var u=new SpeechSynthesisUtterance(text);var b=bestVoice();if(b){u.voice=b;u.lang=b.lang;}else u.lang='en-GB';u.rate=0.98;u.pitch=1.02;
+  var u=new SpeechSynthesisUtterance(text);var b=bestVoice();if(b){u.voice=b;u.lang=b.lang;}else u.lang='en-GB';u.rate=0.98;u.pitch=1.02;u.volume=1;
   u.onend=u.onerror=function(){if(speaking===v)stopVoice();};
-  try{speechSynthesis.speak(u);}catch(e){stopVoice();}
+  try{speechSynthesis.cancel();speechSynthesis.resume();speechSynthesis.speak(u);}catch(e){stopVoice();}
  }
+ // Ask once whether the natural voice is set up; if not, go straight to the browser voice
+ // inside the tap (phones only allow speech that starts from a tap).
+ var serverVoice=null;
+ try{fetch('/api/voice?id=status').then(function(r){return r.ok?r.json():{ready:false};}).then(function(j){serverVoice=!!(j&&j.ready);}).catch(function(){serverVoice=false;});}catch(e){serverVoice=false;}
  function playVoice(v){
   var card=v.closest('[data-name="Farm story card"]')||v.parentElement;for(var up=0;up<4&&card.querySelectorAll('p').length<3&&card.parentElement;up++)card=card.parentElement;var best='';
-  card.querySelectorAll('p').forEach(function(p){var t=p.textContent.trim();if(t.length>best.length&&!/^Hear /.test(t))best=t;});
+  card.querySelectorAll('p').forEach(function(p){var t=p.textContent.trim();if(t.length>best.length&&!/^Hear /.test(t)&&!/^\d+:\d\d$/.test(t))best=t;});
   var who=(v.textContent.match(/Hear ([^,]+)/)||[])[1];best=best.replace(/[“”]/g,'');var text=(who?'Hi, I’m '+who+'. ':'')+best;
   stopVoice();speaking=v;v.classList.add('is-playing');countdown(v);
   var id=null;try{id=sessionStorage.getItem('farmily-customer-product');}catch(e){}
   var fm=/^farm-(\w+)/.exec(scr());if(fm)id='farm-'+fm[1];else if(scr()!=='product'||STORY_IDS.indexOf(id)<0)id=null;
-  if(id&&window.Audio){
+  if(id&&serverVoice===true&&window.Audio){
    var a=new Audio('/api/voice?id='+encodeURIComponent(id));audio=a;var started=false;
+   // Keep speech allowed for a fallback that starts after the tap.
+   try{var w=new SpeechSynthesisUtterance(' ');w.volume=0;speechSynthesis.speak(w);}catch(e){}
+   function fallback(){if(audio===a&&!started){audio=null;try{a.pause();}catch(e){}speak(v,text);}}
    a.onplaying=function(){started=true;};
    a.onended=function(){if(speaking===v)stopVoice();};
-   a.onerror=function(){if(audio===a&&!started){audio=null;speak(v,text);}};
-   var p=a.play();if(p&&p.catch)p.catch(function(){if(audio===a&&!started){audio=null;speak(v,text);}});
+   a.onerror=fallback;setTimeout(fallback,4000);
+   var p=a.play();if(p&&p.catch)p.catch(fallback);
    return;
   }
   speak(v,text);
