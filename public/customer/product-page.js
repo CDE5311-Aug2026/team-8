@@ -114,6 +114,7 @@
  var byMatch={};for(var id in products)byMatch[products[id].match]=id;
  var tea=products.tea;
  function current(){try{return products[sessionStorage.getItem(key)]||tea;}catch(e){return tea;}}
+ window.farmilyProduct={current:current};
  // [layer name or node id, text on the tea page, field] for every product field on the page.
  function rules(p){
   var f=farms[p.farm],t=tea,ft=farms.gv,m={};
@@ -177,10 +178,21 @@
  function setSrc(img,want){if(!img)return;var preset=img.getAttribute('data-preset')||img.getAttribute('src');if(preset!==want){img.removeAttribute('data-preset');img.setAttribute('src',want);}}
  function page(){var name=document.querySelector('[data-node-id="1673:7018"]');return name?name.closest('[data-node-id="1447:3373"]')||document.body:null;}
  var shown=0,shownFor=null;
+ // The photos sit side by side on a track that follows the shopper's finger.
+ function track(hero,p){
+  var box=hero.querySelector('[data-name="Product photo"]');if(!box)return null;
+  var t=box.querySelector('.pp-track');
+  if(!t){t=document.createElement('div');t.className='pp-track';box.appendChild(t);}
+  var key=p.photos.join('|');
+  if(t.getAttribute('data-for')!==key){t.setAttribute('data-for',key);t.innerHTML='';
+   p.photos.forEach(function(src){var img=document.createElement('img');img.className='pp-img';img.alt='';img.draggable=false;img.src=src;t.appendChild(img);});}
+  return t;
+ }
+ function slide(t,dx,animate){if(!t)return;t.style.transition=animate?'transform .32s cubic-bezier(.25,1,.4,1)':'none';t.style.transform='translateX(calc('+(-shown*100)+'% + '+(dx||0)+'px))';}
  function photo(root,p){
   var hero=root.querySelector('[data-name="Hero"]');if(!hero)return;
   if(shownFor!==p)shown=0;shownFor=p;if(shown>=p.photos.length)shown=0;
-  setSrc(hero.querySelector('[data-name="Product photo"] img'),p.photos[shown]);
+  var t=track(hero,p);if(t&&!dragging){var was=t.getAttribute('data-shown');if(was!==String(shown)){slide(t,0,was!=null);t.setAttribute('data-shown',String(shown));}}
   var two=p.photos.length>1;
   // Label: touched up on the first photo, "Original photo" on the farmer's own photo.
   var label=null,w=document.createTreeWalker(hero,NodeFilter.SHOW_TEXT),n;
@@ -191,8 +203,10 @@
    var icon=chip.querySelector('img,svg');if(icon)icon.style.display=want==='Original photo'?'none':'';}
   var d1=hero.querySelector('[data-node-id="1710:2417"]'),d2=hero.querySelector('[data-node-id="1710:2418"]');
   if(d1&&d2){var dots=d1.parentElement;dots.style.display=two?'':'none';
-   [d1,d2].forEach(function(d,i){if(d.getAttribute('data-w')==null)d.setAttribute('data-w',d.getBoundingClientRect().width||(i?6:16));
-    var on=i===shown;d.style.width=(on?16:6)+'px';d.style.opacity=on?'1':'0.6';});}
+   [d1,d2].forEach(function(d,i){var on=i===shown;d.style.width=(on?16:6)+'px';d.style.opacity=on?'1':'0.6';});}
+  // Story-style dashes across the top (shown when the page opens from Fresh picks).
+  var bars=hero.querySelector('.pp-bars');if(!bars){bars=document.createElement('div');bars.className='fp-bars pp-bars';hero.appendChild(bars);}
+  var bh=p.photos.map(function(x,i){return '<span class="'+(i<=shown?'on':'')+'"></span>';}).join('');if(bars.innerHTML!==bh)bars.innerHTML=bh;bars.style.display=two?'':'none';
   hero.style.cursor=two?'pointer':'';
  }
  // Farmer photos with a caption (Figma component "Story photo"). Built once, then refilled.
@@ -237,7 +251,7 @@
    if(root){
     var p=current(),map=p===tea?null:rules(p);if(map)map.__farm=farms[p.farm].name;
     // "More like this" cards keep their own names.
-    swapText(root,map,'[data-name="Product card"]');
+    swapText(root,map,'[data-name="Product card"],[data-node-id="1447:3411"]');
     root.querySelectorAll('[data-name="Dots"]').forEach(function(row){
      var label=row.parentElement&&row.parentElement.querySelector('p');var name=label&&label.textContent.trim(),level=null;
      p.taste.forEach(function(t){if(t[0]===name)level=t[1];});
@@ -289,10 +303,20 @@
   try{sessionStorage.setItem(key,id);sessionStorage.setItem(farmKey,products[id].farm);}catch(err){}
   shown=0;
  },true);
- // Swipe the photo.
- var sx=null,swiped=false;
- document.addEventListener('pointerdown',function(e){sx=e.target.closest&&e.target.closest('[data-name="Hero"]')?e.clientX:null;},true);
- document.addEventListener('pointerup',function(e){if(sx==null)return;var dx=e.clientX-sx;sx=null;if(Math.abs(dx)<40||!page())return;var p=current();if(p.photos.length<2)return;swiped=true;shown=(shown+(dx<0?1:-1)+p.photos.length)%p.photos.length;apply();},true);
+ // Swipe the photo: it follows the finger, then settles on the next photo (wrapping round).
+ var sx=null,sy=null,dragging=false,swiped=false;
+ function heroTrack(){var h=document.querySelector('.screen [data-name="Hero"]');return h&&h.querySelector('.pp-track');}
+ document.addEventListener('pointerdown',function(e){var h=e.target.closest&&e.target.closest('[data-name="Hero"]');if(!h||!page()||e.target.closest('[data-name="Icon button"]')){sx=null;return;}sx=e.clientX;sy=e.clientY;dragging=false;},true);
+ document.addEventListener('pointermove',function(e){if(sx==null)return;var p=current();if(p.photos.length<2)return;var dx=e.clientX-sx,dy=e.clientY-sy;
+  if(!dragging){if(Math.abs(dx)<6||Math.abs(dx)<Math.abs(dy)){if(Math.abs(dy)>10)sx=null;return;}dragging=true;}
+  var t=heroTrack();var atEnd=(dx<0&&shown===p.photos.length-1)||(dx>0&&shown===0);slide(t,atEnd?dx*0.35:dx,false);},true);
+ function release(e){if(sx==null)return;var dx=(e.clientX||sx)-sx;sx=null;var was=dragging;dragging=false;if(!page())return;var p=current();if(p.photos.length<2)return;
+  var t=heroTrack();var w=t?t.getBoundingClientRect().width/p.photos.length:400;
+  if(was)swiped=true;
+  if(Math.abs(dx)>Math.min(60,w*0.18)){swiped=true;shown=(shown+(dx<0?1:-1)+p.photos.length)%p.photos.length;}
+  slide(t,0,true);if(t)t.setAttribute('data-shown',String(shown));apply();}
+ document.addEventListener('pointerup',release,true);
+ document.addEventListener('pointercancel',function(e){if(sx==null)return;sx=null;dragging=false;slide(heroTrack(),0,true);},true);
  var queued=false;
  new MutationObserver(function(){if(busy||queued)return;queued=true;setTimeout(function(){queued=false;apply();},0);}).observe(document.documentElement,{subtree:true,childList:true,characterData:true});
  document.addEventListener('DOMContentLoaded',apply);

@@ -2905,3 +2905,11 @@ body[data-fpchat="other"] [data-name="Chat / Green Valley Farm"] [data-name="Con
 /* iPhone Safari only sends a tap to the page-level click listeners in browse.js when the tapped
    element looks clickable. See all, the search bar, category tiles and browse rows get a pointer. */
 .screen [data-name="Button"],.screen [data-name="Category tile"],.screen [data-node-id="1447:3337"] [data-node-id="1090:313"],.screen [data-name="Section title"] [data-node-id],.br-screen [data-br-back],.br-screen [data-br-clear],.br-screen [data-br-cat],.br-screen [data-br-tipx],.br-screen [data-br-ask],.br-screen [data-br-chat],.br-screen [data-br-farm],.br-screen [data-br-product],.screen [data-node-id="1447:3373"] [data-name="Hero"]{cursor:pointer}
+
+/* ===== Product photo track (product page) ===== */
+.screen [data-node-id="1447:3373"] [data-name="Hero"],.screen [data-node-id="1447:3373"] [data-name="Product photo"]{width:100%!important}
+.screen [data-node-id="1447:3373"] [data-node-id="1447:3377"],.screen [data-node-id="1447:3373"] [data-node-id="1710:2416"]{left:auto!important;right:16px!important}
+[data-name="Product photo"] > img:not(.pp-img){visibility:hidden}
+.pp-track{position:absolute;inset:0;display:flex;will-change:transform;pointer-events:none}
+.pp-img{flex:0 0 100%;width:100%;height:100%;object-fit:cover;display:block;user-select:none;-webkit-user-drag:none}
+.pp-bars{display:none!important}
