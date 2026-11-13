@@ -114,7 +114,7 @@
  var byMatch={};for(var id in products)byMatch[products[id].match]=id;
  var tea=products.tea;
  function current(){try{return products[sessionStorage.getItem(key)]||tea;}catch(e){return tea;}}
- window.farmilyProduct={current:current};
+ window.farmilyProduct={current:current,farm:function(id){return farms[id];}};
  // [layer name or node id, text on the tea page, field] for every product field on the page.
  function rules(p){
   var f=farms[p.farm],t=tea,ft=farms.gv,m={};
@@ -251,7 +251,7 @@
    if(root){
     var p=current(),map=p===tea?null:rules(p);if(map)map.__farm=farms[p.farm].name;
     // "More like this" cards keep their own names.
-    swapText(root,map,'[data-name="Product card"],[data-node-id="1447:3411"]');
+    swapText(root,map,'[data-name="Product card"],[data-node-id="1447:3411"],[data-name="Voice"]');
     root.querySelectorAll('[data-name="Dots"]').forEach(function(row){
      var label=row.parentElement&&row.parentElement.querySelector('p');var name=label&&label.textContent.trim(),level=null;
      p.taste.forEach(function(t){if(t[0]===name)level=t[1];});

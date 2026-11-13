@@ -223,13 +223,14 @@
    var who=nm?nm.textContent.trim().split(' ')[0]:'';return (who?'Hi, I’m '+who+'. ':'')+(q?q.textContent.replace(/[“”]/g,'').trim():'');}
   var card=v.closest('[data-name="Farm story card"]')||v.parentElement;for(var up=0;up<4&&card.querySelectorAll('p').length<3&&card.parentElement;up++)card=card.parentElement;var best='';
   card.querySelectorAll('p').forEach(function(p){var t=p.textContent.trim();if(t.length>best.length&&!/^Hear /.test(t)&&!/^\d+:\d\d$/.test(t))best=t;});
-  var who2=(v.textContent.match(/Hear ([^,]+)/)||[])[1];return (who2?'Hi, I’m '+who2+'. ':'')+best.replace(/[“”]/g,'');
+  var who2=(v.textContent.match(/Hear ([^,]+)/)||[])[1];if(v.matches('[data-name="Voice"]')&&scr()==='product'&&window.farmilyProduct){var cp0=window.farmilyProduct.current(),fm0=cp0&&window.farmilyProduct.farm(cp0.farm);if(fm0)who2=fm0.who;}
+  if(!who2&&v.matches('[data-name="Player"]')){var r0=root();if(r0)[].some.call(r0.querySelectorAll('p'),function(p){var mm=/^Meet (.+)$/.exec(p.textContent.trim());if(mm)who2=mm[1];return !!mm;});}return (who2?'Hi, I’m '+who2+'. ':'')+best.replace(/[“”]/g,'');
  }
  function playVoice(v){
   stopVoice();
   var lab=timeLabel(v);if(lab&&!lab.dataset.fxOrig)lab.dataset.fxOrig=lab.textContent;
   var m=lab&&/(\d+):(\d\d)/.exec(lab.dataset.fxOrig);
-  vs={v:v,text:storyText(v),screen:scr(),audio:null,utt:null,pos:0,base:0,elapsed:0,startedAt:0,total:m?(+m[1])*60+(+m[2]):20,paused:false};
+  var txt0=storyText(v);vs={v:v,text:txt0,screen:scr(),audio:null,utt:null,pos:0,base:0,elapsed:0,startedAt:0,total:estSecs(txt0),paused:false};
   var id=null;try{id=sessionStorage.getItem('farmily-customer-product');}catch(e){}
   var fm=/^farm-(\w+)/.exec(scr());if(fm)id='farm-'+fm[1];else if(v.matches('.fpo-player')){var f=cardFarm();id=f?'farm-'+f:null;}else if(scr()!=='product'||STORY_IDS.indexOf(id)<0)id=null;
   startClock();paintState();
@@ -245,10 +246,19 @@
   }
   speakFrom(0);
  }
+ // How long the story takes to read aloud (about 2.5 words a second), so labels match the voice.
+ function estSecs(text){var w=(text.match(/\S+/g)||[]).length;return Math.max(3,Math.round(w/2.5+0.6));}
+ function fmt(sec){return Math.floor(sec/60)+':'+('0'+sec%60).slice(-2);}
+ function labelPaint(v){
+  if(vs&&vs.v===v)return;var lab=timeLabel(v);if(!lab)return;var text=storyText(v);if(!text)return;
+  var want=fmt(estSecs(text));
+  if(v.matches('[data-name="Voice"]')){var who=(text.match(/^Hi, I’m ([^.]+)\./)||[])[1];if(who){setText(lab,'Hear '+who+', '+want);return;}}
+  setText(lab,lab.textContent.replace(/\d+:\d\d/,want));
+ }
  function voiceTap(v){if(vs&&vs.v===v){if(vs.paused)resumeVoice();else pauseVoice();}else playVoice(v);}
  // Mark play buttons so they can show pause while playing; stop when the page is left.
  function voicePaint(){
-  document.querySelectorAll(PLAYERS).forEach(function(v){var b=playBtn(v);if(b)b.classList.add('fx-vbtn');});
+  document.querySelectorAll(PLAYERS).forEach(function(v){var b=playBtn(v);if(b)b.classList.add('fx-vbtn');labelPaint(v);});
   if(vs&&(!vs.v.isConnected||scr()!==vs.screen))stopVoice();
   paintState();
  }
