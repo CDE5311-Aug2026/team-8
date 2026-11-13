@@ -7,3 +7,5 @@
 
 .voice-field-dialog{--v2-green:#074226}
 .brand-v2-loading-head{display:flex;flex-direction:column;align-items:center;gap:12px}.brand-v2-loading-head>p{margin:0;font:400 15px/22px "Figtree",sans-serif;color:#ffffffa6}
+
+button.brand-v2-photo-tile{padding:0;flex-direction:column;color:inherit;font:inherit}

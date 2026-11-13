@@ -129,3 +129,5 @@
 .refined-brand .refined-looks{scroll-padding-left:16px;scroll-padding-right:16px}.refined-brand .refined-board strong,.refined-brand .refined-board b,.refined-brand .refined-board small{color:inherit}
 
 .refined-pick .refined-option-description{display:flex;flex-direction:column;gap:6px}.refined-option-description>em{display:block;font-size:11px;line-height:16px;font-style:italic;color:#6e6e69}
+
+.refined-prompts button[aria-pressed="true"]{background:#074226;border-color:#074226;color:white}

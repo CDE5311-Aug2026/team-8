@@ -1,4 +1,4 @@
-import {isShowcaseProduct,showcaseListingPhotos} from './showcaseProduct.ts';
+import {isShowcaseProduct,showcaseListingPhotos,showcaseGallery} from './showcaseProduct.ts';
 // Demo preset for "Add product": whatever photo the farmer takes or uploads, the app shows
 // Mango Jam and "AI" fills in its details for the farmer to check. Images: public/preset/
 // (made with Figma AI, kept in Figma Drafts → "Preset images – Mango Jam").
@@ -74,7 +74,7 @@ export function presetListingPhotos(template:LabelTemplate|undefined){const set=
 // Listing photos as shoppers see them. Cover and Packed always follow the product's current theme,
 // so changing the theme changes them too. The farmer's own photos (not packaging renders) stay in between.
 export function themedListingPhotos<P extends {url:string;name?:string}>(product:{showcase?:string;id?:string;photo?:string;labelTemplate?:string;listingPhotos?:P[];designTweaks?:{paper?:string;art?:string;layout?:string}}):{url:string;name?:string}[]{
- if(isShowcaseProduct(product))return [...showcaseListingPhotos(),...(product.listingPhotos?.length?product.listingPhotos:showcaseListingPhotos(product.photo)).filter(p=>p.url!==showcaseListingPhotos()[0].url)];
+ if(isShowcaseProduct(product))return showcaseGallery(product);
  const own=product.listingPhotos||[];const set=presetImagesFor(product);if(!set)return own;
  const ownDesign=!!product.designTweaks&&!!(product.designTweaks.paper||product.designTweaks.art||product.designTweaks.layout);
  const matched=presetDesignPhotos(product);

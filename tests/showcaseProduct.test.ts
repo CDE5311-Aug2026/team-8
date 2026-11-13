@@ -1,7 +1,7 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
 import {existsSync} from 'node:fs';
-import {showcaseProductInfo,showcaseProductPrice,showcasePackaging} from '../shared/showcaseProduct.ts';
+import {showcaseProductInfo,showcaseProductPrice,showcasePackaging,showcaseTheme,showcaseGallery} from '../shared/showcaseProduct.ts';
 import {sampleProfile,signature} from '../shared/branding.ts';
 import {existingBrand} from '../shared/brandFlow.ts';
 import {samplePackagingFor} from '../shared/samplePackaging.ts';
@@ -34,3 +34,25 @@ test('legacy migration preserves showcase uploads across draft and published rel
  migrateLegacySamplePhotos({length:keys.length,key:i=>keys[i],getItem:key=>records[key],setItem:(key,value)=>{records[key]=value;}});
  assert.deepEqual(records,before);
 });
+
+for(const template of ['botanical','minimal','market'] as const){
+ test(`${template} packaging survives saving, publication and later theme changes`,()=>{
+  const selected={...product,labelTemplate:template};
+  const restored=restoreProductWork({product:selected,screen:'packaging',reviewed:true,profileSignature:signature(sampleProfile)},sampleProfile)!;
+  assert.equal(restored.product.labelTemplate,template);
+  const work=newPublishWork(restored.product);
+  work.photos[2]={url:showcaseTheme(template).studio,name:'Packed'};
+  const listing=localPublication(work,sampleProfile);
+  assert.equal(listing.photo,showcaseTheme(template).photo);
+  assert.equal(coverPhoto(listing),showcaseTheme(template).photo);
+  assert.equal(samplePackagingFor(listing)?.image,showcaseTheme(template).photo);
+  assert.equal(listing.listingPhotos?.at(-1)?.url,showcaseTheme(template).studio);
+  assert.equal(listing.listingPhotos?.[1].url,photo);
+  const changed:typeof listing={...listing,labelTemplate:template==='market'?'minimal':'market'};
+  const gallery=showcaseGallery(changed);
+  assert.equal(gallery[0].url,showcaseTheme(changed.labelTemplate).photo);
+  assert.equal(gallery.at(-1)?.url,showcaseTheme(changed.labelTemplate).studio);
+  assert.equal(gallery.length,3);
+  assert.equal(restorePublishWork(work,changed),null);
+ });
+}
